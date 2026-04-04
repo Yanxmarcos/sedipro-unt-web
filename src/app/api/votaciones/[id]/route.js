@@ -1,0 +1,93 @@
+import { NextResponse } from 'next/server'
+import { connectToDatabase } from '@/lib/mongodb'
+import Votacion from '@/models/Votacion'
+import Voto from '@/models/Voto'
+import Asistencia from '@/models/Asistencia'
+import Sediprano from '@/models/Sediprano'
+
+export async function GET(request, { params }) {
+    try {
+        await connectToDatabase()
+        const { id } = await params
+
+        const votacion = await Votacion.findById(id).lean()
+        if (!votacion) return NextResponse.json({ message: 'Votación no encontrada' }, { status: 404 })
+
+        const asistencia = await Asistencia.findById(votacion.asistenciaId).lean()
+
+        // Obtener votos con datos de sedipranos
+        const votos = await Voto.find({ votacionId: id }).lean()
+        const sedipranoIds = votos.map(v => v.sedipranoId)
+        const sedipranos = await Sediprano.find({ _id: { $in: sedipranoIds } }).lean()
+        const sedipranoMap = Object.fromEntries(sedipranos.map(s => [s._id.toString(), s]))
+
+        const votosEnriquecidos = votos.map(v => ({
+            ...v,
+            sediprano: sedipranoMap[v.sedipranoId?.toString()] || null,
+        }))
+
+        // Obtener presentes de la asistencia
+        let presentes = []
+        if (asistencia) {
+            const presenteIds = asistencia.registro.filter(r => r.estado === 'presente').map(r => r.sedipranoId)
+            const presentesSedipranos = await Sediprano.find({ _id: { $in: presenteIds } }).lean()
+            const votadosIds = new Set(votos.map(v => v.sedipranoId?.toString()))
+            presentes = presentesSedipranos.map(s => ({
+                ...s,
+                yaVoto: votadosIds.has(s._id.toString()),
+                voto: votos.find(v => v.sedipranoId?.toString() === s._id.toString()) || null,
+            }))
+        }
+
+        return NextResponse.json({ votacion: { ...votacion, asistencia }, votos: votosEnriquecidos, presentes })
+    } catch (error) {
+        console.error('[GET /api/votaciones/[id]]', error)
+        return NextResponse.json({ message: 'Error al obtener votación' }, { status: 500 })
+    }
+}
+
+export async function PUT(request, { params }) {
+    try {
+        await connectToDatabase()
+        const { id } = await params
+        const { titulo, fechaCierre, estado } = await request.json()
+
+        const votacion = await Votacion.findById(id)
+        if (!votacion) return NextResponse.json({ message: 'Votación no encontrada' }, { status: 404 })
+
+        // Verificar si tiene votos
+        const totalVotos = await Voto.countDocuments({ votacionId: id })
+        if (totalVotos > 0) {
+            return NextResponse.json({ message: 'No se puede editar una votación con votos registrados' }, { status: 400 })
+        }
+
+        if (titulo) votacion.titulo = titulo.trim()
+        if (fechaCierre !== undefined) votacion.fechaCierre = fechaCierre ? new Date(fechaCierre) : null
+        if (estado && ['activa', 'cerrada'].includes(estado)) votacion.estado = estado
+
+        await votacion.save()
+        return NextResponse.json({ votacion })
+    } catch (error) {
+        console.error('[PUT /api/votaciones/[id]]', error)
+        return NextResponse.json({ message: 'Error al actualizar votación' }, { status: 500 })
+    }
+}
+
+export async function DELETE(request, { params }) {
+    try {
+        await connectToDatabase()
+        const { id } = await params
+
+        const votacion = await Votacion.findById(id)
+        if (!votacion) return NextResponse.json({ message: 'Votación no encontrada' }, { status: 404 })
+
+        // Eliminar todos los votos primero
+        await Voto.deleteMany({ votacionId: id })
+        await Votacion.findByIdAndDelete(id)
+
+        return NextResponse.json({ message: 'Votación eliminada correctamente' })
+    } catch (error) {
+        console.error('[DELETE /api/votaciones/[id]]', error)
+        return NextResponse.json({ message: 'Error al eliminar votación' }, { status: 500 })
+    }
+}

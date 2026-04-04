@@ -1,26 +1,81 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/aspect-ratio";
+
+@theme {
+	/* Primary */
+	--color-primary: #672577;
+	--color-primary-hover: #7C4191;
+	--color-primary-active: #4A1A5E;
+	--color-primary-light: #D6B6DF;
+
+	/* Secondary */
+	--color-secondary: #3454A1;
+	--color-secondary-hover: #4A6BB8;
+	--color-secondary-active: #1E3A5F;
+	--color-secondary-light: #A8B8D8;
+
+	/* Accent */
+	--color-accent: #2B2D67;
+	--color-accent-hover: #3F425D;
+	--color-accent-dark: #1A1C3A;
+
+	/* Estados UI */
+	--color-success: #10B981;
+	--color-success-light: #D1FAE5;
+	--color-success-dark: #065F46;
+
+	--color-warning: #F59E0B;
+	--color-warning-light: #FEF3C7;
+	--color-warning-dark: #92400E;
+
+	--color-error: #EF4444;
+	--color-error-light: #FEE2E2;
+	--color-error-dark: #991B1B;
+
+	--color-info: #3B82F6;
+	--color-info-light: #DBEAFE;
+	--color-info-dark: #1E40AF;
+
+	/* CRUD */
+	--color-create: #10B981;
+	--color-edit: #3B82F6;
+	--color-delete: #EF4444;
+	--color-view: #6B7280;
+
+	/* --- Tipografía --- */
+	--font-montserrat: "Montserrat", sans-serif;
+	--font-poppins: "Poppins", sans-serif;
+
+	/* --- Sombras --- */
+	--shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+	--shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+
+	/* --- Animaciones --- */
+	--animate-fade-in: fadeIn 0.2s ease-in-out;
+	--animate-slide-down: slideDown 0.3s ease-out;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+@keyframes slideDown {
+	0% {
+		transform: translateY(-10px);
+		opacity: 0;
+	}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	100% {
+		transform: translateY(0);
+		opacity: 1;
+	}
 }
