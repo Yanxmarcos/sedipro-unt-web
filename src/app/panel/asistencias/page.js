@@ -88,12 +88,9 @@ const Ico = {
 
 function formatDate(iso) {
     if (!iso) return '—'
-    return new Date(iso).toLocaleDateString('es-PE', {
-        timeZone: 'America/Lima',
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-    })
+    const [year, month, day] = iso.split('T')[0].split('-')
+    const meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
+    return `${day} ${meses[Number(month) - 1]} ${year}`
 }
 
 function todayISO() {
