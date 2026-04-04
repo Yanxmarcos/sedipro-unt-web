@@ -101,7 +101,12 @@ function EstadoBtn({ estado, active, onClick, readOnly }) {
 
 function formatDate(iso) {
     if (!iso) return '—'
-    return new Date(iso).toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })
+    const [year, month, day] = iso.split('T')[0].split('-')
+    const meses = [
+        'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+        'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+    ]
+    return `${day} de ${meses[Number(month) - 1]} de ${year}`
 }
 
 function SkeletonRows({ dark, count = 8 }) {
