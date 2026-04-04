@@ -31,7 +31,7 @@ export async function POST(request) {
         }))
 
         const asistencia = await Asistencia.create({
-            fecha: new Date(fecha),
+            fecha: new Date(fecha + 'T00:00:00'),
             descripcion: descripcion.trim(),
             registro,
             resumen: {
