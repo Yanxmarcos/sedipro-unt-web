@@ -10,7 +10,10 @@ export async function GET(request) {
         const { searchParams } = new URL(request.url)
         const dni = searchParams.get('dni')
 
-        const ahora = new Date().toLocaleString('es-PE', { timeZone: 'America/Lima'})
+        const peruDate = new Date()
+        const ahora = new Date(
+            peruDate.toLocaleString('en-US', { timeZone: 'America/Lima' })
+        )
 
         const votacion = await Votacion.findOne({
             estado: 'activa',
