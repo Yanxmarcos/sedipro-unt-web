@@ -217,9 +217,19 @@ export default function HomePage() {
                                         </span>
                                     </div>
                                     {error ? (
-                                        <p className="mt-1.5 text-xs font-poppins" style={{ color: '#EF4444' }}>{error}</p>
+                                        <div className="flex items-start gap-2.5 text-sm mt-3 px-3.5 py-3 rounded-lg font-poppins bg-error-light border border-error text-error-dark animate-fade-in">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mt-0.5 shrink-0 text-error"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                                                aria-hidden="true">
+                                                <path strokeLinecap="round" strokeLinejoin="round"
+                                                    d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                                            </svg>
+                                            <span>{error}</span>
+                                        </div>
                                     ) : (
-                                        <p id="dni-hint" className="mt-1.5 text-xs font-poppins text-gray-400">Ingresa los 8 dígitos de tu DNI peruano.</p>
+                                        <p id="dni-hint" className="mt-1.5 text-xs font-poppins text-gray-400">
+                                            Ingresa los 8 dígitos de tu DNI peruano.
+                                        </p>
                                     )}
                                 </div>
 
@@ -266,7 +276,17 @@ export default function HomePage() {
                                     ))}
                                 </div>
 
-                                {error && <p className="text-xs font-poppins text-center" style={{ color: '#EF4444' }}>{error}</p>}
+                                {error &&
+                                    <div className="flex items-start gap-2.5 text-sm px-3.5 py-3 rounded-lg font-poppins bg-error-light border border-error text-error-dark animate-fade-in">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mt-0.5 shrink-0 text-error"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                                            aria-hidden="true">
+                                            <path strokeLinecap="round" strokeLinejoin="round"
+                                                d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                                        </svg>
+                                        <span>{error}</span>
+                                    </div>
+                                }
 
                                 <div className="flex gap-3">
                                     <button onClick={() => { setStep('dni'); setDni(''); setOpcionSeleccionada(''); setError('') }} className="flex-1 py-2.5 rounded-lg font-semibold text-sm font-poppins border transition-all" style={{ borderColor: '#d1d5db', color: '#6b7280' }}>
