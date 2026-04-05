@@ -10,10 +10,7 @@ export async function GET(request) {
         const { searchParams } = new URL(request.url)
         const dni = searchParams.get('dni')
 
-        const peruDate = new Date()
-        const ahora = new Date(
-            peruDate.toLocaleString('en-US', { timeZone: 'America/Lima' })
-        )
+        const ahora = new Date()
 
         const votacion = await Votacion.findOne({
             estado: 'activa',
@@ -26,6 +23,8 @@ export async function GET(request) {
         }).lean()
 
         if (!votacion) {
+            console.log('Server Time:', new Date().toISOString());
+            console.log('Server TZ:', process.env.TZ);
             return NextResponse.json({ activa: false })
         }
 

@@ -88,14 +88,20 @@ const Ico = {
 
 function formatDate(iso) {
     if (!iso) return '—'
-    const [year, month, day] = iso.split('T')[0].split('-')
+    const fecha = new Date(iso)
+    const day = fecha.getDate()
+    const month = fecha.getMonth()
+    const year = fecha.getFullYear()
     const meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
-    return `${day} ${meses[Number(month) - 1]} ${year}`
+    return `${day} ${meses[month]} ${year}`
 }
 
 function todayISO() {
-    const d = new Date()
-    return d.toISOString().slice(0, 10)
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
 }
 
 function ConfirmDialog({ dark, title, message, onConfirm, onCancel }) {

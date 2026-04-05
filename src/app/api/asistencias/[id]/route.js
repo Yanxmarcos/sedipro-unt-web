@@ -47,7 +47,7 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ message: 'Asistencia no encontrada' }, { status: 404 })
         }
 
-        if (fecha) asistencia.fecha = new Date(fecha)
+        if (fecha) asistencia.fecha = new Date(fecha + 'T00:00:00-05:00')
         if (descripcion) asistencia.descripcion = descripcion.trim()
 
         if (registro) {

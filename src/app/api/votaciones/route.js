@@ -51,14 +51,31 @@ export async function POST(request) {
             opcionesFinales = opcionesLimpias
         }
 
+        const convertirFecha = (fechaStr) => {
+            if (!fechaStr) return null
+            const [fecha, hora] = fechaStr.split('T')
+            const [h, m] = hora.split(':')
+            const fechaPeru = new Date(Date.UTC(
+                parseInt(fecha.split('-')[0]),
+                parseInt(fecha.split('-')[1]) - 1,
+                parseInt(fecha.split('-')[2]),
+                parseInt(h) + 5,
+                parseInt(m)
+            ))
+            return fechaPeru
+        }
+
+        const fechaInicioUTC = fechaInicio ? convertirFecha(fechaInicio) : new Date()
+        const fechaCierreUTC = fechaCierre ? convertirFecha(fechaCierre) : null
+
         const votacion = await Votacion.create({
             asistenciaId,
             titulo: titulo.trim(),
             tipo,
             opciones: opcionesFinales,
             estado: 'activa',
-            fechaInicio: fechaInicio ? new Date(fechaInicio) : new Date(),
-            fechaCierre: fechaCierre ? new Date(fechaCierre) : null,
+            fechaInicio: fechaInicioUTC,
+            fechaCierre: fechaCierreUTC,
             resumen: {
                 totalVotos: 0,
                 opciones: opcionesFinales.map(o => ({ opcion: o, votos: 0 })),

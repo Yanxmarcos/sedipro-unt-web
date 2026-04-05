@@ -23,7 +23,6 @@ export async function POST(request) {
             return NextResponse.json({ message: 'Fecha y descripción son requeridos' }, { status: 400 })
         }
 
-        // Obtener todos los sedipranos para inicializar registro
         const sedipranos = await Sediprano.find({}, '_id').lean()
         const registro = sedipranos.map(s => ({
             sedipranoId: s._id,
@@ -31,7 +30,7 @@ export async function POST(request) {
         }))
 
         const asistencia = await Asistencia.create({
-            fecha: new Date(fecha + 'T00:00:00'),
+            fecha: new Date(fecha + 'T00:00:00-05:00'),
             descripcion: descripcion.trim(),
             registro,
             resumen: {

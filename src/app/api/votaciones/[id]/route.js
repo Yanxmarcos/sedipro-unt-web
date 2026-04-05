@@ -55,14 +55,30 @@ export async function PUT(request, { params }) {
         const votacion = await Votacion.findById(id)
         if (!votacion) return NextResponse.json({ message: 'Votación no encontrada' }, { status: 404 })
 
-        // Verificar si tiene votos
         const totalVotos = await Voto.countDocuments({ votacionId: id })
         if (totalVotos > 0) {
             return NextResponse.json({ message: 'No se puede editar una votación con votos registrados' }, { status: 400 })
         }
 
         if (titulo) votacion.titulo = titulo.trim()
-        if (fechaCierre !== undefined) votacion.fechaCierre = fechaCierre ? new Date(fechaCierre) : null
+        
+        if (fechaCierre !== undefined) {
+            if (fechaCierre) {
+                const [fecha, hora] = fechaCierre.split('T')
+                const [h, m] = hora.split(':')
+                const fechaPeru = new Date(Date.UTC(
+                    parseInt(fecha.split('-')[0]),
+                    parseInt(fecha.split('-')[1]) - 1,
+                    parseInt(fecha.split('-')[2]),
+                    parseInt(h) + 5,
+                    parseInt(m)
+                ))
+                votacion.fechaCierre = fechaPeru
+            } else {
+                votacion.fechaCierre = null
+            }
+        }
+        
         if (estado && ['activa', 'cerrada'].includes(estado)) votacion.estado = estado
 
         await votacion.save()
