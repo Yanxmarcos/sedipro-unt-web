@@ -266,15 +266,20 @@ export default function LoginPage() {
 
 				{/* Footer */}
 				<footer className="mt-5 text-center flex flex-col items-center gap-2">
-					<p className="text-xs font-poppins text-gray-400">
+					<p className="text-sm font-poppins text-gray-400">
 						Exclusivo para la directiva de SEDIPRO UNT.
 					</p>
 					<button
 						type="button"
 						onClick={() => router.push('/')}
-						className="text-sm font-poppins text-primary hover:text-primary-hover underline focus:outline-none transition-colors"
+						className="inline-block py-2.5 px-4 rounded-lg font-semibold text-sm font-poppins text-white transition-all duration-200 focus:outline-none text-center"
+						style={{
+							background: 'linear-gradient(135deg, #672577, #3454A1)',
+							boxShadow: '0 4px 14px rgba(103,37,119,0.35)',
+							borderRadius: '12px',
+						}}
 					>
-						Volver al inicio
+						Salir de Aquí
 					</button>
 				</footer>
 			</div>

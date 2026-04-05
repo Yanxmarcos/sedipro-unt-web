@@ -84,6 +84,11 @@ const Ico = {
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
     ),
+    Search: () => (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+    ),
 }
 
 function formatDate(iso) {
@@ -205,6 +210,7 @@ export default function AsistenciasPage() {
     const [deleteTarget, setDeleteTarget] = useState(null)
     const [deleting, setDeleting] = useState(false)
     const [toast, setToast] = useState(null)
+    const [search, setSearch] = useState('')
 
     const t = getTheme(dark)
 
@@ -297,6 +303,12 @@ export default function AsistenciasPage() {
         }
     }
 
+    // Filtrar asistencias por búsqueda
+    const filteredAsistencias = asistencias.filter(a =>
+        a.descripcion?.toLowerCase().includes(search.toLowerCase()) ||
+        formatDate(a.fecha).toLowerCase().includes(search.toLowerCase())
+    )
+
     const inputStyle = (focused) => ({
         width: '100%',
         padding: '10px 14px',
@@ -339,38 +351,48 @@ export default function AsistenciasPage() {
                 />
             )}
 
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '24px', gap: '12px', flexWrap: 'wrap' }}>
-                <div>
-                    <h1 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '22px', color: t.titleText, margin: 0, lineHeight: 1.2 }}>
-                        Asistencias
-                    </h1>
-                    <p style={{ fontSize: '13px', color: t.bodyText, marginTop: '4px', marginBottom: 0 }}>
-                        Registro y control de asistencias
-                    </p>
-                </div>
+            {/* Header con buscador y botón como en votaciones */}
+            <div style={{ marginBottom: '24px' }}>
+                <h1 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '22px', color: t.titleText, margin: 0, lineHeight: 1.2 }}>
+                    Asistencias
+                </h1>
+                <p style={{ fontSize: '13px', color: t.bodyText, marginTop: '4px', marginBottom: 0 }}>
+                    Registro y control de asistencias
+                </p>
+            </div>
 
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    {/* Create button */}
-                    <button
-                        onClick={() => { setShowForm(v => !v); setFormError('') }}
-                        style={{
-                            display: 'flex', alignItems: 'center', gap: '8px',
-                            padding: '10px 18px', borderRadius: '12px', border: 'none',
-                            backgroundColor: showForm ? t.inputBg : 'var(--color-primary)',
-                            border: showForm ? `1px solid ${t.inputBorder}` : 'none',
-                            color: showForm ? t.labelText : '#fff',
-                            fontFamily: 'Poppins, sans-serif', fontSize: '13px', fontWeight: 600,
-                            cursor: 'pointer',
-                            boxShadow: showForm ? 'none' : '0 4px 14px rgba(103,37,119,0.30)',
-                            transition: 'all 0.15s',
-                            whiteSpace: 'nowrap',
-                        }}
-                    >
-                        {showForm ? <><Ico.Close /> Cancelar</> : <><Ico.Plus /> Crear asistencia</>}
-                    </button>
+            {/* Fila de botón y buscador (como en votaciones) */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                <button
+                    onClick={() => { setShowForm(v => !v); setFormError('') }}
+                    className="flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl font-semibold text-sm font-poppins text-white transition-all duration-200"
+                    style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 4px 14px rgba(103,37,119,0.35)' }}
+                >
+                    {showForm ? <><Ico.Close /> Cancelar</> : <><Ico.Plus /> Crear asistencia</>}
+                </button>
+
+                <div style={{ position: 'relative', flex: 1 }}>
+                    <span style={{
+                        position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)',
+                        color: t.bodyText, pointerEvents: 'none', display: 'flex', alignItems: 'center',
+                    }}>
+                        <Ico.Search />
+                    </span>
+                    <input
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder="Buscar por fecha o descripción..."
+                        className="w-full pl-9 pr-4 py-2.5 text-sm font-poppins rounded-xl border focus:outline-none transition-all"
+                        style={
+                            { backgroundColor: dark ? '#2d2b3e' : '#fff', borderColor: dark ? '#3d3b52' : '#d1d5db', color: dark ? '#e2e8f0' : '#1e293b' }
+                        }
+                        onFocus={e => { e.target.style.borderColor = 'var(--color-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(103,37,119,0.13)' }}
+                        onBlur={e => { e.target.style.borderColor = t.inputBorder; e.target.style.boxShadow = 'none' }}
+                    />
                 </div>
             </div>
 
+            {/* Formulario de creación (se muestra debajo de los botones) */}
             {showForm && (
                 <div style={{
                     backgroundColor: t.cardBg,
@@ -451,6 +473,7 @@ export default function AsistenciasPage() {
                 </div>
             )}
 
+            {/* Tabla de asistencias */}
             <div style={{
                 backgroundColor: t.cardBg,
                 border: `1px solid ${t.cardBorder}`,
@@ -476,7 +499,7 @@ export default function AsistenciasPage() {
                             fontFamily: 'Poppins, sans-serif', fontSize: '11px', fontWeight: 700,
                             padding: '3px 10px', borderRadius: '20px',
                         }}>
-                            {asistencias.length} registro{asistencias.length !== 1 ? 's' : ''}
+                            {filteredAsistencias.length} registro{filteredAsistencias.length !== 1 ? 's' : ''}
                         </span>
                     )}
                 </div>
@@ -504,7 +527,7 @@ export default function AsistenciasPage() {
                         <tbody>
                             {loading ? (
                                 <SkeletonRows dark={dark} count={5} />
-                            ) : asistencias.length === 0 ? (
+                            ) : filteredAsistencias.length === 0 ? (
                                 <tr>
                                     <td colSpan={4} style={{ padding: '60px 20px', textAlign: 'center' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: t.dividerText }}>
@@ -512,15 +535,15 @@ export default function AsistenciasPage() {
                                                 <Ico.Attendance />
                                             </div>
                                             <p style={{ fontFamily: 'Poppins, sans-serif', fontSize: '14px', margin: 0 }}>
-                                                No se registraron asistencias
+                                                {search ? 'No se encontraron resultados' : 'No se registraron asistencias'}
                                             </p>
                                             <p style={{ fontFamily: 'Poppins, sans-serif', fontSize: '12px', margin: 0, opacity: 0.7 }}>
-                                                Haz clic en "Crear asistencia" para comenzar
+                                                {search ? 'Intenta con otra búsqueda' : 'Haz clic en "Crear asistencia" para comenzar'}
                                             </p>
                                         </div>
                                     </td>
                                 </tr>
-                            ) : asistencias.map((a, i) => {
+                            ) : filteredAsistencias.map((a, i) => {
                                 const isEven = i % 2 === 1
                                 return (
                                     <tr
@@ -542,12 +565,10 @@ export default function AsistenciasPage() {
                                             </div>
                                         </td>
 
-                                        {/* Descripcion */}
                                         <td style={{ padding: '13px 16px', fontFamily: 'Poppins, sans-serif', fontSize: '13px', color: dark ? '#EAD8F5' : '#374151' }}>
                                             {a.descripcion}
                                         </td>
 
-                                        {/* Resumen */}
                                         <td style={{ padding: '13px 16px' }}>
                                             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                                                 <ResumenBadge label="P" value={a.resumen?.presentes ?? 0} color="#10B981" dark={dark} />
@@ -556,7 +577,6 @@ export default function AsistenciasPage() {
                                             </div>
                                         </td>
 
-                                        {/* Acciones */}
                                         <td style={{ padding: '13px 16px', textAlign: 'center' }}>
                                             <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
                                                 <ActionBtn
@@ -595,10 +615,10 @@ export default function AsistenciasPage() {
                     </table>
                 </div>
 
-                {!loading && asistencias.length > 0 && (
+                {!loading && filteredAsistencias.length > 0 && (
                     <div style={{ padding: '12px 20px', borderTop: `1px solid ${t.tableBorder}` }}>
                         <p style={{ fontFamily: 'Poppins, sans-serif', fontSize: '12px', color: t.bodyText, margin: 0 }}>
-                            {asistencias.length} asistencia{asistencias.length !== 1 ? 's' : ''} registrada{asistencias.length !== 1 ? 's' : ''}
+                            {filteredAsistencias.length} asistencia{filteredAsistencias.length !== 1 ? 's' : ''} registrada{filteredAsistencias.length !== 1 ? 's' : ''}
                         </p>
                     </div>
                 )}

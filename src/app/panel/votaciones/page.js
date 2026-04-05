@@ -542,6 +542,48 @@ export default function VotacionesPage() {
 
             {/* Tabla */}
             <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: cardBg, border: `1px solid ${borderColor}`, boxShadow: 'var(--shadow-card)' }}>
+                {/* Encabezado con ícono y contador */}
+                <div style={{
+                    padding: '16px 20px',
+                    borderBottom: `1px solid ${borderColor}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '12px',
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{ color: 'var(--color-primary)', display: 'flex' }}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="22" height="22">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="9" y1="13" x2="15" y2="13" />
+                                <line x1="9" y1="17" x2="13" y2="17" />
+                            </svg>
+                        </span>
+                        <span style={{
+                            fontFamily: 'Montserrat, sans-serif',
+                            fontWeight: 700,
+                            fontSize: '14px',
+                            color: textMain
+                        }}>
+                            Listado de votaciones
+                        </span>
+                    </div>
+                    {!loading && (
+                        <span style={{
+                            backgroundColor: dark ? 'rgba(103,37,119,0.20)' : 'rgba(103,37,119,0.10)',
+                            color: dark ? '#C8A8D8' : '#672577',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            padding: '3px 10px',
+                            borderRadius: '20px',
+                        }}>
+                            {filtered.length} registro{filtered.length !== 1 ? 's' : ''}
+                        </span>
+                    )}
+                </div>
+
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm font-poppins">
                         <thead>
@@ -616,7 +658,7 @@ export default function VotacionesPage() {
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                                 </button>
                                                 <button title="Exportar Excel" onClick={() => handleExportExcel(v)} className="p-1.5 rounded-lg transition-colors" style={{ color: '#10B981', backgroundColor: dark ? '#2d2b3e' : '#d1fae5' }}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 01-2-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                                                 </button>
                                                 <button title="Eliminar votación" onClick={() => handleDelete(v)} className="p-1.5 rounded-lg transition-colors" style={{ color: 'var(--color-delete)', backgroundColor: dark ? '#2d2b3e' : '#fee2e2' }}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -629,6 +671,23 @@ export default function VotacionesPage() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Footer con contador */}
+                {!loading && filtered.length > 0 && (
+                    <div style={{
+                        padding: '12px 20px',
+                        borderTop: `1px solid ${borderColor}`,
+                    }}>
+                        <p style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '12px',
+                            color: textMuted,
+                            margin: 0
+                        }}>
+                            {filtered.length} votación{filtered.length !== 1 ? 'es' : ''} registrada{filtered.length !== 1 ? 's' : ''}
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     )

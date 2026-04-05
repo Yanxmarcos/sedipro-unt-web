@@ -485,7 +485,7 @@ export default function PanelLayout({ children }) {
                         transition: 'opacity 0.18s, max-width 0.28s cubic-bezier(0.4,0,0.2,1)',
                     }}>
                         <p style={{ fontFamily: 'Montserrat,sans-serif', fontWeight: 700, fontSize: '13px', color: theme.brandPrimary, lineHeight: 1.2, margin: 0 }}>SEDIPRO UNT</p>
-                        <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '10px', fontWeight: 500, color: theme.brandSub, margin: '3px 0 0' }}>Panel de Control</p>
+                        <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '10px', fontWeight: 500, color: isMobile ? theme.brandPrimary : theme.brandSub, margin: '3px 0 0' }}>Panel de Control</p>
                     </div>
                 </div>
 

@@ -309,7 +309,11 @@ export default function HomePage() {
                         <Link
                             href="/login"
                             className="block w-full py-2.5 px-4 rounded-lg font-semibold text-sm font-poppins text-white transition-all duration-200 focus:outline-none text-center"
-                            style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 4px 14px rgba(103,37,119,0.35)' }}
+                            style={{
+                                background: 'linear-gradient(135deg, #672577, #3454A1)',
+                                boxShadow: '0 4px 14px rgba(103,37,119,0.35)',
+                                borderRadius: '12px', // Para que coincida con el navbar (era 12px)
+                            }}
                         >
                             Administración
                         </Link>
