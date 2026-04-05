@@ -83,13 +83,34 @@ function SkeletonRow() {
     )
 }
 
-function fmtFecha(d) {
+function fmtFechaLocal(d) {
     if (!d) return '—'
-    return new Date(d).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    const fecha = typeof d === 'string' ? d.split('T')[0] : d
+    const [year, month, day] = fecha.split('-')
+    const meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sept.', 'oct.', 'nov.', 'dic.']
+    return `${day} ${meses[parseInt(month) - 1]} ${year}`
 }
-function fmtFechaHora(d) {
+
+function fmtFechaUTC(d) {
     if (!d) return '—'
-    return new Date(d).toLocaleString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+    return new Date(d).toLocaleDateString('es-PE', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    })
+}
+
+function fmtFechaHoraUTC(d) {
+    if (!d) return '—'
+
+    return new Date(d).toLocaleString('es-PE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    })
 }
 
 export default function VotacionesPage() {
@@ -201,11 +222,9 @@ export default function VotacionesPage() {
         }
     }
 
-    const ajustarAHoraPeru = (fechaUTC) => {
-        if (!fechaUTC) return '';
-        const date = new Date(fechaUTC);
-        date.setHours(date.getHours() - 5);
-        return date.toISOString().slice(0, 16);
+    const formatForInput = (fecha) => {
+        if (!fecha) return '';
+        return fecha.slice(0, 16);
     };
 
     const handleEditOpen = async (v) => {
@@ -213,7 +232,7 @@ export default function VotacionesPage() {
             return setAlert({ show: true, type: 'warning', title: 'No se puede editar', message: `Esta votación ya tiene ${v.resumen.totalVotos} voto(s) registrado(s). No es posible editarla.`, showCancel: false, confirmText: 'Entendido', onConfirm: () => setAlert({ show: false }), onCancel: () => setAlert({ show: false }) })
         }
         setEditTarget(v)
-        setEditForm({ titulo: v.titulo, fechaCierre: ajustarAHoraPeru(v.fechaCierre), estado: v.estado })
+        setEditForm({ titulo: v.titulo, fechaCierre: formatForInput(v.fechaCierre), estado: v.estado })
         setShowEditForm(true)
         setShowForm(false)
     }
@@ -290,7 +309,7 @@ export default function VotacionesPage() {
                     `${voto.sediprano?.apellidos || ''} ${voto.sediprano?.nombres || ''}`.trim(),
                     voto.sediprano?.dni || '',
                     voto.opcionSeleccionada,
-                    fmtFechaHora(voto.fechaVoto)
+                    fmtFechaHoraUTC(voto.fechaVoto)
                 ])
             ]
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(votantesData), 'Votantes')
@@ -388,7 +407,7 @@ export default function VotacionesPage() {
                                 <option value="">Seleccionar asistencia...</option>
                                 {asistencias.map(a => (
                                     <option key={a._id} value={a._id}>
-                                        {fmtFecha(a.fecha)} — {a.descripcion} ({a.resumen?.presentes} presentes)
+                                        {fmtFechaLocal(a.fecha)} — {a.descripcion} ({a.resumen?.presentes} presentes)
                                     </option>
                                 ))}
                             </select>
@@ -479,7 +498,7 @@ export default function VotacionesPage() {
 
                         {/* Info no editable */}
                         <div className="rounded-xl p-3 text-xs font-poppins space-y-1" style={{ backgroundColor: dark ? '#2d2b3e' : '#f9fafb', color: textMuted }}>
-                            <p><span className="font-semibold">Asistencia:</span> {editTarget.asistencia ? `${fmtFecha(editTarget.asistencia.fecha)} — ${editTarget.asistencia.descripcion}` : '—'}</p>
+                            <p><span className="font-semibold">Asistencia:</span> {editTarget.asistencia ? `${fmtFechaLocal(editTarget.asistencia.fecha)} — ${editTarget.asistencia.descripcion}` : '—'}</p>
                             <p><span className="font-semibold">Tipo:</span> {editTarget.tipo === 'binaria' ? 'Sí / No' : 'Opción múltiple'}</p>
                             <p><span className="font-semibold">Opciones:</span> {editTarget.opciones?.join(', ')}</p>
                         </div>
@@ -551,13 +570,13 @@ export default function VotacionesPage() {
                                     <tr key={v._id} className="border-t transition-colors" style={{ borderColor: dark ? 'rgba(255,255,255,0.05)' : '#f1f5f9' }}
                                         onMouseEnter={e => e.currentTarget.style.backgroundColor = trHover}
                                         onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
-                                        <td className="px-4 py-3 whitespace-nowrap" style={{ color: textMuted }}>{fmtFecha(v.createdAt)}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap" style={{ color: textMuted }}>{fmtFechaUTC(v.createdAt)}</td>
                                         <td className="px-4 py-3 max-w-xs">
                                             <span className="font-semibold line-clamp-2" style={{ color: textMain }}>{v.titulo}</span>
                                         </td>
                                         <td className="px-4 py-3 max-w-xs" style={{ color: textMuted }}>
                                             <span className="text-xs">
-                                                {v.asistencia ? `${fmtFecha(v.asistencia.fecha)} — ${v.asistencia.descripcion}` : '—'}
+                                                {v.asistencia ? `${fmtFechaLocal(v.asistencia.fecha)} — ${v.asistencia.descripcion}` : '—'}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 whitespace-nowrap">

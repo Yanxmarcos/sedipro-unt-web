@@ -39,6 +39,14 @@ function fmtFechaHora(d) {
     return new Date(d).toLocaleString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
+function fmtFechaLocal(d) {
+    if (!d) return '—'
+    const fecha = typeof d === 'string' ? d.split('T')[0] : d
+    const [year, month, day] = fecha.split('-')
+    const meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sept.', 'oct.', 'nov.', 'dic.']
+    return `${day} ${meses[parseInt(month) - 1]} ${year}`
+}
+
 function BarChart({ opciones, totalVotos, dark }) {
     const colors = ['#672577', '#3454A1', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#F97316', '#EC4899', '#84CC16']
     return (
@@ -207,7 +215,7 @@ export default function ResultadosPage() {
                         </h1>
                         {vot.asistencia && (
                             <p style={{ fontSize: '13px', color: t.bodyText, marginTop: '3px', marginBottom: 0 }}>
-                                {fmtFecha(vot.asistencia.fecha)} — {vot.asistencia.descripcion}
+                                {fmtFechaLocal(vot.asistencia.fecha)} — {vot.asistencia.descripcion}
                             </p>
                         )}
                     </div>
