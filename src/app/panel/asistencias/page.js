@@ -572,8 +572,9 @@ export default function AsistenciasPage() {
                                         <td style={{ padding: '13px 16px' }}>
                                             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                                                 <ResumenBadge label="P" value={a.resumen?.presentes ?? 0} color="#10B981" dark={dark} />
-                                                <ResumenBadge label="A" value={a.resumen?.ausentes ?? 0} color="#EF4444" dark={dark} />
+                                                <ResumenBadge label="T" value={a.resumen?.tardanzas ?? 0} color="#F97316" dark={dark} />
                                                 <ResumenBadge label="J" value={a.resumen?.justificados ?? 0} color="#F59E0B" dark={dark} />
+                                                <ResumenBadge label="A" value={a.resumen?.ausentes ?? 0} color="#EF4444" dark={dark} />
                                             </div>
                                         </td>
 

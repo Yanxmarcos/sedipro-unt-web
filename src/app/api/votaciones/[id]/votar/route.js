@@ -38,10 +38,20 @@ export async function POST(request, { params }) {
         const asistencia = await Asistencia.findById(votacion.asistenciaId).lean()
         if (!asistencia) return NextResponse.json({ message: 'Asistencia vinculada no encontrada' }, { status: 404 })
 
-        const estaPresente = asistencia.registro.some(
-            r => r.sedipranoId.toString() === sedipranoId && r.estado === 'presente'
-        )
-        if (!estaPresente) return NextResponse.json({ message: 'Solo los presentes en la asistencia pueden votar' }, { status: 403 })
+        // Definir estados permitidos para votar
+        const estadosPermitidos = ['presente', 'tardanza'];
+
+        // Verificar que el sediprano tiene un estado válido en la asistencia
+        const registroSediprano = asistencia.registro.find(
+            r => r.sedipranoId.toString() === sedipranoId
+        );
+
+        if (!registroSediprano || !estadosPermitidos.includes(registroSediprano.estado)) {
+            return NextResponse.json(
+                { message: 'Solo los miembros con estado Presente o Tardanza pueden votar' }, 
+                { status: 403 }
+            );
+        }
 
         // Verificar doble voto
         const yaVoto = await Voto.findOne({ votacionId: id, sedipranoId })

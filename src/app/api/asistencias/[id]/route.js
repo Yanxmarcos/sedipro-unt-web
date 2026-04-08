@@ -59,8 +59,9 @@ export async function PUT(request, { params }) {
             const presentes = registro.filter(r => r.estado === 'presente').length
             const justificados = registro.filter(r => r.estado === 'justificado').length
             const ausentes = registro.filter(r => r.estado === 'ausente').length
+            const tardanzas = registro.filter(r => r.estado === 'tardanza').length
 
-            asistencia.resumen = { presentes, ausentes, justificados }
+            asistencia.resumen = { presentes, ausentes, justificados, tardanzas }
         }
 
         await asistencia.save()

@@ -23,8 +23,6 @@ export async function GET(request) {
         }).lean()
 
         if (!votacion) {
-            console.log('Server Time:', new Date().toISOString());
-            console.log('Server TZ:', process.env.TZ);
             return NextResponse.json({ activa: false })
         }
 

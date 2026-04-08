@@ -169,8 +169,14 @@ export default function VotacionesPage() {
         try {
             const res = await fetch('/api/asistencias')
             const data = await res.json()
-            setAsistencias((data.asistencias || []).filter(a => a.resumen?.presentes > 0))
-        } catch {}
+            
+            setAsistencias((data.asistencias || []).filter(a => {
+                const habilitados = (a.resumen?.presentes || 0) + (a.resumen?.tardanzas || 0);
+                return habilitados > 0;
+            }))
+        } catch (error) {
+            console.error("Error cargando asistencias:", error)
+        }
     }, [])
 
     useEffect(() => { fetchVotaciones() }, [fetchVotaciones])
@@ -300,7 +306,7 @@ export default function VotacionesPage() {
                 ['Tipo:', vot.tipo === 'binaria' ? 'Sí/No' : 'Opción múltiple'],
                 ['Estado:', vot.estado === 'activa' ? 'Activa' : 'Cerrada'],
                 ['Total votos:', vot.resumen?.totalVotos || 0],
-                ['Total presentes:', vot.asistencia?.resumen?.presentes || 0],
+                ['Total Habilitados:', (vot.asistencia?.resumen?.presentes || 0) + (vot.asistencia?.resumen?.tardanzas || 0)],
                 [],
                 ['Opción', 'Votos', 'Porcentaje'],
                 ...(vot.resumen?.opciones || []).map(o => {
@@ -414,7 +420,7 @@ export default function VotacionesPage() {
                                 <option value="">Seleccionar asistencia...</option>
                                 {asistencias.map(a => (
                                     <option key={a._id} value={a._id}>
-                                        {fmtFechaLocal(a.fecha)} — {a.descripcion} ({a.resumen?.presentes} presentes)
+                                        {a.descripcion} ({fmtFechaUTC(a.fecha)}) ({ (a.resumen?.presentes || 0) + (a.resumen?.tardanzas || 0) } habilitados)
                                     </option>
                                 ))}
                             </select>
@@ -611,9 +617,14 @@ export default function VotacionesPage() {
                                     </td>
                                 </tr>
                             ) : filtered.map(v => {
-                                const presentes = v.asistencia?.resumen?.presentes || 0
+                                const presentesCount = v.asistencia?.resumen?.presentes || 0
+                                const tardanzasCount = v.asistencia?.resumen?.tardanzas || 0
+                                const totalHabilitados = presentesCount + tardanzasCount
+                                
                                 const votos = v.resumen?.totalVotos || 0
-                                const pct = presentes > 0 ? Math.round((votos / presentes) * 100) : 0
+                                
+                                // El porcentaje ahora se basa en el total de habilitados
+                                const pct = totalHabilitados > 0 ? Math.round((votos / totalHabilitados) * 100) : 0
                                 const isActiva = v.estado === 'activa'
                                 return (
                                     <tr key={v._id} className="border-t transition-colors" style={{ borderColor: dark ? 'rgba(255,255,255,0.05)' : '#f1f5f9' }}
@@ -635,7 +646,7 @@ export default function VotacionesPage() {
                                         </td>
                                         <td className="px-4 py-3 whitespace-nowrap">
                                             <div className="space-y-1 min-w-25">
-                                                <span className="text-xs font-semibold" style={{ color: textMain }}>{votos}/{presentes} <span style={{ color: textMuted }}>({pct}%)</span></span>
+                                                <span className="text-xs font-semibold" style={{ color: textMain }}>{votos}/{totalHabilitados} <span style={{ color: textMuted }}>({pct}%)</span></span>
                                                 <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: dark ? '#2d2b3e' : '#e5e7eb' }}>
                                                     <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: pct >= 70 ? '#10B981' : pct >= 40 ? '#F59E0B' : '#3B82F6' }} />
                                                 </div>

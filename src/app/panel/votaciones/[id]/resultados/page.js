@@ -8,6 +8,13 @@ function isDark() {
     return localStorage.getItem('sedipro_dark') === 'true'
 }
 
+const ESTADOS = {
+    presente:    { label: 'Presente',    color: '#10B981', bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.30)' },
+    tardanza:    { label: 'Tardanza', color: '#F97316', bg: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.30)' },
+    justificado: { label: 'Justificado', color: '#F59E0B', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.28)' },
+    ausente:     { label: 'Ausente',     color: '#EF4444', bg: 'rgba(239,68,68,0.11)',  border: 'rgba(239,68,68,0.28)' },
+}
+
 function getTheme(dark) {
     return {
         cardBg:        dark ? '#160C22' : '#ffffff',
@@ -99,6 +106,7 @@ export default function ResultadosPage() {
     const [toast, setToast] = useState({ show: false })
     const chartRef = useRef(null)
     const t = getTheme(dark)
+    const [showPendientes, setShowPendientes] = useState(false);
 
     useEffect(() => {
         const stored = localStorage.getItem('sedipro_dark')
@@ -140,7 +148,8 @@ export default function ResultadosPage() {
                 ['Tipo:', vot.tipo === 'binaria' ? 'Sí/No' : 'Opción múltiple'],
                 ['Estado:', vot.estado === 'activa' ? 'Activa' : 'Cerrada'],
                 ['Total votos:', vot.resumen?.totalVotos || 0],
-                ['Total presentes:', vot.asistencia?.resumen?.presentes || 0],
+                ['Total habilitados:', totalHabilitados],
+                ['Participación:', `${pctParticipacion}%`],
                 [],
                 ['Opción', 'Votos', 'Porcentaje'],
                 ...(vot.resumen?.opciones || []).map(o => {
@@ -171,6 +180,7 @@ export default function ResultadosPage() {
     const textMain = dark ? '#e2e8f0' : '#1e293b'
     const textMuted = dark ? '#94a3b8' : '#6b7280'
     const thBg = dark ? '#1e1b2e' : '#f9fafb'
+    const ocultarOpcion = true;
 
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: bg }}>
@@ -186,10 +196,11 @@ export default function ResultadosPage() {
 
     const { votacion: vot, votos = [], presentes = [] } = data
     const totalVotos = vot.resumen?.totalVotos || 0
-    const totalPresentes = vot.asistencia?.resumen?.presentes || 0
-    const pctParticipacion = totalPresentes > 0 ? Math.round((totalVotos / totalPresentes) * 100) : 0
+    const totalHabilitados = (vot.asistencia?.resumen?.presentes || 0) + (vot.asistencia?.resumen?.tardanzas || 0)
+    const pctParticipacion = totalHabilitados > 0 ? Math.round((totalVotos / totalHabilitados) * 100) : 0
 
     return (
+        
         <div className="min-h-screen p-4 md:p-6" style={{ backgroundColor: bg }}>
             <Toast {...toast} onClose={() => setToast({ show: false })} />
 
@@ -247,7 +258,7 @@ export default function ResultadosPage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
                 {[
                     { label: 'Total votos', value: totalVotos, color: 'var(--color-primary)' },
-                    { label: 'Presentes', value: totalPresentes, color: 'var(--color-secondary)' },
+                    { label: 'Habilitados', value: totalHabilitados, color: 'var(--color-secondary)' },
                     { label: 'Participación', value: `${pctParticipacion}%`, color: pctParticipacion >= 70 ? '#10B981' : '#F59E0B' },
                     { label: 'Estado', value: vot.estado === 'activa' ? 'Activa' : 'Cerrada', color: vot.estado === 'activa' ? '#10B981' : '#6B7280' },
                     { label: 'Fecha inicio', value: fmtFechaHora(vot.fechaInicio), color: '#3B82F6' },
@@ -303,7 +314,7 @@ export default function ResultadosPage() {
             </div>
 
             {/* Toggle votantes */}
-            <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: cardBg, border: `1px solid ${borderColor}` }}>
+            <div className="rounded-2xl overflow-hidden mb-5" style={{ backgroundColor: cardBg, border: `1px solid ${borderColor}` }}>
                 <button onClick={() => setShowVotantes(v => !v)} className="w-full p-4 flex items-center justify-between text-left transition-colors hover:opacity-80">
                     <span className="text-sm font-bold font-poppins" style={{ color: textMain }}>
                         Lista de votantes ({votos.length})
@@ -330,11 +341,83 @@ export default function ResultadosPage() {
                                         <td className="px-4 py-3 font-semibold" style={{ color: textMain }}>{`${v.sediprano?.apellidos || ''} ${v.sediprano?.nombres || ''}`.trim() || '—'}</td>
                                         <td className="px-4 py-3" style={{ color: textMuted }}>{v.sediprano?.dni || '—'}</td>
                                         <td className="px-4 py-3">
-                                            <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}>{v.opcionSeleccionada}</span>
+                                            <span
+                                                title='Voto Oculto'
+                                                className="py-0.5 rounded-full text-xs font-semibold flex items-center justify-center"
+                                                style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
+                                            >
+                                                {ocultarOpcion ? (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-off-icon lucide-eye-off"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
+                                                ) : (
+                                                    v.opcionSeleccionada
+                                                )}
+                                            </span>
                                         </td>
                                         <td className="px-4 py-3 text-xs" style={{ color: textMuted }}>{fmtFechaHora(v.fechaVoto)}</td>
                                     </tr>
                                 ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
+            {/* Toggle de votantes que faltan (Pendientes) */}
+            <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: cardBg, border: `1px solid ${borderColor}` }}>
+                <button onClick={() => setShowPendientes(p => !p)} className="w-full p-4 flex items-center justify-between text-left transition-colors hover:opacity-80">
+                    <span className="text-sm font-bold font-poppins" style={{ color: textMain }}>
+                        Pendientes por votar ({presentes.filter(p => !p.yaVoto).length})
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform duration-200 ${showPendientes ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: textMuted }}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                
+                {showPendientes && (
+                    <div className="border-t overflow-x-auto" style={{ borderColor: dark ? 'rgba(255,255,255,0.06)' : '#f1f5f9' }}>
+                        <table className="w-full text-sm font-poppins">
+                            <thead>
+                                <tr style={{ backgroundColor: thBg }}>
+                                    {['Nombre', 'Asistencia'].map(h => (
+                                        <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: textMuted }}>
+                                            {h}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {presentes.filter(p => !p.yaVoto).length === 0 ? (
+                                    <tr>
+                                        <td colSpan={2} className="px-4 py-6 text-center text-sm font-poppins" style={{ color: textMuted }}>
+                                            Todos han votado
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    presentes.filter(p => !p.yaVoto).map(p => {
+                                        // Determinamos el estado, por defecto 'presente' si no coincide o viene vacío
+                                        const estadoAsistencia = p.estadoAsistencia?.toLowerCase() || 'presente';
+                                        const infoEstado = ESTADOS[estadoAsistencia] || ESTADOS.presente;
+
+                                        return (
+                                            <tr key={p._id} className="border-t transition-colors hover:bg-black/5 dark:hover:bg-white/5" style={{ borderColor: dark ? 'rgba(255,255,255,0.05)' : '#f1f5f9' }}>
+                                                <td className="px-4 py-3 font-medium" style={{ color: textMain }}>
+                                                    {`${p.nombres || ''} ${p.apellidos || ''}`.trim() || '—'}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <span 
+                                                        className="px-2 py-1 rounded-full text-xs border inline-block text-center"
+                                                        style={{ 
+                                                            backgroundColor: infoEstado.bg,
+                                                            borderColor: infoEstado.border,
+                                                            color: infoEstado.color
+                                                        }}
+                                                    >
+                                                        {infoEstado.label}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
                             </tbody>
                         </table>
                     </div>

@@ -72,8 +72,9 @@ const Ico = {
 
 const ESTADOS = {
     presente:    { label: 'Presente',    color: '#10B981', bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.30)' },
-    ausente:     { label: 'Ausente',     color: '#EF4444', bg: 'rgba(239,68,68,0.11)',  border: 'rgba(239,68,68,0.28)' },
+    tardanza:    { label: 'Tardanza', color: '#F97316', bg: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.30)' },
     justificado: { label: 'Justificado', color: '#F59E0B', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.28)' },
+    ausente:     { label: 'Ausente',     color: '#EF4444', bg: 'rgba(239,68,68,0.11)',  border: 'rgba(239,68,68,0.28)' },
 }
 
 function EstadoBtn({ estado, active, onClick, readOnly }) {
@@ -267,7 +268,8 @@ export default function AsistenciaDetallePage() {
         const presentes = registro.filter(r => r.estado === 'presente').length
         const justificados = registro.filter(r => r.estado === 'justificado').length
         const ausentes = registro.filter(r => r.estado === 'ausente').length
-        return { presentes, ausentes, justificados, total: registro.length }
+        const tardanzas = registro.filter(r => r.estado === 'tardanza').length
+        return { presentes, ausentes, justificados, tardanzas, total: registro.length }
     }, [registro])
 
     return (
@@ -355,8 +357,9 @@ export default function AsistenciaDetallePage() {
                     {[
                         { label: 'Total', value: summary.total, color: 'var(--color-primary)', bg: dark ? 'rgba(103,37,119,0.14)' : 'rgba(103,37,119,0.08)' },
                         { label: 'Presentes', value: summary.presentes, color: '#10B981', bg: 'rgba(16,185,129,0.10)' },
-                        { label: 'Ausentes', value: summary.ausentes, color: '#EF4444', bg: 'rgba(239,68,68,0.09)' },
+                        { label: 'Tardanzas', value: summary.tardanzas, color: '#F97316', bg: 'rgba(249,115,22,0.10)' },
                         { label: 'Justificados', value: summary.justificados, color: '#F59E0B', bg: 'rgba(245,158,11,0.10)' },
+                        { label: 'Ausentes', value: summary.ausentes, color: '#EF4444', bg: 'rgba(239,68,68,0.09)' },
                     ].map(c => (
                         <div key={c.label} style={{
                             backgroundColor: t.cardBg, border: `1px solid ${t.cardBorder}`,
