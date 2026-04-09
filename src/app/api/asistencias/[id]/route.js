@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/mongodb'
 import Asistencia from '@/models/Asistencia'
 import Sediprano from '@/models/Sediprano'
 import Votacion from '@/models/Votacion'
+import EncargadoAsistencia from '@/models/EncargadoAsistencia'
 
 export async function GET(request, { params }) {
     try {
@@ -56,10 +57,10 @@ export async function PUT(request, { params }) {
                 estado: r.estado,
             }))
 
-            const presentes = registro.filter(r => r.estado === 'presente').length
+            const presentes    = registro.filter(r => r.estado === 'presente').length
             const justificados = registro.filter(r => r.estado === 'justificado').length
-            const ausentes = registro.filter(r => r.estado === 'ausente').length
-            const tardanzas = registro.filter(r => r.estado === 'tardanza').length
+            const ausentes     = registro.filter(r => r.estado === 'ausente').length
+            const tardanzas    = registro.filter(r => r.estado === 'tardanza').length
 
             asistencia.resumen = { presentes, ausentes, justificados, tardanzas }
         }
@@ -90,6 +91,9 @@ export async function DELETE(request, { params }) {
         if (!asistencia) {
             return NextResponse.json({ message: 'Asistencia no encontrada' }, { status: 404 })
         }
+
+        // Eliminar el encargado vinculado a esta asistencia si existe
+        await EncargadoAsistencia.findOneAndDelete({ asistenciaId: id })
 
         return NextResponse.json({ message: 'Asistencia eliminada correctamente' })
     } catch (error) {
