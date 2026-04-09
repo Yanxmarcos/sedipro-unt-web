@@ -28,7 +28,8 @@ export async function GET() {
         await connectToDatabase();
 
         const sedipranos = await Sediprano.find({})
-            .select('area nombres apellidos dni -_id')
+            //.select('area nombres apellidos dni -_id')
+            .select('area nombres apellidos dni')
             .sort({ area: 1, apellidos: 1 })
             .lean();
 

@@ -31,9 +31,9 @@ export default function LoginPage() {
 				throw new Error(data.message || 'Error al iniciar sesión')
 			}
 
-			router.push('/panel')
+			router.push(data.redirectTo || '/panel')
 		} catch (err) {
-			console.error('💥 [FRONT] Error:', err);
+			console.error('[FRONT] Error:', err);
 			setError(err.message || 'No se pudo iniciar sesión.')
 		} finally {
 			setIsLoading(false)
