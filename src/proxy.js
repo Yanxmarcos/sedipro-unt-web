@@ -2,8 +2,18 @@ import { NextResponse } from 'next/server';
 import { verifyToken } from './lib/jwt';
 import { TOKEN_NAME } from './lib/cookies';
 
-const publicRoutes = ['/login', '/api/auth/login'];
+const publicRoutes = ['/login'];
 const publicApiRoutes = ['/api/auth/login'];
+
+const protectedRoutes = [
+    '/panel',
+    '/api/asistencias',
+    '/api/encargados',
+    '/api/registro',
+    '/api/sedipranos',
+    '/registro',
+    '/api/dashboard',
+];
 
 export default function proxy(request) {
     const { pathname } = request.nextUrl;
@@ -22,7 +32,9 @@ export default function proxy(request) {
         return NextResponse.next();
     }
     
-    if (pathname.startsWith('/panel') || pathname.startsWith('/api/auth/change-password')) {
+    const needsAuth = protectedRoutes.some(route => pathname.startsWith(route));
+    
+    if (needsAuth) {
         if (!token) {
             const loginUrl = new URL('/login', request.url);
             loginUrl.searchParams.set('redirect', pathname);
@@ -54,6 +66,12 @@ export const config = {
     matcher: [
         '/panel/:path*',
         '/login',
+        '/registro/:path*',
         '/api/auth/:path*',
+        '/api/asistencias/:path*',
+        '/api/encargados/:path*',
+        '/api/registro/:path*',
+        '/api/sedipranos/:path*',
+        '/api/dashboard/:path*',
     ],
 };

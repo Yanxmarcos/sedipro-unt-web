@@ -1,4 +1,3 @@
-// src/app/api/auth/verify/route.js
 import { NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/jwt';
 import { getTokenFromRequest } from '@/lib/cookies';
@@ -30,8 +29,6 @@ export async function GET(request) {
         apellidos: decoded.apellidos,
     }
 
-    // Para encargados de asistencia, incluir el asistenciaId del token
-    // Esto permite que la página de registro verifique que la URL coincide
     if (decoded.rol === 'ENCARGADO' && decoded.asistenciaId) {
         user.asistenciaId = decoded.asistenciaId
     }

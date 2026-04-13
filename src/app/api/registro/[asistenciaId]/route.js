@@ -1,4 +1,3 @@
-// src/app/api/registro/[asistenciaId]/route.js
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/mongodb'
 import Asistencia from '@/models/Asistencia'
@@ -17,36 +16,30 @@ export async function POST(request, { params }) {
             return NextResponse.json({ message: 'El DNI es requerido' }, { status: 400 })
         }
 
-        // ── 1. Verificar el token del request ─────────────────────────────────
         const token   = getTokenFromRequest(request)
         const decoded = token ? verifyToken(token) : null
 
         if (!decoded || decoded.rol !== 'ENCARGADO') {
-            return NextResponse.json(
-                { message: 'No autorizado' },
-                { status: 401 }
-            )
+            return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
         }
 
-        // ── 2. Buscar el encargado ACTUALMENTE asignado en la BD ──────────────
-        const encargado = await EncargadoAsistencia.findOne({ asistenciaId }).lean()
+        const encargados = await EncargadoAsistencia.find({ asistenciaId }).lean()
 
-        if (!encargado) {
+        if (!encargados.length) {
             return NextResponse.json(
                 { message: 'Ya no tienes acceso a esta asistencia. Contacta a la directiva.' },
                 { status: 403 }
             )
         }
 
-        // ── 3. Validar que el token pertenece al encargado actual ─────────────
-        if (decoded.dni !== encargado.dni) {
+        const esEncargadoActual = encargados.some(e => e.dni === decoded.dni)
+        if (!esEncargadoActual) {
             return NextResponse.json(
-                { message: 'Tu acceso ha sido revocado. Ya no eres el encargado de esta asistencia.' },
+                { message: 'Tu acceso ha sido revocado. Ya no eres encargado de esta asistencia.' },
                 { status: 403 }
             )
         }
 
-        // ── 4. Buscar sediprano por DNI ingresado ─────────────────────────────
         const sediprano = await Sediprano.findOne({ dni: dni.trim() }).lean()
         if (!sediprano) {
             return NextResponse.json(
@@ -55,7 +48,6 @@ export async function POST(request, { params }) {
             )
         }
 
-        // ── 5. Buscar y actualizar la asistencia ──────────────────────────────
         const asistencia = await Asistencia.findById(asistenciaId)
         if (!asistencia) {
             return NextResponse.json({ message: 'Asistencia no encontrada' }, { status: 404 })
@@ -74,9 +66,6 @@ export async function POST(request, { params }) {
 
         const estadoActual = asistencia.registro[idx].estado
 
-        // ── Solo se puede marcar como presente si está ausente ────────────────
-        // justificado y tardanza son estados asignados desde el panel (directiva)
-        // y el encargado no debe sobreescribirlos
         if (estadoActual !== 'ausente') {
             const etiquetas = {
                 presente:    'presente ✓',
@@ -87,9 +76,9 @@ export async function POST(request, { params }) {
                 message: `${sediprano.nombres} ${sediprano.apellidos} ya fue marcado como ${etiquetas[estadoActual] ?? estadoActual}`,
                 yaRegistrado: true,
                 sediprano: {
-                    nombres: sediprano.nombres,
+                    nombres:  sediprano.nombres,
                     apellidos: sediprano.apellidos,
-                    area: sediprano.area,
+                    area:     sediprano.area,
                 },
                 estadoActual,
             })
@@ -110,15 +99,14 @@ export async function POST(request, { params }) {
         return NextResponse.json({
             message: `¡${sediprano.nombres} ${sediprano.apellidos} registrado como presente!`,
             sediprano: {
-                nombres: sediprano.nombres,
+                nombres:  sediprano.nombres,
                 apellidos: sediprano.apellidos,
-                area: sediprano.area,
+                area:     sediprano.area,
             },
             estadoActual: 'presente',
         })
 
     } catch (error) {
-        console.error('[POST /api/registro/[asistenciaId]]', error)
         return NextResponse.json({ message: 'Error al registrar asistencia' }, { status: 500 })
     }
 }

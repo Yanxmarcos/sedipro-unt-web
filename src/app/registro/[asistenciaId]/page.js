@@ -88,14 +88,11 @@ export default function RegistroAsistenciaPage() {
                     return
                 }
 
-                // Solo ENCARGADO puede estar aquí
                 if (data.user.rol !== 'ENCARGADO') {
                     router.replace('/panel')
                     return
                 }
 
-                // Verificar que el asistenciaId de la URL coincide con el del token
-                // Esto evita que un encargado acceda a la asistencia de otro
                 if (data.user.asistenciaId && data.user.asistenciaId !== asistenciaId) {
                     setAuthError('wrong_asistencia')
                     setAuthLoading(false)
@@ -112,7 +109,6 @@ export default function RegistroAsistenciaPage() {
         verificar()
     }, [router, asistenciaId])
 
-    /* ── cargar info de la asistencia ── */
     useEffect(() => {
         if (!asistenciaId || authLoading || authError) return
         fetch(`/api/asistencias/${asistenciaId}`)
@@ -121,19 +117,16 @@ export default function RegistroAsistenciaPage() {
             .catch(() => {})
     }, [asistenciaId, authLoading, authError])
 
-    /* ── foco automático ── */
     useEffect(() => {
         if (!authLoading && !authError && inputRef.current) inputRef.current.focus()
     }, [authLoading, authError])
 
-    /* ── limpiar feedback automáticamente ── */
     useEffect(() => {
         if (!feedback) return
         const timer = setTimeout(() => setFeedback(null), 4500)
         return () => clearTimeout(timer)
     }, [feedback])
 
-    /* ── submit DNI ── */
     async function handleSubmit(e) {
         e.preventDefault()
         const dniClean = dni.trim()
@@ -151,8 +144,6 @@ export default function RegistroAsistenciaPage() {
             const data = await res.json()
 
             if (!res.ok) {
-                // Si el acceso fue revocado (encargado eliminado o reemplazado),
-                // mostrar pantalla de acceso revocado en lugar de solo un mensaje
                 if (res.status === 401 || res.status === 403) {
                     setAuthError('revoked')
                     return
@@ -195,13 +186,11 @@ export default function RegistroAsistenciaPage() {
         }
     }
 
-    /* ── logout ── */
     async function handleLogout() {
         try { await fetch('/api/auth/logout', { method: 'POST' }) } catch {}
         router.replace('/login')
     }
 
-    /* ── pantalla de carga ── */
     if (authLoading) {
         return (
             <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f5fa' }}>
@@ -214,7 +203,6 @@ export default function RegistroAsistenciaPage() {
         )
     }
 
-    /* ── pantalla de acceso revocado (encargado eliminado/reemplazado) ── */
     if (authError === 'revoked') {
         return (
             <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f5fa', padding: '20px' }}>
@@ -240,7 +228,6 @@ export default function RegistroAsistenciaPage() {
         )
     }
 
-    /* ── pantalla de acceso denegado (intentó acceder a otra asistencia) ── */
     if (authError === 'wrong_asistencia') {
         return (
             <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f5fa', padding: '20px' }}>
@@ -266,7 +253,6 @@ export default function RegistroAsistenciaPage() {
         )
     }
 
-    /* ── colores del feedback ── */
     const feedbackColors = {
         success: { bg: 'rgba(16,185,129,0.10)',  border: 'rgba(16,185,129,0.35)', text: '#065F46', icon: '#10B981' },
         warn:    { bg: 'rgba(245,158,11,0.10)',  border: 'rgba(245,158,11,0.35)', text: '#92400E', icon: '#F59E0B' },
@@ -303,7 +289,6 @@ export default function RegistroAsistenciaPage() {
                 </div>
             )}
 
-            {/* ── Header sticky ── */}
             <header style={{ backgroundColor: '#fff', borderBottom: '1px solid rgba(214,182,223,0.50)', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 2px 12px rgba(103,37,119,0.07)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <img src="/logos/isotipo.webp" alt="SEDIPRO" style={{ width: '32px', height: '32px', objectFit: 'contain' }}
@@ -331,8 +316,6 @@ export default function RegistroAsistenciaPage() {
             </header>
 
             <main style={{ maxWidth: '520px', margin: '0 auto', padding: '28px 16px' }}>
-
-                {/* ── Badge del encargado ── */}
                 {encargado && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: '#fff', border: '1px solid rgba(214,182,223,0.55)', borderRadius: '14px', padding: '14px 16px', marginBottom: '24px', boxShadow: '0 2px 12px rgba(103,37,119,0.08)' }}>
                         <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #672577, #3454A1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#fff' }}>
@@ -349,7 +332,6 @@ export default function RegistroAsistenciaPage() {
                     </div>
                 )}
 
-                {/* ── Card de ingreso DNI ── */}
                 <div style={{ backgroundColor: '#fff', border: '1px solid rgba(214,182,223,0.55)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(103,37,119,0.10)', marginBottom: '20px' }}>
                     <div style={{ height: '4px', background: 'linear-gradient(90deg, #672577, #3454A1)' }} />
 

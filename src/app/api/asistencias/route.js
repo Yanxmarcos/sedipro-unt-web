@@ -1,4 +1,3 @@
-// src/app/api/asistencias/route.js
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/mongodb'
 import Asistencia from '@/models/Asistencia'
@@ -10,25 +9,28 @@ export async function GET() {
         await connectToDatabase()
         const asistencias = await Asistencia.find({}).sort({ fecha: -1 }).lean()
 
-        // Obtener todos los encargados de una sola consulta (eficiente)
+        // Traer todos los encargados en una sola consulta
         const encargados = await EncargadoAsistencia.find({}).lean()
-        const encargadoMap = Object.fromEntries(
-            encargados.map(e => [e.asistenciaId.toString(), {
-                _id: e._id,
-                nombres: e.nombres,
-                apellidos: e.apellidos,
-                dni: e.dni,
-                sedipranoId: e.sedipranoId,
-            }])
-        )
 
-        // Agregar info del encargado a cada asistencia
-        const asistenciasConEncargado = asistencias.map(a => ({
+        const encargadosMap = encargados.reduce((acc, e) => {
+            const key = e.asistenciaId.toString()
+            if (!acc[key]) acc[key] = []
+            acc[key].push({
+                _id:         e._id,
+                sedipranoId: e.sedipranoId,
+                nombres:     e.nombres,
+                apellidos:   e.apellidos,
+                dni:         e.dni,
+            })
+            return acc
+        }, {})
+
+        const asistenciasConEncargados = asistencias.map(a => ({
             ...a,
-            encargado: encargadoMap[a._id.toString()] || null,
+            encargados: encargadosMap[a._id.toString()] || [],
         }))
 
-        return NextResponse.json({ asistencias: asistenciasConEncargado })
+        return NextResponse.json({ asistencias: asistenciasConEncargados })
     } catch (error) {
         console.error('[GET /api/asistencias]', error)
         return NextResponse.json({ message: 'Error al obtener asistencias' }, { status: 500 })
@@ -55,9 +57,10 @@ export async function POST(request) {
             descripcion: descripcion.trim(),
             registro,
             resumen: {
-                presentes: 0,
-                ausentes: sedipranos.length,
+                presentes:    0,
+                ausentes:     sedipranos.length,
                 justificados: 0,
+                tardanzas:    0,
             },
         })
 

@@ -21,8 +21,8 @@ export async function GET(request, { params }) {
 
         const registroCompleto = asistencia.registro.map(r => ({
             sedipranoId: r.sedipranoId,
-            estado: r.estado,
-            sediprano: sedipranoMap[r.sedipranoId.toString()] || null,
+            estado:      r.estado,
+            sediprano:   sedipranoMap[r.sedipranoId.toString()] || null,
         }))
 
         const votacionesCount = await Votacion.countDocuments({ asistenciaId: id })
@@ -48,21 +48,21 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ message: 'Asistencia no encontrada' }, { status: 404 })
         }
 
-        if (fecha) asistencia.fecha = new Date(fecha + 'T00:00:00-05:00')
+        if (fecha)       asistencia.fecha       = new Date(fecha + 'T00:00:00-05:00')
         if (descripcion) asistencia.descripcion = descripcion.trim()
 
         if (registro) {
             asistencia.registro = registro.map(r => ({
                 sedipranoId: r.sedipranoId,
-                estado: r.estado,
+                estado:      r.estado,
             }))
 
-            const presentes    = registro.filter(r => r.estado === 'presente').length
-            const justificados = registro.filter(r => r.estado === 'justificado').length
-            const ausentes     = registro.filter(r => r.estado === 'ausente').length
-            const tardanzas    = registro.filter(r => r.estado === 'tardanza').length
-
-            asistencia.resumen = { presentes, ausentes, justificados, tardanzas }
+            asistencia.resumen = {
+                presentes:    registro.filter(r => r.estado === 'presente').length,
+                justificados: registro.filter(r => r.estado === 'justificado').length,
+                ausentes:     registro.filter(r => r.estado === 'ausente').length,
+                tardanzas:    registro.filter(r => r.estado === 'tardanza').length,
+            }
         }
 
         await asistencia.save()
@@ -82,7 +82,7 @@ export async function DELETE(request, { params }) {
         if (votacionesCount > 0) {
             return NextResponse.json({
                 message: `Esta asistencia tiene ${votacionesCount} votación(es) vinculada(s). Elimina primero las votaciones para poder eliminar esta asistencia.`,
-                hasVotaciones: true,
+                hasVotaciones:  true,
                 votacionesCount,
             }, { status: 409 })
         }
@@ -92,8 +92,8 @@ export async function DELETE(request, { params }) {
             return NextResponse.json({ message: 'Asistencia no encontrada' }, { status: 404 })
         }
 
-        // Eliminar el encargado vinculado a esta asistencia si existe
-        await EncargadoAsistencia.findOneAndDelete({ asistenciaId: id })
+        // Eliminar TODOS los encargados vinculados a esta asistencia
+        await EncargadoAsistencia.deleteMany({ asistenciaId: id })
 
         return NextResponse.json({ message: 'Asistencia eliminada correctamente' })
     } catch (error) {

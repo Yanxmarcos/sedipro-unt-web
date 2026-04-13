@@ -27,7 +27,6 @@ export default function PageSedipranos() {
                 </p>
             </div>
 
-            {/* DataTable */}
             <SedipranosTable />
         </div>
     )

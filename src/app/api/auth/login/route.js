@@ -1,4 +1,3 @@
-// src/app/api/auth/login/route.js
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/mongodb'
 import User from '@/models/User'
@@ -19,7 +18,6 @@ export async function POST(request) {
 
         await connectToDatabase()
 
-        // ── 1. Buscar en la colección de users (directiva/admin) ──────────────
         const user = await User.findOne({
             $or: [
                 { user: username },
@@ -58,7 +56,6 @@ export async function POST(request) {
             return response
         }
 
-        // ── 2. No está en users → buscar en encargados_asistencia ─────────────
         const encargado = await EncargadoAsistencia.findOne({ dni: username })
 
         if (!encargado) {
@@ -76,7 +73,6 @@ export async function POST(request) {
             )
         }
 
-        // Generar token con rol ENCARGADO e incluir asistenciaId
         const tokenPayload = {
             _id: encargado._id,
             user: encargado.dni,
