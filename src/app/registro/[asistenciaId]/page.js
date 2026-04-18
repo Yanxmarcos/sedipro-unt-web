@@ -9,6 +9,12 @@ const Ico = {
             <polyline points="20 6 9 17 4 12" />
         </svg>
     ),
+    Clock: () => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+        </svg>
+    ),
     IdCard: () => (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="2" y="5" width="20" height="14" rx="2" />
@@ -50,6 +56,11 @@ const Ico = {
             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
         </svg>
     ),
+    Back: () => (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+        </svg>
+    ),
 }
 
 function formatDate(iso) {
@@ -64,15 +75,18 @@ export default function RegistroAsistenciaPage() {
     const params       = useParams()
     const asistenciaId = params?.asistenciaId
 
-    const [encargado,   setEncargado]   = useState(null)
-    const [asistencia,  setAsistencia]  = useState(null)
-    const [authLoading, setAuthLoading] = useState(true)
-    const [authError,   setAuthError]   = useState(null) // null | 'unauthorized' | 'wrong_asistencia'
-    const [dni,         setDni]         = useState('')
-    const [submitting,  setSubmitting]  = useState(false)
-    const [feedback,    setFeedback]    = useState(null)
-    const [registrados, setRegistrados] = useState([])
-    const [showLogout,  setShowLogout]  = useState(false)
+    const [encargado,      setEncargado]      = useState(null)
+    const [asistencia,     setAsistencia]     = useState(null)
+    const [authLoading,    setAuthLoading]    = useState(true)
+    const [authError,      setAuthError]      = useState(null) // null | 'unauthorized' | 'wrong_asistencia' | 'revoked'
+    const [dni,            setDni]            = useState('')
+    const [submitting,     setSubmitting]     = useState(false)
+    const [feedback,       setFeedback]       = useState(null)
+    const [registrados,    setRegistrados]    = useState([])
+    const [showLogout,     setShowLogout]     = useState(false)
+
+    // Paso 2: DNI encontrado, esperando que el encargado elija el estado
+    const [awaitingEstado, setAwaitingEstado] = useState(null) // null | { dni: string }
 
     const inputRef = useRef(null)
 
@@ -118,8 +132,10 @@ export default function RegistroAsistenciaPage() {
     }, [asistenciaId, authLoading, authError])
 
     useEffect(() => {
-        if (!authLoading && !authError && inputRef.current) inputRef.current.focus()
-    }, [authLoading, authError])
+        if (!authLoading && !authError && !awaitingEstado && inputRef.current) {
+            inputRef.current.focus()
+        }
+    }, [authLoading, authError, awaitingEstado])
 
     useEffect(() => {
         if (!feedback) return
@@ -127,11 +143,18 @@ export default function RegistroAsistenciaPage() {
         return () => clearTimeout(timer)
     }, [feedback])
 
-    async function handleSubmit(e) {
+    /* ── Paso 1: el encargado ingresa el DNI y confirma ── */
+    function handleSubmit(e) {
         e.preventDefault()
         const dniClean = dni.trim()
-        if (!dniClean) return
+        if (!dniClean || dniClean.length < 8) return
+        setFeedback(null)
+        setAwaitingEstado({ dni: dniClean })
+    }
 
+    /* ── Paso 2: el encargado elige el estado ── */
+    async function handleRegistrar(estado) {
+        if (!awaitingEstado) return
         setSubmitting(true)
         setFeedback(null)
 
@@ -139,7 +162,7 @@ export default function RegistroAsistenciaPage() {
             const res  = await fetch(`/api/registro/${asistenciaId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dni: dniClean }),
+                body: JSON.stringify({ dni: awaitingEstado.dni, estado }),
             })
             const data = await res.json()
 
@@ -149,6 +172,7 @@ export default function RegistroAsistenciaPage() {
                     return
                 }
                 setFeedback({ type: 'error', msg: data.message || 'Error al registrar' })
+                setAwaitingEstado(null)
                 return
             }
 
@@ -158,6 +182,7 @@ export default function RegistroAsistenciaPage() {
                     msg: data.message,
                     nombre: `${data.sediprano.nombres} ${data.sediprano.apellidos}`,
                 })
+                setAwaitingEstado(null)
                 return
             }
 
@@ -165,25 +190,33 @@ export default function RegistroAsistenciaPage() {
                 type: 'success',
                 msg: data.message,
                 nombre: `${data.sediprano.nombres} ${data.sediprano.apellidos}`,
-                area: data.sediprano.area,
             })
 
             setRegistrados(prev => [
                 {
                     nombre: `${data.sediprano.nombres} ${data.sediprano.apellidos}`,
-                    area: data.sediprano.area,
-                    hora: new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
+                    area:   data.sediprano.area,
+                    hora:   new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
+                    estado,
                 },
                 ...prev,
             ])
 
         } catch {
             setFeedback({ type: 'error', msg: 'Error de conexión. Intenta de nuevo.' })
+            setAwaitingEstado(null)
         } finally {
             setSubmitting(false)
+            setAwaitingEstado(null)
             setDni('')
             setTimeout(() => inputRef.current?.focus(), 50)
         }
+    }
+
+    function handleCancelarEstado() {
+        setAwaitingEstado(null)
+        setFeedback(null)
+        setTimeout(() => inputRef.current?.focus(), 50)
     }
 
     async function handleLogout() {
@@ -343,86 +376,170 @@ export default function RegistroAsistenciaPage() {
                             </h2>
                         </div>
 
-                        <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '20px', lineHeight: 1.6 }}>
-                            Ingresa el DNI del sediprano para marcarlo como{' '}
-                            <strong style={{ color: '#10B981' }}>presente</strong>.
-                        </p>
-
-                        <form onSubmit={handleSubmit}>
-                            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4A1A5E', marginBottom: '8px' }}>
-                                DNI del sediprano
-                            </label>
-
-                            <div style={{ position: 'relative', marginBottom: '16px' }}>
-                                <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#9880B0', pointerEvents: 'none', display: 'flex' }}>
-                                    <Ico.IdCard />
-                                </span>
-                                <input
-                                    ref={inputRef}
-                                    type="text"
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    maxLength={8}
-                                    value={dni}
-                                    onChange={e => setDni(e.target.value.replace(/\D/g, ''))}
-                                    placeholder="Ej: 76543210"
-                                    disabled={submitting}
-                                    style={{
-                                        width: '100%', boxSizing: 'border-box',
-                                        padding: '13px 14px 13px 44px',
-                                        borderRadius: '12px', border: '2px solid #e5d9ef',
-                                        backgroundColor: '#f9f6fb', color: '#111827',
-                                        fontSize: '16px', fontWeight: 700, letterSpacing: '0.10em',
-                                        outline: 'none', transition: 'border-color 0.15s, box-shadow 0.15s',
-                                    }}
-                                    onFocus={e => { e.target.style.borderColor = '#672577'; e.target.style.boxShadow = '0 0 0 3px rgba(103,37,119,0.13)' }}
-                                    onBlur={e => { e.target.style.borderColor = '#e5d9ef'; e.target.style.boxShadow = 'none' }}
-                                />
-                            </div>
-
-                            {/* Feedback */}
-                            {feedback && (() => {
-                                const fc = feedbackColors[feedback.type]
-                                return (
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', backgroundColor: fc.bg, border: `1px solid ${fc.border}`, borderRadius: '10px', padding: '12px 14px', marginBottom: '16px', animation: 'slideDown 0.2s ease' }}>
-                                        <span style={{ color: fc.icon, flexShrink: 0, marginTop: '1px' }}>
-                                            {feedback.type === 'success' ? <Ico.Check /> : <Ico.Alert />}
-                                        </span>
-                                        <div>
-                                            {feedback.nombre && (
-                                                <p style={{ fontSize: '13px', fontWeight: 700, color: fc.text, margin: '0 0 2px 0' }}>
-                                                    {feedback.nombre}
-                                                </p>
-                                            )}
-                                            <p style={{ fontSize: '13px', color: fc.text, margin: 0, lineHeight: 1.5 }}>
-                                                {feedback.msg}
+                        {/* ── Feedback ── */}
+                        {feedback && (() => {
+                            const fc = feedbackColors[feedback.type]
+                            return (
+                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', backgroundColor: fc.bg, border: `1px solid ${fc.border}`, borderRadius: '10px', padding: '12px 14px', marginBottom: '16px', animation: 'slideDown 0.2s ease' }}>
+                                    <span style={{ color: fc.icon, flexShrink: 0, marginTop: '1px' }}>
+                                        {feedback.type === 'success' ? <Ico.Check /> : <Ico.Alert />}
+                                    </span>
+                                    <div>
+                                        {feedback.nombre && (
+                                            <p style={{ fontSize: '13px', fontWeight: 700, color: fc.text, margin: '0 0 2px 0' }}>
+                                                {feedback.nombre}
                                             </p>
-                                        </div>
+                                        )}
+                                        <p style={{ fontSize: '13px', color: fc.text, margin: 0, lineHeight: 1.5 }}>
+                                            {feedback.msg}
+                                        </p>
                                     </div>
-                                )
-                            })()}
+                                </div>
+                            )
+                        })()}
 
-                            <button
-                                type="submit"
-                                disabled={dni.trim().length < 8 || submitting}
-                                style={{
-                                    width: '100%', padding: '13px',
-                                    borderRadius: '12px', border: 'none',
-                                    background: (dni.trim().length < 8 || submitting) ? '#E5E7EB' : 'linear-gradient(135deg, #672577, #3454A1)',
-                                    color: (dni.trim().length < 8 || submitting) ? '#9CA3AF' : '#fff',
-                                    fontSize: '14px', fontWeight: 700,
-                                    cursor: (dni.trim().length < 8 || submitting) ? 'not-allowed' : 'pointer',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                                    boxShadow: (dni.trim().length < 8 || submitting) ? 'none' : '0 4px 16px rgba(103,37,119,0.30)',
-                                    transition: 'all 0.2s',
-                                }}
-                            >
-                                {submitting
-                                    ? <><Ico.Spinner /> Registrando…</>
-                                    : <><Ico.Check /> Registrar presente</>
-                                }
-                            </button>
-                        </form>
+                        {/* ══════════════════════════════════════════
+                            PASO 1 — Ingresar DNI
+                        ══════════════════════════════════════════ */}
+                        {!awaitingEstado && (
+                            <form onSubmit={handleSubmit}>
+                                <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '20px', lineHeight: 1.6 }}>
+                                    Ingresa el DNI del sediprano para elegir su estado.
+                                </p>
+
+                                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4A1A5E', marginBottom: '8px' }}>
+                                    DNI del sediprano
+                                </label>
+
+                                <div style={{ position: 'relative', marginBottom: '16px' }}>
+                                    <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#9880B0', pointerEvents: 'none', display: 'flex' }}>
+                                        <Ico.IdCard />
+                                    </span>
+                                    <input
+                                        ref={inputRef}
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        maxLength={8}
+                                        value={dni}
+                                        onChange={e => setDni(e.target.value.replace(/\D/g, ''))}
+                                        placeholder="Ej: 76543210"
+                                        disabled={submitting}
+                                        style={{
+                                            width: '100%', boxSizing: 'border-box',
+                                            padding: '13px 14px 13px 44px',
+                                            borderRadius: '12px', border: '2px solid #e5d9ef',
+                                            backgroundColor: '#f9f6fb', color: '#111827',
+                                            fontSize: '16px', fontWeight: 700, letterSpacing: '0.10em',
+                                            outline: 'none', transition: 'border-color 0.15s, box-shadow 0.15s',
+                                        }}
+                                        onFocus={e => { e.target.style.borderColor = '#672577'; e.target.style.boxShadow = '0 0 0 3px rgba(103,37,119,0.13)' }}
+                                        onBlur={e => { e.target.style.borderColor = '#e5d9ef'; e.target.style.boxShadow = 'none' }}
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={dni.trim().length < 8}
+                                    style={{
+                                        width: '100%', padding: '13px',
+                                        borderRadius: '12px', border: 'none',
+                                        background: dni.trim().length < 8 ? '#E5E7EB' : 'linear-gradient(135deg, #672577, #3454A1)',
+                                        color: dni.trim().length < 8 ? '#9CA3AF' : '#fff',
+                                        fontSize: '14px', fontWeight: 700,
+                                        cursor: dni.trim().length < 8 ? 'not-allowed' : 'pointer',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                        boxShadow: dni.trim().length < 8 ? 'none' : '0 4px 16px rgba(103,37,119,0.30)',
+                                        transition: 'all 0.2s',
+                                    }}
+                                >
+                                    <Ico.User /> Marcar Sediprano
+                                </button>
+                            </form>
+                        )}
+
+                        {/* ══════════════════════════════════════════
+                            PASO 2 — Elegir estado
+                        ══════════════════════════════════════════ */}
+                        {awaitingEstado && (
+                            <div style={{ animation: 'slideDown 0.2s ease' }}>
+                                {/* DNI encontrado — indicador */}
+                                <div style={{ backgroundColor: 'rgba(103,37,119,0.06)', border: '1px solid rgba(103,37,119,0.18)', borderRadius: '10px', padding: '10px 14px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span style={{ color: '#9880B0', display: 'flex' }}><Ico.IdCard /></span>
+                                        <span style={{ fontSize: '13px', color: '#4A1A5E', fontWeight: 600 }}>DNI:</span>
+                                        <span style={{ fontSize: '15px', color: '#1F1030', fontWeight: 700, letterSpacing: '0.10em' }}>{awaitingEstado.dni}</span>
+                                    </div>
+                                    <button
+                                        onClick={handleCancelarEstado}
+                                        disabled={submitting}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#9880B0', background: 'none', border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', fontFamily: 'Poppins, sans-serif', fontWeight: 600, padding: '4px 8px', borderRadius: '8px' }}
+                                    >
+                                        <Ico.Back /> Cambiar
+                                    </button>
+                                </div>
+
+                                <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '16px', lineHeight: 1.6 }}>
+                                    ¿Con qué estado deseas registrar al sediprano?
+                                </p>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    {/* Botón Presente */}
+                                    <button
+                                        onClick={() => handleRegistrar('presente')}
+                                        disabled={submitting}
+                                        style={{
+                                            padding: '16px 12px',
+                                            borderRadius: '14px',
+                                            border: '2px solid rgba(16,185,129,0.35)',
+                                            backgroundColor: submitting ? '#F3F4F6' : 'rgba(16,185,129,0.08)',
+                                            color: submitting ? '#9CA3AF' : '#065F46',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '14px', fontWeight: 700,
+                                            cursor: submitting ? 'not-allowed' : 'pointer',
+                                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+                                            transition: 'all 0.15s',
+                                            boxShadow: submitting ? 'none' : '0 2px 10px rgba(16,185,129,0.15)',
+                                        }}
+                                        onMouseEnter={e => { if (!submitting) { e.currentTarget.style.backgroundColor = 'rgba(16,185,129,0.16)'; e.currentTarget.style.borderColor = 'rgba(16,185,129,0.60)' }}}
+                                        onMouseLeave={e => { if (!submitting) { e.currentTarget.style.backgroundColor = 'rgba(16,185,129,0.08)'; e.currentTarget.style.borderColor = 'rgba(16,185,129,0.35)' }}}
+                                    >
+                                        {submitting
+                                            ? <Ico.Spinner />
+                                            : <span style={{ fontSize: '22px' }}>✓</span>
+                                        }
+                                        <span>Presente</span>
+                                    </button>
+
+                                    {/* Botón Tardanza */}
+                                    <button
+                                        onClick={() => handleRegistrar('tardanza')}
+                                        disabled={submitting}
+                                        style={{
+                                            padding: '16px 12px',
+                                            borderRadius: '14px',
+                                            border: '2px solid rgba(245,158,11,0.35)',
+                                            backgroundColor: submitting ? '#F3F4F6' : 'rgba(245,158,11,0.08)',
+                                            color: submitting ? '#9CA3AF' : '#92400E',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '14px', fontWeight: 700,
+                                            cursor: submitting ? 'not-allowed' : 'pointer',
+                                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+                                            transition: 'all 0.15s',
+                                            boxShadow: submitting ? 'none' : '0 2px 10px rgba(245,158,11,0.15)',
+                                        }}
+                                        onMouseEnter={e => { if (!submitting) { e.currentTarget.style.backgroundColor = 'rgba(245,158,11,0.16)'; e.currentTarget.style.borderColor = 'rgba(245,158,11,0.60)' }}}
+                                        onMouseLeave={e => { if (!submitting) { e.currentTarget.style.backgroundColor = 'rgba(245,158,11,0.08)'; e.currentTarget.style.borderColor = 'rgba(245,158,11,0.35)' }}}
+                                    >
+                                        {submitting
+                                            ? <Ico.Spinner />
+                                            : <span style={{ fontSize: '22px' }}>⏰</span>
+                                        }
+                                        <span>Tardanza</span>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -433,8 +550,8 @@ export default function RegistroAsistenciaPage() {
                             <span style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '13px', color: '#4A1A5E' }}>
                                 Registrados esta sesión
                             </span>
-                            <span style={{ backgroundColor: 'rgba(16,185,129,0.12)', color: '#065F46', fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px' }}>
-                                {registrados.length} presente{registrados.length !== 1 ? 's' : ''}
+                            <span style={{ backgroundColor: 'rgba(103,37,119,0.10)', color: '#4A1A5E', fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px' }}>
+                                {registrados.length} registrado{registrados.length !== 1 ? 's' : ''}
                             </span>
                         </div>
                         <ul style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: '280px', overflowY: 'auto' }}>
@@ -449,13 +566,25 @@ export default function RegistroAsistenciaPage() {
                                     }}
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10B981', flexShrink: 0 }} />
+                                        <div style={{
+                                            width: '8px', height: '8px', borderRadius: '50%', flexShrink: 0,
+                                            backgroundColor: r.estado === 'tardanza' ? '#F59E0B' : '#10B981',
+                                        }} />
                                         <div>
                                             <p style={{ fontSize: '13px', fontWeight: 600, color: '#111827', margin: 0 }}>{r.nombre}</p>
                                             <p style={{ fontSize: '11px', color: '#9880B0', margin: 0 }}>{r.area}</p>
                                         </div>
                                     </div>
-                                    <span style={{ fontSize: '11px', color: '#9CA3AF' }}>{r.hora}</span>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
+                                        <span style={{
+                                            fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '20px',
+                                            backgroundColor: r.estado === 'tardanza' ? 'rgba(245,158,11,0.12)' : 'rgba(16,185,129,0.12)',
+                                            color: r.estado === 'tardanza' ? '#92400E' : '#065F46',
+                                        }}>
+                                            {r.estado === 'tardanza' ? 'Tardanza' : 'Presente'}
+                                        </span>
+                                        <span style={{ fontSize: '11px', color: '#9CA3AF' }}>{r.hora}</span>
+                                    </div>
                                 </li>
                             ))}
                         </ul>

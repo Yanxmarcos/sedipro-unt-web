@@ -6,14 +6,23 @@ import EncargadoAsistencia from '@/models/EncargadoAsistencia'
 import { verifyToken } from '@/lib/jwt'
 import { getTokenFromRequest } from '@/lib/cookies'
 
+const ESTADOS_PERMITIDOS = ['presente', 'tardanza']
+
 export async function POST(request, { params }) {
     try {
         await connectToDatabase()
         const { asistenciaId } = await params
-        const { dni } = await request.json()
+        const { dni, estado = 'presente' } = await request.json()
 
         if (!dni?.trim()) {
             return NextResponse.json({ message: 'El DNI es requerido' }, { status: 400 })
+        }
+
+        if (!ESTADOS_PERMITIDOS.includes(estado)) {
+            return NextResponse.json(
+                { message: 'Estado no válido. Debe ser "presente" o "tardanza"' },
+                { status: 400 }
+            )
         }
 
         const token   = getTokenFromRequest(request)
@@ -70,22 +79,22 @@ export async function POST(request, { params }) {
             const etiquetas = {
                 presente:    'presente ✓',
                 justificado: 'justificado',
-                tardanza:    'tardanza',
+                tardanza:    'tardanza ⏰',
             }
             return NextResponse.json({
                 message: `${sediprano.nombres} ${sediprano.apellidos} ya fue marcado como ${etiquetas[estadoActual] ?? estadoActual}`,
                 yaRegistrado: true,
                 sediprano: {
-                    nombres:  sediprano.nombres,
+                    nombres:   sediprano.nombres,
                     apellidos: sediprano.apellidos,
-                    area:     sediprano.area,
+                    area:      sediprano.area,
                 },
                 estadoActual,
             })
         }
 
-        // Marcar presente y recalcular resumen
-        asistencia.registro[idx].estado = 'presente'
+        // Marcar con el estado elegido y recalcular resumen
+        asistencia.registro[idx].estado = estado
 
         asistencia.resumen = {
             presentes:    asistencia.registro.filter(r => r.estado === 'presente').length,
@@ -96,14 +105,16 @@ export async function POST(request, { params }) {
 
         await asistencia.save()
 
+        const etiquetaEstado = estado === 'tardanza' ? 'tardanza ⏰' : 'presente ✓'
+
         return NextResponse.json({
-            message: `¡${sediprano.nombres} ${sediprano.apellidos} registrado como presente!`,
+            message: `¡${sediprano.nombres} ${sediprano.apellidos} registrado como ${etiquetaEstado}!`,
             sediprano: {
-                nombres:  sediprano.nombres,
+                nombres:   sediprano.nombres,
                 apellidos: sediprano.apellidos,
-                area:     sediprano.area,
+                area:      sediprano.area,
             },
-            estadoActual: 'presente',
+            estadoActual: estado,
         })
 
     } catch (error) {
