@@ -5,13 +5,47 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 const AREAS = ['DIRECTIVA', 'GTH', 'TI', 'MKT', 'PMO', 'LTK Y FNZ']
 
 const AREA_COLORS = {
-    DIRECTIVA: { bg: 'rgba(103,37,119,0.14)', text: '#7C4191', border: 'rgba(103,37,119,0.30)' },
-    GTH:       { bg: 'rgba(52,84,161,0.13)',  text: '#3454A1', border: 'rgba(52,84,161,0.30)'  },
-    TI:        { bg: 'rgba(16,185,129,0.12)', text: '#059669', border: 'rgba(16,185,129,0.30)' },
-    MKT:       { bg: 'rgba(245,158,11,0.13)', text: '#B45309', border: 'rgba(245,158,11,0.30)' },
-    PMO:       { bg: 'rgba(59,130,246,0.12)', text: '#2563EB', border: 'rgba(59,130,246,0.28)' },
-    LTK:       { bg: 'rgba(239,68,68,0.11)',  text: '#DC2626', border: 'rgba(239,68,68,0.28)'  },
-    DEFAULT:   { bg: 'rgba(239,68,68,0.11)',  text: '#DC2626', border: 'rgba(239,68,68,0.28)'  },
+    DIRECTIVA: { 
+        bg: 'rgba(103,37,119,0.14)', 
+        text: '#7C4191', 
+        border: 'rgba(103,37,119,0.30)' 
+    },
+
+    GTH: { 
+        bg: 'rgba(115,184,90,0.14)', 
+        text: '#73B85A', 
+        border: 'rgba(115,184,90,0.30)' 
+    },
+
+    TI: { 
+        bg: 'rgba(230,74,14,0.14)', 
+        text: '#E64A0E', 
+        border: 'rgba(230,74,14,0.30)' 
+    },
+
+    MKT: { 
+        bg: 'rgba(179,21,58,0.14)', 
+        text: '#B3153A', 
+        border: 'rgba(179,21,58,0.30)' 
+    },
+
+    PMO: { 
+        bg: 'rgba(230,177,73,0.14)', 
+        text: '#E6B149', 
+        border: 'rgba(230,177,73,0.30)' 
+    },
+
+    LTK: { 
+        bg: 'rgba(95,192,211,0.14)', 
+        text: '#5FC0D3', 
+        border: 'rgba(95,192,211,0.30)' 
+    },
+
+    DEFAULT: { 
+        bg: 'rgba(95,192,211,0.14)', 
+        text: '#5FC0D3', 
+        border: 'rgba(95,192,211,0.30)' 
+    },
 }
 
 function getAreaColor(area = '') {
