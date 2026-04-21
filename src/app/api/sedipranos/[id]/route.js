@@ -1,4 +1,3 @@
-// src/app/api/sedipranos/[id]/route.js
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import Sediprano from '@/models/Sediprano';

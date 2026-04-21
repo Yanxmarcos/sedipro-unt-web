@@ -1,4 +1,3 @@
-// src/components/SedipranosTable.jsx
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
@@ -52,7 +51,6 @@ function getTheme(dark) {
     }
 }
 
-// ─── Íconos ──────────────────────────────────────────────────────────────────
 const Ico = {
     Search: () => (
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -151,7 +149,6 @@ const COLUMNS = [
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
 
-// ─── Toast ───────────────────────────────────────────────────────────────────
 function Toast({ toast }) {
     if (!toast) return null
     const isSuccess = toast.type === 'success'
@@ -176,7 +173,6 @@ function Toast({ toast }) {
     )
 }
 
-// ─── ConfirmDialog ────────────────────────────────────────────────────────────
 function ConfirmDialog({ dark, row, onConfirm, onCancel, loading }) {
     const t = getTheme(dark)
     const nombre = row ? `${row.nombres} ${row.apellidos}` : ''
