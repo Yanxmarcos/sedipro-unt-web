@@ -461,7 +461,7 @@ export default function Home() {
                         </p>
                         <div className="pt-4 relative z-10">
                             <a href="https://forms.gle/uVSW131HtsJnKzE17" className="px-12 py-5 bg-primary text-on-surface rounded-full font-label-md text-headline-md font-bold shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
-                                Inscribirme Ahora
+                                Inscribirme
                             </a>
                         </div>
                     </div>
