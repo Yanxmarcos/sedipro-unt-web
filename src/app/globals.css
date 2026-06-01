@@ -207,6 +207,57 @@
 		border: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
+	/* Fase bloqueada con capa de blur encima */
+	.glass-card-locked {
+		background: rgba(30, 41, 59, 0.1);
+		backdrop-filter: blur(24px);
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		position: relative;
+		overflow: hidden;
+	}
+
+	/* Capa de blur encima (como vidrio) */
+	.glass-card-locked::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.4);
+		backdrop-filter: blur(12px);
+		border-radius: 1rem;
+		z-index: 10;
+	}
+
+	/* Contenido debajo de la capa */
+	.glass-card-locked > :not(.locked-badge-container) {
+		filter: blur(4px);
+		opacity: 0.5;
+	}
+
+	/* Badge de "Próximamente" que queda ENCIMA de la capa de blur */
+	.locked-badge-container {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 20;
+	}
+
+	.locked-badge {
+		background: rgba(0, 0, 0, 0.7);
+		backdrop-filter: blur(8px);
+		padding: 8px 20px;
+		border-radius: 9999px;
+		color: white;
+		font-size: 14px;
+		font-weight: bold;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+	}
+
 	.hero-gradient {
 		background: linear-gradient(135deg, #0b1326 0%, #3b0191 50%, #6b46c1 100%);
 	}

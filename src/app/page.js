@@ -153,9 +153,9 @@ export default function Home() {
                     </a>
                 </div>
                 <div className="flex items-center gap-4">
-                    <button className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-primary-container text-on-primary-container rounded-full font-label-md text-label-md font-bold active:scale-95 transform transition-transform duration-200 shadow-lg">
+                    <a href="https://forms.gle/uVSW131HtsJnKzE17" className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-primary-container text-on-primary-container rounded-full font-label-md text-label-md font-bold active:scale-95 transform transition-transform duration-200 shadow-lg">
                         Inscribirme Ahora
-                    </button>
+                    </a>
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className="md:hidden text-on-surface"
@@ -197,9 +197,9 @@ export default function Home() {
                             Beneficios
                         </a>
 
-                        <button className="mt-2 px-6 py-3 bg-primary-container text-on-primary-container rounded-xl font-bold">
+                        <a href="https://forms.gle/uVSW131HtsJnKzE17" className="mt-2 px-6 py-3 bg-primary-container text-on-primary-container rounded-xl font-bold">
                             Inscribirme Ahora
-                        </button>
+                        </a>
 
                     </div>
                 </div>
@@ -235,9 +235,9 @@ export default function Home() {
                                 Únete a la comunidad de líderes más influyente de la UNT. <strong>SEDInvita 2026</strong> es el punto de partida para tu crecimiento profesional y personal.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                                <button className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
+                                <a href="https://forms.gle/uVSW131HtsJnKzE17" className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
                                     Inscribirme Ahora
-                                </button>
+                                </a>
                                 <a  href="https://www.facebook.com/SediproUNT" target="_blank" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
                                     Más Información
                                 </a>
@@ -290,7 +290,7 @@ export default function Home() {
                                 </p>
                             </div>
                             {/* Fase 2, 3, 4 similares... */}
-                            <div className="glass-card p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
+                            <div className="glass-card-locked p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <span className="font-display-lg text-display-lg font-extrabold text-on-surface">02</span>
                                 </div>
@@ -308,7 +308,7 @@ export default function Home() {
                                     Inducciones y Dinámicas. Integración grupal y perfil profundo.
                                 </p>
                             </div>
-                            <div className="glass-card p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
+                            <div className="glass-card-locked p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <span className="font-display-lg text-display-lg font-extrabold text-on-surface">03</span>
                                 </div>
@@ -326,7 +326,7 @@ export default function Home() {
                                     Desarrollo de Proyecto y Casos de Estudio. Creatividad estratégica y defensa de ideas.
                                 </p>
                             </div>
-                            <div className="glass-card p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
+                            <div className="glass-card-locked p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <span className="font-display-lg text-display-lg font-extrabold text-on-surface">04</span>
                                 </div>
@@ -460,9 +460,9 @@ export default function Home() {
                             ¿Estás preparado para el desafío? Inicia tu proceso de postulación hoy mismo y sé parte de la élite académica de la UNT.
                         </p>
                         <div className="pt-4 relative z-10">
-                            <button className="px-12 py-5 bg-primary text-on-surface rounded-full font-label-md text-headline-md font-bold shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
+                            <a href="https://forms.gle/uVSW131HtsJnKzE17" className="px-12 py-5 bg-primary text-on-surface rounded-full font-label-md text-headline-md font-bold shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
                                 Inscribirme Ahora
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </section>
