@@ -1,349 +1,574 @@
-'use client'
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
+'use client';
 
-export default function HomePage() {
-    const [step, setStep] = useState('loading')
-    const [votacion, setVotacion] = useState(null)
-    const [sediprano, setSediprano] = useState(null)
-    const [dni, setDni] = useState('')
-    const [opcionSeleccionada, setOpcionSeleccionada] = useState('')
-    const [error, setError] = useState('')
-    const [loadingDni, setLoadingDni] = useState(false)
-    const [saving, setSaving] = useState(false)
-    const [alert, setAlert] = useState({ show: false })
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { 
+    Check, 
+    Heart , Menu, X
+} from 'lucide-react';
 
-    const dniLength = dni.length
-    const isReady = dniLength === 8
+import {
+    FaFacebookF,
+    FaInstagram,
+    FaLinkedinIn,
+    FaYoutube,
+    FaTiktok
+} from 'react-icons/fa'
+
+const images = [
+    { src: '/img/hito1.webp', alt: 'Hito 1' },
+    { src: '/img/hito2.webp', alt: 'Hito 2' },
+    { src: '/img/hito3.webp', alt: 'Hito 3' },
+    { src: '/img/hito4.webp', alt: 'Hito 4' },
+    { src: '/img/hito5.webp', alt: 'Hito 5' },
+    { src: '/img/hito6.webp', alt: 'Hito 6' },
+];
+
+export default function Home() {
+
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [activeSection, setActiveSection] = useState('inicio');
 
     useEffect(() => {
-        fetch('/api/votaciones/activa')
-            .then(r => r.json())
-            .then(data => {
-                if (data.activa) {
-                    setVotacion(data.votacion)
-                    setStep('dni')
-                } else {
-                    setStep('cerrado')
+        const interval = setInterval(() => {
+            setIsTransitioning(true);
+            setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+            setIsTransitioning(false);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        // Smooth scroll para links de navegación
+        const handleAnchorClick = (e) => {
+            const anchor = e.target.closest('a[href^="#"]');
+
+            if (anchor) {
+                e.preventDefault();
+
+                const targetId = anchor.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                    });
                 }
-            })
-            .catch(() => setStep('cerrado'))
-    }, [])
-
-    const inputStyle = {
-        borderColor: error ? '#EF4444' : isReady ? 'var(--color-success)' : '#D1D5DB',
-        boxShadow: error ? '0 0 0 3px rgba(239,68,68,0.15)' : isReady ? '0 0 0 3px rgba(16,185,129,0.15)' : 'none',
-    }
-
-    const handleVerificarDni = async () => {
-        if (!isReady) return
-        setError('')
-        setLoadingDni(true)
-        try {
-            const res = await fetch(`/api/votaciones/activa?dni=${dni}`)
-            const data = await res.json()
-
-            if (!data.activa) return setError('No hay votación activa en este momento')
-            if (data.error || !data.sediprano) return setError(data.error || 'DNI no encontrado en el padrón de SEDIPRO')
-            if (data.yaVoto) {
-                setSediprano(data.sediprano)
-                setStep('yaVoto')
-                return
             }
-            setSediprano(data.sediprano)
-            setVotacion(data.votacion)
-            setStep('votando')
-        } catch {
-            setError('Error al verificar. Inténtalo de nuevo.')
-        } finally {
-            setLoadingDni(false)
-        }
-    }
+        };
 
-    const handleVotar = async () => {
-        if (!opcionSeleccionada) return setError('Selecciona una opción antes de confirmar')
-        setSaving(true)
-        setError('')
-        try {
-            const res = await fetch(`/api/votaciones/${votacion._id}/votar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sedipranoId: sediprano._id, opcionSeleccionada })
-            })
-            const data = await res.json()
-            if (!res.ok) return setError(data.message)
+        // Efecto parallax para la mascota
+        const handleScroll = () => {
+            const scroll = window.pageYOffset;
+            const mascot = document.querySelector('.animate-float');
 
-            setAlert({
-                show: true,
-                type: 'success',
-                title: '¡Voto registrado!',
-                message: `Tu voto por "${opcionSeleccionada}" ha sido guardado correctamente.`,
-                onConfirm: () => {
-                    setAlert({ show: false })
-                    setDni('')
-                    setOpcionSeleccionada('')
-                    setSediprano(null)
-                    setError('')
-                    setStep('dni')
-                }
-            })
-        } catch {
-            setError('Error al registrar el voto. Inténtalo de nuevo.')
-        } finally {
-            setSaving(false)
-        }
-    }
+            if (mascot) {
+                mascot.style.transform =
+                    `translateY(${scroll * 0.1}px) translateY(${Math.sin(scroll * 0.005) * 10}px)`;
+            }
+        };
 
-    const cardStyle = {
-        backgroundColor: '#fff',
-        boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04)',
-        border: '1px solid rgba(214,182,223,0.45)',
-    }
+        document.addEventListener('click', handleAnchorClick);
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            document.removeEventListener('click', handleAnchorClick);
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    useEffect(() => {
+        const sections = document.querySelectorAll('section[id]');
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setActiveSection(entry.target.id);
+                    }
+                });
+            },
+            {
+                threshold: 0.5,
+            }
+        );
+
+        sections.forEach((section) => observer.observe(section));
+
+        return () => observer.disconnect();
+    }, []);
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden" style={{ backgroundColor: '#f8f5fa' }}>
+        <>
+            {/* TopNavBar */}
+            <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-3 bg-surface-container/80 backdrop-blur-2xl rounded-full mt-4 mx-4 md:mx-auto max-w-container-max border border-white/10 shadow-2xl">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 relative">
+                        <Image
+                            alt="SEDInvita 2026"
+                            fill
+                            className="object-contain"
+                            src="/img/sedinvita-logo.webp"
+                        />
+                    </div>
+                    <span className="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">
+                        SEDInvita 2026
+                    </span>
+                </div>
+                <div className="hidden md:flex items-center gap-8">
+                    <a
+                        href="#inicio"
+                        className={`pb-1 font-label-md text-label-md transition-all duration-300 ${
+                            activeSection === 'inicio'
+                                ? 'text-primary border-b-2 border-primary font-bold'
+                                : 'text-on-surface-variant/70 font-medium hover:text-primary'
+                        }`}
+                    >
+                        Inicio
+                    </a>
 
-            {alert.show && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(2px)' }}>
-                    <div className="w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl animate-fade-in" style={cardStyle}>
-                        <div className="h-1.5 w-full" style={{ background: 'linear-gradient(to right, var(--color-primary), var(--color-secondary))' }} />
-                        <div className="p-6 text-center space-y-4">
-                            <div className="flex justify-center">
-                                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: '#D1FAE5' }}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="#10B981" strokeWidth={2}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-bold font-poppins" style={{ color: '#1e293b' }}>{alert.title}</h3>
-                                <p className="mt-1.5 text-sm font-poppins text-gray-500">{alert.message}</p>
-                            </div>
-                            <button onClick={alert.onConfirm} className="w-full py-2.5 px-4 rounded-lg font-semibold text-sm font-poppins text-white" style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 4px 14px rgba(103,37,119,0.35)' }}>
-                                Aceptar
-                            </button>
-                        </div>
+                    <a
+                        href="#fases"
+                        className={`pb-1 font-label-md text-label-md transition-all duration-300 ${
+                            activeSection === 'fases'
+                                ? 'text-primary border-b-2 border-primary font-bold'
+                                : 'text-on-surface-variant/70 font-medium hover:text-primary'
+                        }`}
+                    >
+                        Fases
+                    </a>
+
+                    <a
+                        href="#beneficios"
+                        className={`pb-1 font-label-md text-label-md transition-all duration-300 ${
+                            activeSection === 'beneficios'
+                                ? 'text-primary border-b-2 border-primary font-bold'
+                                : 'text-on-surface-variant/70 font-medium hover:text-primary'
+                        }`}
+                    >
+                        Beneficios
+                    </a>
+                </div>
+                <div className="flex items-center gap-4">
+                    <button className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-primary-container text-on-primary-container rounded-full font-label-md text-label-md font-bold active:scale-95 transform transition-transform duration-200 shadow-lg">
+                        Inscribirme Ahora
+                    </button>
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="md:hidden text-on-surface"
+                    >
+                        {mobileMenuOpen ? (
+                            <X size={28} />
+                        ) : (
+                            <Menu size={28} />
+                        )}
+                    </button>
+                </div>
+            </nav> 
+
+            {mobileMenuOpen && (
+                <div className="fixed top-24 left-4 right-4 z-40 md:hidden">
+                    <div className="glass-card rounded-3xl p-6 flex flex-col gap-4 shadow-2xl">
+                        
+                        <a
+                            href="#inicio"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="font-semibold text-on-surface"
+                        >
+                            Inicio
+                        </a>
+
+                        <a
+                            href="#fases"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="font-semibold text-on-surface"
+                        >
+                            Fases
+                        </a>
+
+                        <a
+                            href="#beneficios"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="font-semibold text-on-surface"
+                        >
+                            Beneficios
+                        </a>
+
+                        <button className="mt-2 px-6 py-3 bg-primary-container text-on-primary-container rounded-xl font-bold">
+                            Inscribirme Ahora
+                        </button>
+
                     </div>
                 </div>
             )}
 
-            <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-                <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full blur-3xl" style={{ backgroundColor: 'var(--color-primary)', opacity: 0.18 }} />
-                <div className="absolute -bottom-32 -right-32 w-80 h-80 rounded-full blur-3xl" style={{ backgroundColor: 'var(--color-secondary)', opacity: 0.13 }} />
-            </div>
-
-            <div className="w-full max-w-sm relative z-10 animate-fade-in">
-                <header className="text-center mb-7">
-                    <div className="flex justify-center mb-4">
-                        <img
-                            src="/logos/sedi-logo.svg"
-                            alt="Logo SEDIPRO UNT"
-                            className="w-24 h-24 lg:w-32 lg:h-32 object-contain transition-transform duration-300 hover:scale-105"
-                            style={{ filter: 'drop-shadow(0 8px 16px rgba(103,37,119,0.30)) drop-shadow(0 2px 4px rgba(103,37,119,0.15))' }}
-                            onError={(e) => {
-                                const img = e.currentTarget
-                                const fb = document.createElement('div')
-                                fb.style.cssText = 'width:80px;height:80px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(103,37,119,0.30)'
-                                fb.innerHTML = '<span style="color:#fff;font-size:1.5rem;font-weight:700;font-family:Montserrat,sans-serif">S</span>'
-                                img.replaceWith(fb)
-                            }}
-                        />
+            <main>
+                {/* Hero Section */}
+                <section className="relative min-h-screen flex items-center pt-24 overflow-hidden hero-gradient" id="inicio">
+                    <div className="absolute inset-0 opacity-10 pointer-events-none overflow-hidden">
+                        <div className="absolute -top-24 -right-24 w-[600px] h-[600px] opacity-20 grayscale rotate-12 relative">
+                            {/* <Image
+                                alt="Background Hito"
+                                fill
+                                className="object-contain"
+                                src="/img/hito-pose1.webp"
+                            /> */}
+                        </div>
+                        <div className="absolute -bottom-24 -left-24 w-[500px] h-[500px] opacity-10 grayscale -rotate-12 relative">
+                            {/* <Image
+                                alt="Background Hito"
+                                fill
+                                className="object-contain"
+                                src="/img/hito-pose1.webp"
+                            /> */}
+                        </div>
                     </div>
-                    <p className="text-base font-semibold font-poppins text-primary">Sistema de Votación</p>
-                </header>
-
-                <div className="rounded-xl overflow-hidden" style={cardStyle}>
-                    <div className="h-1.5 w-full bg-linear-to-r from-primary via-secondary to-accent" aria-hidden="true" />
-
-                    <div className="p-7 space-y-6">
-                        {/* Loading */}
-                        {step === 'loading' && (
-                            <div className="flex justify-center py-6">
-                                <div className="w-8 h-8 rounded-full border-4 border-t-transparent animate-spin" style={{ borderColor: 'var(--color-primary)', borderTopColor: 'transparent' }} />
+                    <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop w-full grid grid-cols-1 md:grid-cols-2 gap-stack-lg items-center relative z-10">
+                        <div className="space-y-stack-md text-center md:text-left flex flex-col items-center md:items-start mt-12 md:mt-0">
+                            <h1 className="font-display-lg text-[32px] sm:text-[36px] md:text-display-lg text-on-surface leading-tight text-glow">
+                                Conecta, lidera y <br /><span className="text-primary-container">transforma</span> tu futuro académico.
+                            </h1>
+                            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-lg mx-auto md:mx-0">
+                                Únete a la comunidad de líderes más influyente de la UNT. <strong>SEDInvita 2026</strong> es el punto de partida para tu crecimiento profesional y personal.
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                                <button className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
+                                    Inscribirme Ahora
+                                </button>
+                                <a  href="https://www.facebook.com/SediproUNT" target="_blank" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
+                                    Más Información
+                                </a>
                             </div>
-                        )}
-
-                        {/* Cerrado */}
-                        {step === 'cerrado' && (
-                            <div className="flex flex-col items-center justify-center space-y-3 text-center">
-                                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FEE2E2', color: '#EF4444' }}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h2 className="text-lg font-bold font-poppins text-accent">Proceso Cerrado</h2>
-                                    <p className="mt-1.5 text-sm font-poppins text-gray-500">No hay votaciones activas por el momento. Mantente atento a los comunicados oficiales.</p>
-                                </div>
+                        </div>
+                        <div className="flex justify-center items-center relative">
+                            <div className="absolute w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-primary/20 blur-[100px] rounded-full"></div>
+                            <div className="w-[300px] md:w-[500px] relative animate-float drop-shadow-2xl z-10">
+                                <Image
+                                    alt={images[currentImageIndex].alt}
+                                    width={500}
+                                    height={500}
+                                    className={`object-contain transition-opacity duration-300 ${
+                                        isTransitioning ? 'opacity-0' : 'opacity-100'
+                                    }`}
+                                    src={images[currentImageIndex].src}
+                                />
                             </div>
-                        )}
+                        </div>
+                    </div>
+                </section>
 
-                        {/* DNI */}
-                        {step === 'dni' && (
-                            <div className="space-y-4">
-                                {votacion && (
-                                    <div className="rounded-xl p-3.5 space-y-1" style={{ backgroundColor: '#faf5fc', border: '1px solid rgba(103,37,119,0.15)' }}>
-                                        <p className="text-xs font-semibold font-poppins" style={{ color: 'var(--color-primary)' }}>Votación activa</p>
-                                        <p className="text-sm font-bold font-poppins text-accent">{votacion.titulo}</p>
-                                        <p className="text-xs font-poppins text-gray-500">Opciones: {votacion.opciones?.join(', ')}</p>
-                                    </div>
-                                )}
+                {/* Chronogram Section (Phases) */}
+                <section className="py-stack-lg bg-surface relative overflow-hidden" id="fases">
+                    <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+                        <div className="text-center mb-stack-lg space-y-4">
+                            <h2 className="font-headline-lg text-headline-lg text-on-surface">Proceso de Selección</h2>
+                            <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+                                Diseñamos un camino estructurado para identificar y potenciar el talento de cada estudiante que desea formar parte de SEDIPRO.
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-stack-md">
+                            {/* Phase cards igual que el original... */}
+                            <div className="glass-card-selected-glow p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
+                                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                                    <span className="font-display-lg text-display-lg font-extrabold text-on-surface">01</span>
+                                </div>
+                                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-stack-sm">
+                                    <Image
+                                        alt="Background Hito"
+                                        width={50}
+                                        height={50}
+                                        className="object-contain"
+                                        src="/img/hito5.webp"
+                                    />
+                                </div>
+                                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 1</h3>
+                                <p className="font-body-md text-body-md text-on-surface-variant">
+                                    Inscripciones Abiertas y Evaluación Preliminar. Primer acercamiento a tus aptitudes.
+                                </p>
+                            </div>
+                            {/* Fase 2, 3, 4 similares... */}
+                            <div className="glass-card p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
+                                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                                    <span className="font-display-lg text-display-lg font-extrabold text-on-surface">02</span>
+                                </div>
+                                <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary mb-stack-sm">
+                                    <Image
+                                        alt="Background Hito"
+                                        width={50}
+                                        height={50}
+                                        className="object-contain"
+                                        src="/img/hito3.webp"
+                                    />
+                                </div>
+                                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 2</h3>
+                                <p className="font-body-md text-body-md text-on-surface-variant">
+                                    Inducciones y Dinámicas. Integración grupal y perfil profundo.
+                                </p>
+                            </div>
+                            <div className="glass-card p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
+                                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                                    <span className="font-display-lg text-display-lg font-extrabold text-on-surface">03</span>
+                                </div>
+                                <div className="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-tertiary mb-stack-sm">
+                                    <Image
+                                        alt="Background Hito"
+                                        width={50}
+                                        height={50}
+                                        className="object-contain"
+                                        src="/img/hito4.webp"
+                                    />
+                                </div>
+                                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 3</h3>
+                                <p className="font-body-md text-body-md text-on-surface-variant">
+                                    Desarrollo de Proyecto y Casos de Estudio. Creatividad estratégica y defensa de ideas.
+                                </p>
+                            </div>
+                            <div className="glass-card p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
+                                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                                    <span className="font-display-lg text-display-lg font-extrabold text-on-surface">04</span>
+                                </div>
+                                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-stack-sm">
+                                    <Image
+                                        alt="Background Hito"
+                                        width={50}
+                                        height={50}
+                                        className="object-contain"
+                                        src="/img/hito2.webp"
+                                    />
+                                </div>
+                                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 4</h3>
+                                <p className="font-body-md text-body-md text-on-surface-variant">
+                                    Entrevistas Personales y Bienvenida. Evaluación final y ceremonia de ingreso oficial.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                                <div>
-                                    <label htmlFor="dni" className="block text-sm font-semibold font-poppins mb-1.5 text-primary-active">Número de DNI</label>
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary" aria-hidden="true">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0" />
-                                            </svg>
-                                        </span>
-                                        <input
-                                            id="dni"
-                                            type="text"
-                                            value={dni}
-                                            onChange={(e) => { setDni(e.target.value.replace(/\D/g, '').slice(0, 8)); setError('') }}
-                                            onKeyDown={e => e.key === 'Enter' && isReady && handleVerificarDni()}
-                                            placeholder="Ej. 70123456"
-                                            maxLength={8}
-                                            inputMode="numeric"
-                                            autoComplete="off"
-                                            aria-required="true"
-                                            aria-invalid={!!error}
-                                            className="form-input w-full pl-9 pr-14 py-2.5 text-sm font-poppins rounded-lg border bg-white text-gray-900 transition-all duration-150 focus:outline-none focus:ring-0"
-                                            style={inputStyle}
-                                        />
-                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-poppins tabular-nums font-semibold" style={{ color: isReady ? 'var(--color-success)' : '#9CA3AF' }}>
-                                            {dniLength}/8
-                                        </span>
+                {/* Benefits Section */}
+                <section className="py-stack-lg bg-surface-container-lowest relative overflow-hidden" id="beneficios">
+                    <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-stack-lg items-center">
+                        <div className="lg:col-span-5 space-y-stack-md">
+                            <h2 className="font-display-lg text-headline-lg md:text-display-lg text-on-surface leading-tight">
+                                ¿Por qué ser parte de <span className="text-primary">SEDIPRO UNT</span>?
+                            </h2>
+                            <p className="font-body-lg text-body-lg text-on-surface-variant">
+                                Más que una organización, somos una incubadora de líderes. Descubre cómo potenciar tus habilidades blandas y técnicas en un entorno real.
+                            </p>
+                            <ul className="space-y-4">
+                                <li className="flex items-start gap-4">
+                                    <div className="mt-1 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary flex-shrink-0">
+                                        <Check size={20} strokeWidth={2.5} /> 
                                     </div>
-                                    {error ? (
-                                        <div className="flex items-start gap-2.5 text-sm mt-3 px-3.5 py-3 rounded-lg font-poppins bg-error-light border border-error text-error-dark animate-fade-in">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mt-0.5 shrink-0 text-error"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-                                                aria-hidden="true">
-                                                <path strokeLinecap="round" strokeLinejoin="round"
-                                                    d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                                            </svg>
-                                            <span>{error}</span>
-                                        </div>
-                                    ) : (
-                                        <p id="dni-hint" className="mt-1.5 text-xs font-poppins text-gray-400">
-                                            Ingresa los 8 dígitos de tu DNI peruano.
+                                    <div>
+                                        <h4 className="font-headline-md text-body-lg font-bold text-on-surface">Metodología PMI + Ágil</h4>
+                                        <p className="font-body-md text-body-md text-on-surface-variant">
+                                            Aprende y aplica buenas prácticas en gestión de proyectos con estándares PMI y herramientas ágiles.
                                         </p>
-                                    )}
+                                    </div>
+                                </li>
+                                <li className="flex items-start gap-4">
+                                    <div className="mt-1 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary flex-shrink-0">
+                                        <Check size={20} strokeWidth={2.5} /> 
+                                    </div>
+                                    <div>
+                                        <h4 className="font-headline-md text-body-lg font-bold text-on-surface">Tres Enfoques de Impacto</h4>
+                                        <p className="font-body-md text-body-md text-on-surface-variant">
+                                            Trabajamos desde lo académico, social y ambiental para formar profesionales capacitados en dirección de proyectos.
+                                        </p>
+                                    </div>
+                                </li>
+                                <li className="flex items-start gap-4">
+                                    <div className="mt-1 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary flex-shrink-0">
+                                        <Check size={20} strokeWidth={2.5} /> 
+                                    </div>
+                                    <div>
+                                        <h4 className="font-headline-md text-body-lg font-bold text-on-surface">Formación de Líderes</h4>
+                                        <p className="font-body-md text-body-md text-on-surface-variant">
+                                            Desarrolla habilidades de liderazgo con valores como innovación, integridad, trabajo en equipo y vocación de servicio.
+                                        </p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div className="lg:col-span-7 grid grid-cols-2 gap-4">
+                            <div className="space-y-4 pt-12">
+                                <div className="aspect-square rounded-2xl bg-surface-variant overflow-hidden relative">
+                                    <Image
+                                        alt="Imagen 1"
+                                        fill
+                                        className="object-cover"
+                                        src="/img/info1.jpg"
+                                    />
                                 </div>
-
-                                <button
-                                    onClick={handleVerificarDni}
-                                    disabled={!isReady || loadingDni}
-                                    className="w-full py-2.5 px-4 rounded-lg font-semibold text-sm font-poppins text-white transition-all duration-200"
-                                    style={{ backgroundColor: isReady ? 'var(--color-primary)' : '#D1D5DB', boxShadow: isReady ? '0 4px 14px rgba(103,37,119,0.35)' : 'none', cursor: isReady ? 'pointer' : 'not-allowed' }}
-                                >
-                                    {loadingDni ? 'Verificando...' : 'Continuar'}
-                                </button>
+                                <div className="aspect-[4/3] rounded-2xl overflow-hidden relative">
+                                    <Image
+                                        alt="Imagen 2"
+                                        fill
+                                        className="object-cover"
+                                        src="/img/info33.jpg"
+                                    />
+                                </div>
                             </div>
-                        )}
-
-                        {/* Votando */}
-                        {step === 'votando' && votacion && sediprano && (
                             <div className="space-y-4">
-                                <div className="text-center">
-                                    <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2" style={{ backgroundColor: '#f3e8ff' }}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="var(--color-primary)" strokeWidth={2}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                    </div>
-                                    <p className="text-sm font-semibold font-poppins text-accent">{sediprano.apellidos} {sediprano.nombres}</p>
-                                    <p className="text-xs font-poppins text-gray-400">DNI: {sediprano.dni}</p>
+                                <div className="aspect-[4/3] rounded-2xl overflow-hidden relative">
+                                    <Image
+                                        alt="Imagen 3"
+                                        fill
+                                        className="object-cover"
+                                        src="/img/info44.jpg"
+                                    />
                                 </div>
-
-                                <div className="rounded-xl p-3.5" style={{ backgroundColor: '#faf5fc', border: '1px solid rgba(103,37,119,0.15)' }}>
-                                    <p className="text-xs font-semibold font-poppins mb-1" style={{ color: 'var(--color-primary)' }}>Pregunta</p>
-                                    <p className="text-sm font-bold font-poppins text-accent">{votacion.titulo}</p>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <p className="text-xs font-semibold font-poppins text-gray-500">Selecciona tu opción:</p>
-                                    {votacion.opciones?.map(op => (
-                                        <label key={op} className="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all" style={{
-                                            borderColor: opcionSeleccionada === op ? 'var(--color-primary)' : '#e5e7eb',
-                                            backgroundColor: opcionSeleccionada === op ? '#faf5fc' : '#fff',
-                                            boxShadow: opcionSeleccionada === op ? '0 0 0 2px rgba(103,37,119,0.2)' : 'none'
-                                        }}>
-                                            <input type="radio" name="opcion" value={op} checked={opcionSeleccionada === op} onChange={() => { setOpcionSeleccionada(op); setError('') }} className="accent-primary" />
-                                            <span className="text-sm font-semibold font-poppins" style={{ color: opcionSeleccionada === op ? 'var(--color-primary)' : '#374151' }}>{op}</span>
-                                        </label>
-                                    ))}
-                                </div>
-
-                                {error &&
-                                    <div className="flex items-start gap-2.5 text-sm px-3.5 py-3 rounded-lg font-poppins bg-error-light border border-error text-error-dark animate-fade-in">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mt-0.5 shrink-0 text-error"
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-                                            aria-hidden="true">
-                                            <path strokeLinecap="round" strokeLinejoin="round"
-                                                d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                                        </svg>
-                                        <span>{error}</span>
-                                    </div>
-                                }
-
-                                <div className="flex gap-3">
-                                    <button onClick={() => { setStep('dni'); setDni(''); setOpcionSeleccionada(''); setError('') }} className="flex-1 py-2.5 rounded-lg font-semibold text-sm font-poppins border transition-all" style={{ borderColor: '#d1d5db', color: '#6b7280' }}>
-                                        Cancelar
-                                    </button>
-                                    <button
-                                        onClick={handleVotar}
-                                        disabled={!opcionSeleccionada || saving}
-                                        className="flex-1 py-2.5 rounded-lg font-semibold text-sm font-poppins text-white transition-all"
-                                        style={{ backgroundColor: opcionSeleccionada ? 'var(--color-primary)' : '#D1D5DB', boxShadow: opcionSeleccionada ? '0 4px 14px rgba(103,37,119,0.35)' : 'none' }}
-                                    >
-                                        {saving ? 'Guardando...' : 'Guardar selección'}
-                                    </button>
+                                <div className="aspect-square rounded-2xl bg-surface-variant overflow-hidden relative">
+                                    <Image
+                                        alt="Imagen 4"
+                                        fill
+                                        className="object-cover"
+                                        src="/img/info2.jpg"
+                                    />
                                 </div>
                             </div>
-                        )}
 
-                        {/* Ya votó */}
-                        {step === 'yaVoto' && (
-                            <div className="flex flex-col items-center justify-center space-y-3 text-center">
-                                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FEF3C7', color: '#F59E0B' }}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h2 className="text-lg font-bold font-poppins text-accent">Ya has votado</h2>
-                                    <p className="mt-1.5 text-sm font-poppins text-gray-500">
-                                        {sediprano?.apellidos} {sediprano?.nombres}, tu voto ya fue registrado en esta votación. No puedes votar dos veces.
-                                    </p>
-                                </div>
-                                <button onClick={() => { setStep('dni'); setDni(''); setSediprano(null); setError('') }} className="text-sm font-semibold font-poppins" style={{ color: 'var(--color-primary)' }}>
-                                    ← Volver
-                                </button>
+                        </div>
+                    </div>
+                </section>
+
+                {/* CTA Section */}
+                <section className="py-stack-lg px-margin-mobile relative overflow-hidden">
+                    {/* Imagen de fondo */}
+                    <div className="absolute inset-0 z-0">
+                        <Image
+                            alt="Fondo Sedipro UNT"
+                            fill
+                            className="object-cover"
+                            src="/img/cta-fondo.webp" // Cambia por tu ruta de imagen
+                        />
+                        {/* Overlay oscuro para que se lea bien el texto */}
+                        <div className="absolute inset-0 bg-black/60"></div>
+                    </div>
+                    
+                    {/* Contenido */}
+                    <div className="max-w-container-max mx-auto glass-card-extra-light rounded-[32px] p-stack-lg md:p-24 text-center space-y-stack-md relative z-10 border-white/5 backdrop-blur-sm">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-secondary/10 pointer-events-none rounded-[32px]"></div>
+                        <h2 className="font-display-lg text-headline-lg md:text-[56px] text-on-surface leading-tight relative z-10">
+                            Tu oportunidad <br />te está esperando.
+                        </h2>
+                        <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto relative z-10">
+                            ¿Estás preparado para el desafío? Inicia tu proceso de postulación hoy mismo y sé parte de la élite académica de la UNT.
+                        </p>
+                        <div className="pt-4 relative z-10">
+                            <button className="px-12 py-5 bg-primary text-on-surface rounded-full font-label-md text-headline-md font-bold shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
+                                Inscribirme Ahora
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            {/* Footer */}
+            <footer className="bg-surface-container-lowest border-t border-outline-variant/30 py-16">
+                <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-stack-md">
+                    
+                    {/* Izquierda: Logo + SEDIPRO UNT + Copyright */}
+                    <div className="flex flex-col gap-2 items-center md:items-start">
+                        <div className="flex items-center gap-3">
+                            {/* Logo pequeño */}
+                            <div className="w-8 h-8 relative">
+                                <Image
+                                    alt="Logo SEDIPRO UNT"
+                                    width={32}
+                                    height={32}
+                                    className="object-contain"
+                                    src="/logos/isotipo.webp"
+                                />
                             </div>
-                        )}
+                            <span className="text-label-md font-headline-md font-bold text-on-surface">SEDIPRO UNT</span>
+                        </div>
+                        <p className="font-body-md text-body-md text-on-surface-variant font-label-sm text-label-sm">
+                            © 2026 SEDIPRO UNT. Todos los derechos reservados.
+                        </p>
+                    </div>
 
-                        <hr className="border-gray-200" />
-
-                        <Link
-                            href="/login"
-                            className="block w-full py-2.5 px-4 rounded-lg font-semibold text-sm font-poppins text-white transition-all duration-200 focus:outline-none text-center"
-                            style={{
-                                background: 'linear-gradient(135deg, #672577, #3454A1)',
-                                boxShadow: '0 4px 14px rgba(103,37,119,0.35)',
-                                borderRadius: '12px', // Para que coincida con el navbar (era 12px)
-                            }}
+                    {/* Centro: Redes Sociales */}
+                    <div className="flex gap-4">
+                        <a
+                            href="https://www.facebook.com/SediproUNT"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Facebook"
+                            className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
                         >
-                            Administración
-                        </Link>
+                            <FaFacebookF size={18} />
+                        </a>
+
+                        <a
+                            href="https://www.instagram.com/sedipro.unt/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Instagram"
+                            className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                        >
+                            <FaInstagram size={18} />
+                        </a>
+
+                        <a
+                            href="https://www.linkedin.com/company/sediprount/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="LinkedIn"
+                            className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                        >
+                            <FaLinkedinIn size={18} />
+                        </a>
+
+                        <a
+                            href="https://www.youtube.com/c/SEDIPROUNT"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="YouTube"
+                            className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                        >
+                            <FaYoutube size={18} />
+                        </a>
+
+                        <a
+                            href="https://www.tiktok.com/@sediprount"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="TikTok"
+                            className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                        >
+                            <FaTiktok size={18} />
+                        </a>
+                    </div>
+
+                    {/* Derecha: Desarrollo por Área de TI */}
+                    <div className="flex items-center gap-2">
+                        <span className="font-label-sm text-body-md text-on-surface-variant text-label-sm">
+                            Hecho con
+                        </span>
+                        <Heart size={14} className="text-orange-500 fill-orange-500 animate-pulse" />
+                        <span className="font-label-sm text-body-md text-on-surface-variant text-label-sm">
+                            por
+                        </span>
+                        <span className="font-label-sm text-label-md font-semibold text-orange-500 text-label-sm">
+                            Área de TI
+                        </span>
+                        <div className="w-6 h-6 relative">
+                            <Image
+                                alt="Logo Área de TI SEDIPRO"
+                                width={24}
+                                height={24}
+                                className="object-contain"
+                                src="/img/area-ti.png" // Cambia por la ruta del logo del área de TI
+                            />
+                        </div>
                     </div>
                 </div>
-
-                <footer className="mt-5 text-center space-y-1">
-                    <p className="text-xs font-poppins text-gray-400">© {new Date().getFullYear()} SEDIPRO UNT. Todos los derechos reservados.</p>
-                </footer>
-            </div>
-        </div>
-    )
+            </footer>
+        </>
+    );
 }

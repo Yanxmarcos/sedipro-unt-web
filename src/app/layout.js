@@ -15,8 +15,8 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-	title: "SEDIPRO UNT | App web",
-	description: "Plataforma oficial de asistencias para SEDIPRO UNT.",
+	title: "SEDIPRO UNT",
+	description: "Sección Estudiantil de Dirección de Proyectos de la Universidad Nacional de Trujillo.",
 	icons: {
 		icon: [
 			{ url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
