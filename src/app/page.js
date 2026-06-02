@@ -2,18 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { 
-    Check, 
-    Heart , Menu, X
+import {
+    Check,
+    Heart, Menu, X, Lock
 } from 'lucide-react';
-
+import Link from 'next/link'
 import {
     FaFacebookF,
     FaInstagram,
     FaLinkedinIn,
     FaYoutube,
     FaTiktok
-} from 'react-icons/fa'
+} from 'react-icons/fa';
 
 const images = [
     { src: '/img/hito1.webp', alt: 'Hito 1' },
@@ -42,7 +42,6 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
-        // Smooth scroll para links de navegación
         const handleAnchorClick = (e) => {
             const anchor = e.target.closest('a[href^="#"]');
 
@@ -60,7 +59,6 @@ export default function Home() {
             }
         };
 
-        // Efecto parallax para la mascota
         const handleScroll = () => {
             const scroll = window.pageYOffset;
             const mascot = document.querySelector('.animate-float');
@@ -110,6 +108,7 @@ export default function Home() {
                         <Image
                             alt="SEDInvita 2026"
                             fill
+                            sizes="40px"
                             className="object-contain"
                             src="/img/sedinvita-logo.webp"
                         />
@@ -121,33 +120,30 @@ export default function Home() {
                 <div className="hidden md:flex items-center gap-8">
                     <a
                         href="#inicio"
-                        className={`pb-1 font-label-md text-label-md transition-all duration-300 ${
-                            activeSection === 'inicio'
-                                ? 'text-primary border-b-2 border-primary font-bold'
-                                : 'text-on-surface-variant/70 font-medium hover:text-primary'
-                        }`}
+                        className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'inicio'
+                                ? 'text-on-surface-variant/70 font-medium hover:text-primary border-b-2'
+                                : 'text-primary border-primary font-bold'
+                            }`}
                     >
                         Inicio
                     </a>
 
                     <a
                         href="#fases"
-                        className={`pb-1 font-label-md text-label-md transition-all duration-300 ${
-                            activeSection === 'fases'
-                                ? 'text-primary border-b-2 border-primary font-bold'
-                                : 'text-on-surface-variant/70 font-medium hover:text-primary'
-                        }`}
+                        className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'fases'
+                                ? 'text-on-surface-variant/70 font-medium hover:text-primary border-b-2'
+                                : 'text-primary border-primary font-bold'
+                            }`}
                     >
                         Fases
                     </a>
 
                     <a
                         href="#beneficios"
-                        className={`pb-1 font-label-md text-label-md transition-all duration-300 ${
-                            activeSection === 'beneficios'
-                                ? 'text-primary border-b-2 border-primary font-bold'
-                                : 'text-on-surface-variant/70 font-medium hover:text-primary'
-                        }`}
+                        className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'beneficios'
+                                ? 'text-on-surface-variant/70 font-medium hover:text-primary border-b-2'
+                                : 'text-primary border-primary font-bold'
+                            }`}
                     >
                         Beneficios
                     </a>
@@ -167,12 +163,11 @@ export default function Home() {
                         )}
                     </button>
                 </div>
-            </nav> 
+            </nav>
 
             {mobileMenuOpen && (
                 <div className="fixed top-24 left-4 right-4 z-40 md:hidden">
                     <div className="glass-card rounded-3xl p-6 flex flex-col gap-4 shadow-2xl">
-                        
                         <a
                             href="#inicio"
                             onClick={() => setMobileMenuOpen(false)}
@@ -180,7 +175,6 @@ export default function Home() {
                         >
                             Inicio
                         </a>
-
                         <a
                             href="#fases"
                             onClick={() => setMobileMenuOpen(false)}
@@ -188,7 +182,6 @@ export default function Home() {
                         >
                             Fases
                         </a>
-
                         <a
                             href="#beneficios"
                             onClick={() => setMobileMenuOpen(false)}
@@ -196,11 +189,9 @@ export default function Home() {
                         >
                             Beneficios
                         </a>
-
                         <a href="https://forms.gle/uVSW131HtsJnKzE17" className="mt-2 px-6 py-3 bg-primary-container text-on-primary-container rounded-xl font-bold">
                             Inscribirme Ahora
                         </a>
-
                     </div>
                 </div>
             )}
@@ -238,8 +229,8 @@ export default function Home() {
                                 <a href="https://forms.gle/uVSW131HtsJnKzE17" className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
                                     Inscribirme Ahora
                                 </a>
-                                <a  href="https://www.facebook.com/SediproUNT" target="_blank" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
-                                    Más Información
+                                <a href="#fases" target="_blank" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
+                                    Fase Actual
                                 </a>
                             </div>
                         </div>
@@ -250,9 +241,9 @@ export default function Home() {
                                     alt={images[currentImageIndex].alt}
                                     width={500}
                                     height={500}
-                                    className={`object-contain transition-opacity duration-300 ${
-                                        isTransitioning ? 'opacity-0' : 'opacity-100'
-                                    }`}
+                                    priority
+                                    className={`object-contain transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'
+                                        }`}
                                     src={images[currentImageIndex].src}
                                 />
                             </div>
@@ -264,9 +255,9 @@ export default function Home() {
                 <section className="py-stack-lg bg-surface relative overflow-hidden" id="fases">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
                         <div className="text-center mb-stack-lg space-y-4">
-                            <h2 className="font-headline-lg text-headline-lg text-on-surface">Proceso de Selección</h2>
+                            <h2 className="font-headline-lg text-headline-lg text-on-surface">Fases de SEDInvita</h2>
                             <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
-                                Diseñamos un camino estructurado para identificar y potenciar el talento de cada estudiante que desea formar parte de SEDIPRO.
+                                Diseñamos un camino estructurado para identificar el talento de cada estudiante que desea formar parte de SEDIPRO UNT.
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-stack-md">
@@ -289,7 +280,7 @@ export default function Home() {
                                     Inscripciones Abiertas y Evaluación Preliminar. Primer acercamiento a tus aptitudes.
                                 </p>
                             </div>
-                            {/* Fase 2, 3, 4 similares... */}
+                            {/* Fase 2, 3, 4... */}
                             <div className="glass-card-locked p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <span className="font-display-lg text-display-lg font-extrabold text-on-surface">02</span>
@@ -361,7 +352,7 @@ export default function Home() {
                             <ul className="space-y-4">
                                 <li className="flex items-start gap-4">
                                     <div className="mt-1 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary flex-shrink-0">
-                                        <Check size={20} strokeWidth={2.5} /> 
+                                        <Check size={20} strokeWidth={2.5} />
                                     </div>
                                     <div>
                                         <h4 className="font-headline-md text-body-lg font-bold text-on-surface">Metodología PMI + Ágil</h4>
@@ -372,7 +363,7 @@ export default function Home() {
                                 </li>
                                 <li className="flex items-start gap-4">
                                     <div className="mt-1 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary flex-shrink-0">
-                                        <Check size={20} strokeWidth={2.5} /> 
+                                        <Check size={20} strokeWidth={2.5} />
                                     </div>
                                     <div>
                                         <h4 className="font-headline-md text-body-lg font-bold text-on-surface">Tres Enfoques de Impacto</h4>
@@ -383,7 +374,7 @@ export default function Home() {
                                 </li>
                                 <li className="flex items-start gap-4">
                                     <div className="mt-1 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary flex-shrink-0">
-                                        <Check size={20} strokeWidth={2.5} /> 
+                                        <Check size={20} strokeWidth={2.5} />
                                     </div>
                                     <div>
                                         <h4 className="font-headline-md text-body-lg font-bold text-on-surface">Formación de Líderes</h4>
@@ -402,6 +393,7 @@ export default function Home() {
                                         fill
                                         className="object-cover"
                                         src="/img/info1.jpg"
+                                        sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
                                 </div>
                                 <div className="aspect-[4/3] rounded-2xl overflow-hidden relative">
@@ -410,6 +402,7 @@ export default function Home() {
                                         fill
                                         className="object-cover"
                                         src="/img/info33.jpg"
+                                        sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
                                 </div>
                             </div>
@@ -420,6 +413,7 @@ export default function Home() {
                                         fill
                                         className="object-cover"
                                         src="/img/info44.jpg"
+                                        sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
                                 </div>
                                 <div className="aspect-square rounded-2xl bg-surface-variant overflow-hidden relative">
@@ -428,10 +422,10 @@ export default function Home() {
                                         fill
                                         className="object-cover"
                                         src="/img/info2.jpg"
+                                        sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </section>
@@ -443,13 +437,14 @@ export default function Home() {
                         <Image
                             alt="Fondo Sedipro UNT"
                             fill
+                            priority
                             className="object-cover"
-                            src="/img/cta-fondo.webp" // Cambia por tu ruta de imagen
+                            src="/img/cta-fondo.webp"
+                            sizes="100vw"
                         />
-                        {/* Overlay oscuro para que se lea bien el texto */}
                         <div className="absolute inset-0 bg-black/60"></div>
                     </div>
-                    
+
                     {/* Contenido */}
                     <div className="max-w-container-max mx-auto glass-card-extra-light rounded-[32px] p-stack-lg md:p-24 text-center space-y-stack-md relative z-10 border-white/5 backdrop-blur-sm">
                         <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-secondary/10 pointer-events-none rounded-[32px]"></div>
@@ -469,104 +464,115 @@ export default function Home() {
             </main>
 
             {/* Footer */}
-            <footer className="bg-surface-container-lowest border-t border-outline-variant/30 py-16">
-                <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-stack-md">
-                    
-                    {/* Izquierda: Logo + SEDIPRO UNT + Copyright */}
-                    <div className="flex flex-col gap-2 items-center md:items-start">
-                        <div className="flex items-center gap-3">
-                            {/* Logo pequeño */}
-                            <div className="w-8 h-8 relative">
+            <footer className="bg-surface-container-lowest border-t border-outline-variant/30 py-12">
+                <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-stack-md">
+                        <div className="flex flex-col gap-2 items-center md:items-start">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 relative">
+                                    <Image
+                                        src="/logos/isotipo.webp"
+                                        alt="Logo SEDIPRO UNT"
+                                        width={32}
+                                        height={32}
+                                        className="w-auto h-auto object-contain"
+                                    />
+                                </div>
+                                <span className="text-label-md font-headline-md font-bold text-on-surface">SEDIPRO UNT</span>
+                            </div>
+                            <p className="font-body-md text-body-md text-on-surface-variant font-label-sm text-label-sm">
+                                Sección Estudiantil de Dirección de
+                            </p>
+                            <p className="font-body-md text-body-md text-on-surface-variant font-label-sm text-label-sm">
+                                Proyectos de la UNT.
+                            </p>
+                            <Link href="/login" className="flex gap-1 mt-1 group cursor-pointer">
+                                <Lock size={14} className="text-outline-variant group-hover:text-primary transition-colors duration-200" />
+                                <span className="text-xs text-outline-variant group-hover:text-primary transition-colors duration-200">
+                                    Administración
+                                </span>
+                            </Link>
+                        </div>
+
+                        {/* Redes Sociales */}
+                        <div className="flex gap-4">
+                            <a
+                                href="https://www.facebook.com/SediproUNT"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Facebook"
+                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                            >
+                                <FaFacebookF size={18} />
+                            </a>
+                            <a
+                                href="https://www.instagram.com/sedipro.unt/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Instagram"
+                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                            >
+                                <FaInstagram size={18} />
+                            </a>
+                            <a
+                                href="https://www.linkedin.com/company/sediprount/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="LinkedIn"
+                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                            >
+                                <FaLinkedinIn size={18} />
+                            </a>
+                            <a
+                                href="https://www.youtube.com/c/SEDIPROUNT"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="YouTube"
+                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                            >
+                                <FaYoutube size={18} />
+                            </a>
+                            <a
+                                href="https://www.tiktok.com/@sediprount"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="TikTok"
+                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                            >
+                                <FaTiktok size={18} />
+                            </a>
+                        </div>
+
+                        {/* Hecho por Área de TI */}
+                        <div className="flex items-center gap-2">
+                            <span className="font-label-sm text-body-md text-on-surface-variant text-label-sm">
+                                Hecho con
+                            </span>
+                            <Heart size={14} className="text-orange-500 fill-orange-500 animate-pulse" />
+                            <span className="font-label-sm text-body-md text-on-surface-variant text-label-sm">
+                                por
+                            </span>
+                            <span className="font-label-sm text-label-md font-semibold text-orange-500 text-label-sm">
+                                Área de TI
+                            </span>
+                            <div className="w-6 h-6 relative">
                                 <Image
-                                    alt="Logo SEDIPRO UNT"
-                                    width={32}
-                                    height={32}
+                                    alt="Logo Área de TI SEDIPRO"
+                                    width={24}
+                                    height={24}
                                     className="object-contain"
-                                    src="/logos/isotipo.webp"
+                                    src="/img/area-ti.png"
                                 />
                             </div>
-                            <span className="text-label-md font-headline-md font-bold text-on-surface">SEDIPRO UNT</span>
                         </div>
-                        <p className="font-body-md text-body-md text-on-surface-variant font-label-sm text-label-sm">
+                    </div>
+
+                    <div className="mt-10 pt-6 border-t border-outline-variant/20 text-center">
+                        <p className="text-xs text-on-surface-variant/60">
                             © 2026 SEDIPRO UNT. Todos los derechos reservados.
                         </p>
                     </div>
 
-                    {/* Centro: Redes Sociales */}
-                    <div className="flex gap-4">
-                        <a
-                            href="https://www.facebook.com/SediproUNT"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Facebook"
-                            className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
-                        >
-                            <FaFacebookF size={18} />
-                        </a>
-
-                        <a
-                            href="https://www.instagram.com/sedipro.unt/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Instagram"
-                            className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
-                        >
-                            <FaInstagram size={18} />
-                        </a>
-
-                        <a
-                            href="https://www.linkedin.com/company/sediprount/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="LinkedIn"
-                            className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
-                        >
-                            <FaLinkedinIn size={18} />
-                        </a>
-
-                        <a
-                            href="https://www.youtube.com/c/SEDIPROUNT"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="YouTube"
-                            className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
-                        >
-                            <FaYoutube size={18} />
-                        </a>
-
-                        <a
-                            href="https://www.tiktok.com/@sediprount"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="TikTok"
-                            className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
-                        >
-                            <FaTiktok size={18} />
-                        </a>
-                    </div>
-
-                    {/* Derecha: Desarrollo por Área de TI */}
-                    <div className="flex items-center gap-2">
-                        <span className="font-label-sm text-body-md text-on-surface-variant text-label-sm">
-                            Hecho con
-                        </span>
-                        <Heart size={14} className="text-orange-500 fill-orange-500 animate-pulse" />
-                        <span className="font-label-sm text-body-md text-on-surface-variant text-label-sm">
-                            por
-                        </span>
-                        <span className="font-label-sm text-label-md font-semibold text-orange-500 text-label-sm">
-                            Área de TI
-                        </span>
-                        <div className="w-6 h-6 relative">
-                            <Image
-                                alt="Logo Área de TI SEDIPRO"
-                                width={24}
-                                height={24}
-                                className="object-contain"
-                                src="/img/area-ti.png" // Cambia por la ruta del logo del área de TI
-                            />
-                        </div>
-                    </div>
                 </div>
             </footer>
         </>

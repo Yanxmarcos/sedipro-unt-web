@@ -10,6 +10,7 @@ const NAV_ITEMS = [
     { href: '/panel/asistencias', label: 'Asistencias', iconKey: 'Attendance' },
     { href: '/panel/votaciones', label: 'Votaciones', iconKey: 'Vote' },
     { href: '/panel/sedipranos', label: 'Sedipranos', iconKey: 'Members' },
+    { href: '/panel/sedinvita',  label: 'SEDInvita',  iconKey: 'SEDInvita' },
 ]
 
 function getTheme(dark) {

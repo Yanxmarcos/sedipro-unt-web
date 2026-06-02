@@ -16,7 +16,7 @@ const poppins = Poppins({
 
 export const metadata = {
 	title: "SEDIPRO UNT",
-	description: "Sección Estudiantil de Dirección de Proyectos de la Universidad Nacional de Trujillo.",
+	description: "SEDIPRO UNT - Sección Estudiantil de Dirección de Proyectos de la Universidad Nacional de Trujillo (UNT), un equipo multidisciplinario de estudiantes comprometidos con el desarrollo y progreso de la sociedad.",
 	icons: {
 		icon: [
 			{ url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
@@ -27,6 +27,33 @@ export const metadata = {
 		],
 	},
 	manifest: '/site.webmanifest',
+	openGraph: {
+		title: 'SEDIPRO UNT',
+		description: 'Sección Estudiantil de Dirección de Proyectos de la UNT',
+		url: 'https://sediprount.org',
+		siteName: 'SEDIPRO UNT',
+		images: [
+			{
+				url: '/og-image.webp',
+				width: 1200,
+				height: 630,
+				alt: 'SEDIPRO UNT',
+			},
+		],
+		type: 'website',
+	},
+	twitter: {
+		card: 'summary_large_image',
+		title: 'SEDIPRO UNT',
+		description: 'Sección Estudiantil de Dirección de Proyectos de la UNT',
+		images: ['/og-image.webp'],
+		creator: '@SediproUNT',
+		site: '@SediproUNT',
+	},
+	metadataBase: new URL('https://sediprount.org'),
+	alternates: {
+		canonical: 'https://sediprount.org',
+	},
 };
 
 export default function RootLayout({ children }) {

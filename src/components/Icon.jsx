@@ -81,4 +81,11 @@ export const Icon = {
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
         </svg>
     ),
+    SEDInvita: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-round-plus-icon lucide-user-round-plus">
+            <path d="M2 21a8 8 0 0 1 13.292-6"/>
+            <circle cx="10" cy="8" r="5"/>
+            <path d="M19 16v6"/><path d="M22 19h-6"/>
+        </svg>
+    ),
 }

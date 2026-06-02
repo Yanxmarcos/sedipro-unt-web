@@ -68,12 +68,12 @@ export default function LoginPage() {
 			</div>
 
 			<div className="w-full max-w-sm relative z-10 animate-fade-in">
-				<header className="text-center mb-7">
-					<div className="flex justify-center mb-4">
+				<header className="text-center mb-4">
+					<div className="flex justify-center mb-2">
 						<img
 							src="/logos/sedi-logo.svg"
 							alt="Logo SEDIPRO UNT"
-							className="w-24 h-24 lg:w-32 lg:h-32 object-contain transition-transform duration-300 hover:scale-105"
+							className="w-24 h-24 lg:w-42 lg:h-42 object-contain transition-transform duration-300 hover:scale-105"
 							style={{
 								filter: 'drop-shadow(0 8px 16px rgba(103,37,119,0.30)) drop-shadow(0 2px 4px rgba(103,37,119,0.15))'
 							}}
@@ -267,7 +267,7 @@ export default function LoginPage() {
 				{/* Footer */}
 				<footer className="mt-5 text-center flex flex-col items-center gap-2">
 					<p className="text-sm font-poppins text-gray-400">
-						Exclusivo para la directiva de SEDIPRO UNT.
+						Acceso restringido. Exclusivo para la directiva de SEDIPRO UNT
 					</p>
 					<button
 						type="button"

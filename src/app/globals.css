@@ -214,6 +214,7 @@
 		border: 1px solid rgba(255, 255, 255, 0.05);
 		position: relative;
 		overflow: hidden;
+		user-select: none;
 	}
 
 	/* Capa de blur encima (como vidrio) */
@@ -225,12 +226,14 @@
 		backdrop-filter: blur(12px);
 		border-radius: 1rem;
 		z-index: 10;
+		user-select: none;
 	}
 
 	/* Contenido debajo de la capa */
 	.glass-card-locked > :not(.locked-badge-container) {
 		filter: blur(4px);
 		opacity: 0.5;
+		user-select: none;
 	}
 
 	/* Badge de "Próximamente" que queda ENCIMA de la capa de blur */
