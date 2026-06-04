@@ -486,12 +486,6 @@ export default function Home() {
                             <p className="font-body-md text-body-md text-on-surface-variant font-label-sm text-label-sm">
                                 Proyectos de la UNT.
                             </p>
-                            <Link href="/login" className="flex gap-1 mt-1 group cursor-pointer">
-                                <Lock size={14} className="text-outline-variant group-hover:text-primary transition-colors duration-200" />
-                                <span className="text-xs text-outline-variant group-hover:text-primary transition-colors duration-200">
-                                    Administración
-                                </span>
-                            </Link>
                         </div>
 
                         {/* Redes Sociales */}
@@ -568,11 +562,16 @@ export default function Home() {
                     </div>
 
                     <div className="mt-10 pt-6 border-t border-outline-variant/20 text-center">
-                        <p className="text-xs text-on-surface-variant/60">
+                        <Link href="/login" className="w-full flex justify-center items-center gap-1 mt-1 group cursor-pointer">
+                            <Lock size={14} className="text-outline-variant group-hover:text-primary transition-colors duration-200" />
+                            <span className="text-xs text-outline-variant group-hover:text-primary transition-colors duration-200">
+                                Administración
+                            </span>
+                        </Link>
+                        <p className="text-xs text-on-surface-variant/60 mt-5">
                             © 2026 SEDIPRO UNT. Todos los derechos reservados.
                         </p>
                     </div>
-
                 </div>
             </footer>
         </>
