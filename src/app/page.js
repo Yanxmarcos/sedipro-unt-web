@@ -2,18 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import {
-    Check,
-    Heart, Menu, X, Lock
-} from 'lucide-react';
+import { Check, Heart, Menu, X, Lock } from 'lucide-react';
 import Link from 'next/link'
-import {
-    FaFacebookF,
-    FaInstagram,
-    FaLinkedinIn,
-    FaYoutube,
-    FaTiktok
-} from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTiktok } from 'react-icons/fa';
 
 const images = [
     { src: '/img/hito1.webp', alt: 'Hito 1' },
@@ -30,6 +21,17 @@ export default function Home() {
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('inicio');
+
+    // CONFIGURACIÓN DE FASES
+    // glass-card-selected-glow
+    // glass-card
+    // glass-card-locked
+    const CONFIG_FASES = {
+        1: { clase: 'glass-card-selected-glow' },
+        2: { clase: 'glass-card-locked' },
+        3: { clase: 'glass-card-locked' },
+        4: { clase: 'glass-card-locked' }
+    }
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -262,7 +264,7 @@ export default function Home() {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-stack-md">
                             {/* Phase cards igual que el original... */}
-                            <div className="glass-card-selected-glow p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
+                            <div className={`${CONFIG_FASES[1].clase} p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative`}>
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <span className="font-display-lg text-display-lg font-extrabold text-on-surface">01</span>
                                 </div>
@@ -277,11 +279,11 @@ export default function Home() {
                                 </div>
                                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 1</h3>
                                 <p className="font-body-md text-body-md text-on-surface-variant">
-                                    Inscripciones Abiertas y Evaluación Preliminar. Primer acercamiento a tus aptitudes.
+                                    Inscripciones abiertas y evaluación preliminar. Primer acercamiento a tus aptitudes.
                                 </p>
                             </div>
                             {/* Fase 2, 3, 4... */}
-                            <div className="glass-card-locked p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
+                            <div className={`${CONFIG_FASES[2].clase} p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative`}>
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <span className="font-display-lg text-display-lg font-extrabold text-on-surface">02</span>
                                 </div>
@@ -296,10 +298,10 @@ export default function Home() {
                                 </div>
                                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 2</h3>
                                 <p className="font-body-md text-body-md text-on-surface-variant">
-                                    Inducciones y Dinámicas. Integración grupal y perfil profundo.
+                                    Inducciones y dinámicas. Integración grupal y perfil profundo.
                                 </p>
                             </div>
-                            <div className="glass-card-locked p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
+                            <div className={`${CONFIG_FASES[3].clase} p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative`}>
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <span className="font-display-lg text-display-lg font-extrabold text-on-surface">03</span>
                                 </div>
@@ -314,10 +316,10 @@ export default function Home() {
                                 </div>
                                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 3</h3>
                                 <p className="font-body-md text-body-md text-on-surface-variant">
-                                    Desarrollo de Proyecto y Casos de Estudio. Creatividad estratégica y defensa de ideas.
+                                    Desarrollo de Proyecto y casos de estudio. Creatividad estratégica y defensa de ideas.
                                 </p>
                             </div>
-                            <div className="glass-card-locked p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative">
+                            <div className={`${CONFIG_FASES[4].clase} p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative`}>
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <span className="font-display-lg text-display-lg font-extrabold text-on-surface">04</span>
                                 </div>
@@ -332,7 +334,7 @@ export default function Home() {
                                 </div>
                                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 4</h3>
                                 <p className="font-body-md text-body-md text-on-surface-variant">
-                                    Entrevistas Personales y Bienvenida. Evaluación final y ceremonia de ingreso oficial.
+                                    Entrevistas personales y bienvenida. Evaluación final y ceremonia de ingreso oficial.
                                 </p>
                             </div>
                         </div>
@@ -455,8 +457,8 @@ export default function Home() {
                             ¿Estás preparado para el desafío? Inicia tu proceso de postulación hoy mismo y sé parte de la élite académica de la UNT.
                         </p>
                         <div className="pt-4 relative z-10">
-                            <a href="https://forms.gle/uVSW131HtsJnKzE17" className="px-12 py-5 bg-primary text-on-surface rounded-full font-label-md text-headline-md font-bold shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
-                                Inscribirme
+                            <a href="https://forms.gle/uVSW131HtsJnKzE17" className="px-8 py-4 bg-primary text-on-secondary-container rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
+                                Inscribirme Ahora
                             </a>
                         </div>
                     </div>
