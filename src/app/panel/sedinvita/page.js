@@ -106,16 +106,6 @@ function parseExcelRows(sheetData) {
 }
 
 // ─────────────────────────────────────────────
-// FASES
-// ─────────────────────────────────────────────
-const FASES = [
-    { key: 'F1', label: 'Fase 1', color: '#10B981', desc: 'Inscripciones' },
-    { key: 'F2', label: 'Fase 2', color: '#3B82F6', desc: 'Induccion I + Dinámicas' },
-    { key: 'F3', label: 'Fase 3', color: '#F59E0B', desc: 'Inducción II' },
-    { key: 'F4', label: 'Fase 4', color: '#672577', desc: 'Entrevistas + Fin' },
-]
-
-// ─────────────────────────────────────────────
 // COMPONENTES PEQUEÑOS REUTILIZABLES
 // ─────────────────────────────────────────────
 function ActionBtn({ children, color, hoverColor, bg, title, onClick, disabled }) {
@@ -770,45 +760,6 @@ export default function SEDInvitaPage() {
                             Gestión de procesos dentro del proyecto SEDInvita 2026
                         </p>
                     </div>
-                </div>
-            </div>
-
-            {/* ── Selector de Fase ── */}
-            <div style={{
-                backgroundColor: t.cardBg, border: `1px solid ${t.cardBorder}`,
-                boxShadow: t.cardShadow, borderRadius: '14px',
-                padding: '14px 16px', marginBottom: '16px',
-            }}>
-                <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '11px', fontWeight: 700, color: t.labelText, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>
-                    Fase del programa
-                </p>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {FASES.map(f => {
-                        const active = fase === f.key
-                        return (
-                            <button
-                                key={f.key}
-                                onClick={() => setFase(f.key)}
-                                style={{
-                                    display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
-                                    padding: '9px 14px', borderRadius: '11px', border: 'none', cursor: 'pointer',
-                                    flex: '1 1 120px',
-                                    backgroundColor: active ? f.color : (dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'),
-                                    boxShadow: active ? `0 4px 14px ${f.color}44` : 'none',
-                                    transition: 'all 0.2s ease',
-                                    outline: active ? `2px solid ${f.color}` : `1px solid ${t.tabBorder}`,
-                                    outlineOffset: active ? '0px' : '-1px',
-                                }}
-                            >
-                                <span style={{ fontFamily: 'Poppins,sans-serif', fontSize: '13px', fontWeight: 700, color: active ? '#fff' : t.titleText, lineHeight: 1 }}>
-                                    {f.label}
-                                </span>
-                                <span style={{ fontFamily: 'Poppins,sans-serif', fontSize: '11px', color: active ? 'rgba(255,255,255,0.8)' : t.bodyText, marginTop: '3px' }}>
-                                    {f.desc}
-                                </span>
-                            </button>
-                        )
-                    })}
                 </div>
             </div>
 
