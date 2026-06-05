@@ -15,7 +15,7 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-	title: "SEDIPRO UNT",
+	title: "SEDIPRO UNT | Sección Estudiantil de Dirección de Proyectos de la UNT",
 	description: "SEDIPRO UNT - Sección Estudiantil de Dirección de Proyectos de la Universidad Nacional de Trujillo (UNT), un equipo multidisciplinario de estudiantes comprometidos con el desarrollo y progreso de la sociedad.",
 	keywords: "SEDIPRO, UNT, Dirección de Proyectos, Universidad Nacional de Trujillo, estudiantes, gestión de proyectos",
 	authors: [{ name: "SEDIPRO UNT" }],
@@ -24,7 +24,8 @@ export const metadata = {
 	
 	icons: {
 		icon: [
-			{ url: '/favicon.ico', sizes: 'any' },
+			{ url: '/favicon.svg', type: 'image/svg+xml' },
+			{ url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
 			{ url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
 			{ url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' }
 		],
