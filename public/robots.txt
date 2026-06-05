@@ -1,0 +1,35 @@
+# robots.txt - SEDIPRO UNT
+# Ubicación: /public/robots.txt
+
+# Permitir a todos los bots
+User-agent: *
+Allow: /
+
+# Rutas a NO indexar
+Disallow: /api/
+Disallow: /admin/
+Disallow: /.next/
+Disallow: /private/
+
+# Rutas específicas para bots
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0.5
+
+# Bots que pueden acceder
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Bots que queremos bloquear
+User-agent: BadBot
+Disallow: /
+
+User-agent: MJ12bot
+Crawl-delay: 10
+
+# Configuración de rastreo
+Crawl-delay: 1
+Request-rate: 30/60
