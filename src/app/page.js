@@ -429,7 +429,7 @@ export default function Home() {
                                 Conecta, lidera y <br /><span className="text-primary-container">transforma</span> tu futuro académico.
                             </h1>
                             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-lg mx-auto md:mx-0">
-                                Únete a la comunidad de líderes más influyente de la UNT. <strong>SEDInvita 2026</strong> es el punto de partida para tu crecimiento profesional y personal.
+                                Únete a la comunidad de líderes más influyente de la UNT. <span className='text-on-surface font-bold'>SEDInvita 2026</span> es el punto de partida para tu crecimiento profesional y personal. Inscripciones abiertas: <span className='text-on-surface font-bold'> del 1 al 18 de junio.</span>
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
                                 <a href="https://forms.gle/uVSW131HtsJnKzE17" target='_blank' className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
@@ -483,7 +483,7 @@ export default function Home() {
                                 </div>
                                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 1</h3>
                                 <p className="font-body-md text-body-md text-on-surface-variant">
-                                    Inscripciones abiertas y evaluación preliminar. Primer acercamiento a tus aptitudes.
+                                    Inscripciones abiertas y evaluación preliminar: del 1 al 18 de junio.
                                 </p>
                             </div>
                             {/* Fase 2, 3, 4... */}
@@ -658,7 +658,7 @@ export default function Home() {
                             Tu oportunidad <br />te está esperando.
                         </h2>
                         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto relative z-10">
-                            ¿Estás preparado para el desafío? Inicia tu proceso de postulación hoy mismo y sé parte de la élite académica de la UNT.
+                            ¿Estás preparado para el desafío? Inicia tu proceso de postulación hoy mismo y sé parte de la élite académica de la UNT. Inscripciones abiertas: del 1 al 18 de junio.
                         </p>
                         <div className="pt-4 relative z-10">
                             <a href="https://forms.gle/uVSW131HtsJnKzE17" target='_blank' className="px-8 py-4 bg-primary text-on-secondary-container rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
