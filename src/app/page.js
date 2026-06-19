@@ -627,7 +627,7 @@ export default function Home() {
                 </section>
 
                 {/* Benefits Section */}
-                <section className="py-stack-lg bg-surface-container-lowest relative overflow-hidden" id="beneficios">
+                <section className="py-stack-lg bg-surface relative overflow-hidden" id="beneficios">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-stack-lg items-center">
                         <div className="lg:col-span-5 space-y-stack-md">
                             <h2 className="font-display-lg text-headline-lg md:text-display-lg text-on-surface leading-tight">
@@ -738,7 +738,7 @@ export default function Home() {
                 </section>
 
                 {/* Areas */}
-                <section className="py-stack-lg bg-surface relative overflow-hidden" id="areas">
+                <section className="py-stack-lg bg-surface-container-lowest relative overflow-hidden" id="areas">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
                         <div className="text-center mb-stack-lg space-y-4">
                             <h2 className="font-headline-lg text-headline-lg text-on-surface">Áreas de SEDIPRO UNT</h2>
