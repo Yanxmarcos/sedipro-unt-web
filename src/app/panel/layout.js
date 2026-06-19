@@ -10,8 +10,165 @@ const NAV_ITEMS = [
     { href: '/panel/asistencias', label: 'Asistencias', iconKey: 'Attendance' },
     { href: '/panel/votaciones', label: 'Votaciones', iconKey: 'Vote' },
     { href: '/panel/sedipranos', label: 'Sedipranos', iconKey: 'Members' },
-    { href: '/panel/sedinvita',  label: 'SEDInvita',  iconKey: 'SEDInvita' },
+    {
+        href: '/panel/sedinvita',
+        label: 'SEDInvita',
+        iconKey: 'SEDInvita',
+        children: [
+            { href: '/panel/sedinvita/sedinvitados', label: 'SEDinvitados' },
+            { href: '/panel/sedinvita/asistencia', label: 'Asistencia' },
+            { href: '/panel/sedinvita/evaluacion', label: 'Evaluación' },
+        ],
+    },
 ]
+
+function getActiveInfo(pathname) {
+    for (const item of NAV_ITEMS) {
+        if (item.children) {
+            const child = item.children.find(c => pathname.startsWith(c.href))
+            if (child) return { item, label: item.label, sub: child.label }
+            if (pathname === item.href) return { item, label: item.label, sub: null }
+        } else {
+            const active = item.exact ? pathname === item.href : pathname.startsWith(item.href)
+            if (active) return { item, label: item.label, sub: null }
+        }
+    }
+    return { item: NAV_ITEMS[0], label: 'Dashboard', sub: null }
+}
+
+function SideNavGroup({ item, pathname, hideLabel, theme, open, onToggle, onLinkClick }) {
+    const IconComp = Icon[item.iconKey]
+    const childActive = item.children.some(c => pathname.startsWith(c.href))
+    const parentActive = childActive
+
+    return (
+        <div className="sdp-navgroup" style={{ marginBottom: '2px', position: 'relative' }}>
+            {hideLabel ? (
+                <Link
+                    href={item.children[0].href}
+                    onClick={onLinkClick}
+                    title={item.label}
+                    style={{
+                        display: 'flex', alignItems: 'center', gap: '10px',
+                        padding: '10px', borderRadius: '12px', textDecoration: 'none',
+                        background: childActive ? 'linear-gradient(135deg,#672577,#3454A1)' : 'transparent',
+                        color: childActive ? '#fff' : theme.navText,
+                        boxShadow: childActive ? '0 4px 14px rgba(103,37,119,0.28)' : 'none',
+                    }}
+                    onMouseEnter={(e) => { if (!childActive) e.currentTarget.style.backgroundColor = theme.navHoverBg }}
+                    onMouseLeave={(e) => { if (!childActive) e.currentTarget.style.backgroundColor = '' }}
+                >
+                    <span style={{ flexShrink: 0, width: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <IconComp />
+                    </span>
+                </Link>
+            ) : (
+                <button
+                    onClick={onToggle}
+                    style={{
+                        display: 'flex', alignItems: 'center', gap: '10px',
+                        width: '100%', padding: '10px', borderRadius: '12px',
+                        border: 'none', cursor: 'pointer', textAlign: 'left',
+                        background: parentActive ? 'linear-gradient(135deg,#672577,#3454A1)' : 'transparent',
+                        color: parentActive ? '#fff' : theme.navText,
+                        boxShadow: parentActive ? '0 4px 14px rgba(103,37,119,0.28)' : 'none',
+                        transition: 'background 0.15s, box-shadow 0.15s',
+                    }}
+                    onMouseEnter={(e) => { if (!parentActive) e.currentTarget.style.backgroundColor = theme.navHoverBg }}
+                    onMouseLeave={(e) => { if (!parentActive) e.currentTarget.style.backgroundColor = '' }}
+                >
+                    <span style={{ flexShrink: 0, width: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <IconComp />
+                    </span>
+                    <span style={{
+                        flex: 1, fontFamily: 'Poppins,sans-serif', fontSize: '13px',
+                        fontWeight: childActive ? 600 : 500,
+                        whiteSpace: 'nowrap', overflow: 'hidden',
+                    }}>
+                        {item.label}
+                    </span>
+                    <span style={{
+                        flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s',
+                    }}>
+                        <Icon.ChevronRight />
+                    </span>
+                </button>
+            )}
+
+            {/* Submenu desplegable (sidebar expandida) */}
+            {!hideLabel && (
+                <div style={{
+                    overflow: 'hidden',
+                    maxHeight: open ? `${item.children.length * 38 + 8}px` : '0px',
+                    transition: 'max-height 0.25s ease',
+                }}>
+                    <div style={{ paddingLeft: '0px', paddingTop: '4px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {item.children.map(child => {
+                            const active = pathname.startsWith(child.href)
+                            return (
+                                <Link
+                                    key={child.href} href={child.href} onClick={onLinkClick}
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: '16px',
+                                        padding: '8px 16px', borderRadius: '10px', textDecoration: 'none',
+                                        fontSize: '12px', fontFamily: 'Poppins,sans-serif',
+                                        fontWeight: active ? 600 : 500,
+                                        color: active ? '#fff' : theme.navText,
+                                        background: active ? 'linear-gradient(135deg,#672577,#3454A1)' : 'transparent',
+                                    }}
+                                    onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = theme.navHoverBg }}
+                                    onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = '' }}
+                                >
+                                    <span style={{
+                                        width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0,
+                                        backgroundColor: active ? '#fff' : theme.navText,
+                                        opacity: active ? 1 : 0.5,
+                                    }} />
+                                    {child.label}
+                                </Link>
+                            )
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* Flyout (sidebar colapsada, desktop) */}
+            {hideLabel && (
+                <div className="sdp-flyout" style={{
+                    position: 'absolute', left: 'calc(100% + 12px)', top: 0,
+                    backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}`,
+                    borderRadius: '12px', boxShadow: theme.cardShadow,
+                    minWidth: '160px', padding: '6px', zIndex: 99,
+                }}>
+                    <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '11px', fontWeight: 600, color: theme.labelText, margin: '4px 8px 6px' }}>
+                        {item.label}
+                    </p>
+                    {item.children.map(child => {
+                        const active = pathname.startsWith(child.href)
+                        return (
+                            <Link
+                                key={child.href} href={child.href} onClick={onLinkClick}
+                                style={{
+                                    display: 'block', padding: '7px 10px', borderRadius: '8px', textDecoration: 'none',
+                                    fontSize: '12px', fontFamily: 'Poppins,sans-serif',
+                                    fontWeight: active ? 600 : 500,
+                                    color: active ? '#fff' : theme.navText,
+                                    background: active ? 'linear-gradient(135deg,#672577,#3454A1)' : 'transparent',
+                                }}
+                                onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = theme.navHoverBg }}
+                                onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = '' }}
+                            >
+                                {child.label}
+                            </Link>
+                        )
+                    })}
+                </div>
+            )}
+        </div>
+    )
+}
 
 function getTheme(dark) {
     return {
@@ -340,6 +497,16 @@ export default function PanelLayout({ children }) {
     const [settingsOpen, setSettingsOpen] = useState(false)
     const [userData, setUserData] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
+    const [openMenus, setOpenMenus] = useState({})
+
+    useEffect(() => {
+        NAV_ITEMS.forEach(item => {
+            if (item.children?.some(c => pathname.startsWith(c.href))) {
+                setOpenMenus(prev => prev[item.href] ? prev : { ...prev, [item.href]: true })
+            }
+        })
+    }, [pathname])
+
     useEffect(() => {
         try {
             setDarkMode(localStorage.getItem('sedipro_dark') === 'true')
@@ -407,7 +574,7 @@ export default function PanelLayout({ children }) {
         return item.exact ? pathname === item.href : pathname.startsWith(item.href)
     }
 
-    const currentItem = NAV_ITEMS.find(i => isActive(i)) ?? NAV_ITEMS[0]
+    const activeInfo = getActiveInfo(pathname)
     const theme = getTheme(darkMode)
     const desktopCollapsed = !isMobile && collapsed
     const displayName = userData?.nombres && userData?.apellidos
@@ -432,6 +599,16 @@ export default function PanelLayout({ children }) {
                 ::-webkit-scrollbar        { width: 4px; height: 4px; }
                 ::-webkit-scrollbar-track  { background: transparent; }
                 ::-webkit-scrollbar-thumb  { background: rgba(103,37,119,0.28); border-radius: 4px; }
+                .sdp-navgroup { position: relative; }
+                .sdp-navgroup .sdp-flyout {
+                    opacity: 0; visibility: hidden; transform: translateX(-6px);
+                    transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+                    pointer-events: none;
+                }
+                .sdp-navgroup:hover .sdp-flyout {
+                    opacity: 1; visibility: visible; transform: translateX(0);
+                    pointer-events: auto;
+                }
             `}</style>
 
             {isMobile && mobileOpen && (
@@ -492,14 +669,27 @@ export default function PanelLayout({ children }) {
 
                 <nav style={{ flex: 1, padding: '10px 8px', overflowY: 'auto', overflowX: 'hidden' }}>
                     {NAV_ITEMS.map((item) => (
-                        <SideNavLink
-                            key={item.href}
-                            item={item}
-                            active={isActive(item)}
-                            hideLabel={desktopCollapsed}
-                            theme={theme}
-                            onClick={() => isMobile && setMobileOpen(false)}
-                        />
+                        item.children ? (
+                            <SideNavGroup
+                                key={item.href}
+                                item={item}
+                                pathname={pathname}
+                                hideLabel={desktopCollapsed}
+                                theme={theme}
+                                open={!!openMenus[item.href]}
+                                onToggle={() => setOpenMenus(m => ({ ...m, [item.href]: !m[item.href] }))}
+                                onLinkClick={() => isMobile && setMobileOpen(false)}
+                            />
+                        ) : (
+                            <SideNavLink
+                                key={item.href}
+                                item={item}
+                                active={isActive(item)}
+                                hideLabel={desktopCollapsed}
+                                theme={theme}
+                                onClick={() => isMobile && setMobileOpen(false)}
+                            />
+                        )
                     ))}
                 </nav>
 
@@ -567,9 +757,17 @@ export default function PanelLayout({ children }) {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '5px', overflow: 'hidden', minWidth: 0 }}>
                             <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontFamily: 'Poppins,sans-serif', whiteSpace: 'nowrap', flexShrink: 0 }}>Panel</span>
                             <span style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }}><Icon.ChevronRight /></span>
-                            <span style={{ color: '#fff', fontSize: '13px', fontFamily: 'Poppins,sans-serif', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                {currentItem?.label ?? 'Dashboard'}
+                            <span style={{ color: activeInfo.sub ? 'rgba(255,255,255,0.7)' : '#fff', fontSize: '13px', fontFamily: 'Poppins,sans-serif', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {activeInfo.label}
                             </span>
+                            {activeInfo.sub && (
+                                <>
+                                    <span style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }}><Icon.ChevronRight /></span>
+                                    <span style={{ color: '#fff', fontSize: '13px', fontFamily: 'Poppins,sans-serif', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                        {activeInfo.sub}
+                                    </span>
+                                </>
+                            )}
                         </div>
                     </div>
 

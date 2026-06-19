@@ -1,10 +1,14 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
-import { Check, Heart, Menu, X, Lock } from 'lucide-react';
+import { Check, Heart, Menu, X, Lock , ArrowUp} from 'lucide-react';
 import Link from 'next/link'
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTiktok } from 'react-icons/fa';
+
+import TurnoModal from "@/components/TurnoModal";
+import TurnoTemporalModal from "@/components/TurnoTemporalModalProps";
+import MagicBento from "@/components/MagicBento";
 
 const ShaderBackground = () => {
     const canvasRef = useRef(null);
@@ -138,7 +142,6 @@ const ShaderBackground = () => {
     }
   `;
 
-    // ... (resto de funciones loadShader, initShaderProgram, useEffect igual que antes)
     const loadShader = (gl, type, source) => {
         const shader = gl.createShader(type);
         gl.shaderSource(shader, source);
@@ -214,6 +217,53 @@ const ShaderBackground = () => {
     return <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full -z-10" />;
 };
 
+const ScrollToTopButton = () => {
+    const [isFooterVisible, setIsFooterVisible] = useState(false);
+
+    useEffect(() => {
+        const footer = document.querySelector('footer');
+        if (!footer) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                // El botón aparece cuando el footer está visible
+                setIsFooterVisible(entry.isIntersecting);
+            },
+            {
+                threshold: 0.1, // 10% del footer visible
+                rootMargin: '0px 0px -50px 0px' // Ajusta para que aparezca un poco antes
+            }
+        );
+
+        observer.observe(footer);
+
+        return () => {
+            if (footer) observer.unobserve(footer);
+        };
+    }, []);
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
+    };
+
+    return (
+        <button
+            onClick={scrollToTop}
+            className={`fixed bottom-8 right-8 z-50 p-4 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-full shadow-2xl shadow-primary/30 hover:scale-110 transition-all duration-500 ${
+                isFooterVisible 
+                    ? 'opacity-100 translate-y-0 pointer-events-auto' 
+                    : 'opacity-0 translate-y-10 pointer-events-none'
+            }`}
+            aria-label="Volver arriba"
+        >
+            <ArrowUp size={24} strokeWidth={2.5} />
+        </button>
+    );
+};
+
 const images = [
     { src: '/img/hito1.webp', alt: 'Hito 1' },
     { src: '/img/hito2.webp', alt: 'Hito 2' },
@@ -224,21 +274,20 @@ const images = [
 ];
 
 export default function Home() {
-
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('inicio');
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // CONFIGURACIÓN DE FASES
-    // glass-card-selected-glow
-    // glass-card
-    // glass-card-locked
+
+    const [showTemporalModal, setShowTemporalModal] = useState(false);
+
     const CONFIG_FASES = {
-        1: { clase: 'glass-card-selected-glow' },
-        2: { clase: 'glass-card-locked' },
-        3: { clase: 'glass-card-locked' },
-        4: { clase: 'glass-card-locked' }
+        1: { clase: 'glass-card' },
+        2: { clase: 'glass-card-selected-glow' },
+        3: { clase: 'glass-card' },
+        4: { clase: 'glass-card' }
     }
 
     useEffect(() => {
@@ -309,10 +358,26 @@ export default function Home() {
         return () => observer.disconnect();
     }, []);
 
+    // Prevenir scroll del body cuando el modal está abierto
+    useEffect(() => {
+        if (isModalOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isModalOpen]);
+
+    const openModal = () => {
+        setShowTemporalModal(true);
+    };
+
     return (
         <>
-            {/* TopNavBar */}
-            <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-3 bg-surface-container/80 backdrop-blur-2xl rounded-full mt-4 mx-4 md:mx-auto max-w-container-max border border-white/10 shadow-2xl">
+            {/* TopNavBar - Actualizado con gradiente hero */}
+            <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-3 bg-[#0b1326]/80 backdrop-blur-2xl rounded-full mt-4 mx-4 md:mx-auto max-w-container-max border border-white/10 shadow-2xl">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 relative">
                         <Image
@@ -331,8 +396,8 @@ export default function Home() {
                     <a
                         href="#inicio"
                         className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'inicio'
-                                ? 'text-on-surface-variant/70 font-medium hover:text-primary border-b-2'
-                                : 'text-primary border-primary font-bold'
+                            ? 'text-on-surface-variant font-bold hover:text-primary border-b-2'
+                            : 'text-on-surface-variant/60 border-on-surface-variant/60 font-medium'
                             }`}
                     >
                         Inicio
@@ -341,8 +406,8 @@ export default function Home() {
                     <a
                         href="#fases"
                         className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'fases'
-                                ? 'text-on-surface-variant/70 font-medium hover:text-primary border-b-2'
-                                : 'text-primary border-primary font-bold'
+                            ? 'text-on-surface-variant font-bold hover:text-primary border-b-2'
+                            : 'text-on-surface-variant/60 border-on-surface-variant/60 font-medium'
                             }`}
                     >
                         Fases
@@ -351,17 +416,30 @@ export default function Home() {
                     <a
                         href="#beneficios"
                         className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'beneficios'
-                                ? 'text-on-surface-variant/70 font-medium hover:text-primary border-b-2'
-                                : 'text-primary border-primary font-bold'
+                            ? 'text-on-surface-variant font-bold hover:text-primary border-b-2'
+                            : 'text-on-surface-variant/60 border-on-surface-variant/60 font-medium'
                             }`}
                     >
                         Beneficios
                     </a>
+
+                    <a
+                        href="#areas"
+                        className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'areas'
+                            ? 'text-on-surface-variant font-bold hover:text-primary border-b-2'
+                            : 'text-on-surface-variant/60 border-on-surface-variant/60 font-medium'
+                            }`}
+                    >
+                        Áreas
+                    </a>
+
                 </div>
                 <div className="flex items-center gap-4">
-                    <a href="https://forms.gle/uVSW131HtsJnKzE17" target='_blank' className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-primary-container text-on-primary-container rounded-full font-label-md text-label-md font-bold active:scale-95 transform transition-transform duration-200 shadow-lg">
-                        Inscribirme Ahora
-                    </a>
+                    <button 
+                    onClick={openModal}
+                    className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-full font-label-md text-label-md font-bold active:scale-105 hover:scale-105 transform transition-transform duration-200 shadow-lg">
+                        Elegir Turno
+                    </button>
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className="md:hidden text-on-surface"
@@ -399,16 +477,23 @@ export default function Home() {
                         >
                             Beneficios
                         </a>
-                        <a href="https://forms.gle/uVSW131HtsJnKzE17" target='_blank' className="mt-2 px-6 py-3 bg-primary-container text-on-primary-container rounded-xl font-bold">
-                            Inscribirme Ahora
+                        <a
+                            href="#areas"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="font-semibold text-on-surface"
+                        >
+                            Áreas
                         </a>
+                        <button onClick={openModal} className="mt-2 px-6 py-3 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-xl font-bold">
+                            Elegir Turno
+                        </button>
                     </div>
                 </div>
             )}
 
             <main>
-                {/* Hero Section */}
-                <section className="relative min-h-screen flex items-center pt-24 overflow-hidden" id="inicio">
+                {/* Hero Section - Igual como está */}
+                <section className="relative min-h-screen flex items-center pt-24 overflow-hidden hero-gradient" id="inicio">
                     {/* Fondo de respaldo inmediato (se ve mientras carga el shader) */}
                     <div className="absolute inset-0 z-[-1] hero-gradient"></div>
                     
@@ -421,21 +506,19 @@ export default function Home() {
                     <div className="absolute inset-0 z-[1]" style={{ 
                         background: "linear-gradient(135deg, rgba(11, 19, 38, 0.7) 0%, rgba(59, 1, 145, 0.6) 50%, rgba(107, 70, 193, 0.5) 100%)"
                     }}></div>
-                    
-                    {/* Contenido del hero */}
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop w-full grid grid-cols-1 md:grid-cols-2 gap-stack-lg items-center relative z-10">
                         <div className="space-y-stack-md text-center md:text-left flex flex-col items-center md:items-start mt-12 md:mt-0">
                             <h1 className="font-display-lg text-[32px] sm:text-[36px] md:text-display-lg text-on-surface leading-tight text-glow">
                                 Conecta, lidera y <br /><span className="text-primary-container">transforma</span> tu futuro académico.
                             </h1>
                             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-lg mx-auto md:mx-0">
-                                Únete a la comunidad de líderes más influyente de la UNT. <span className='text-on-surface font-bold'>SEDInvita 2026</span> es el punto de partida para tu crecimiento profesional y personal. Inscripciones abiertas: <span className='text-on-surface font-bold'> del 1 al 18 de junio.</span>
+                                Únete a la comunidad de líderes más influyente de la UNT. <strong>SEDInvita 2026</strong> es el punto de partida para tu crecimiento profesional y personal.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                                <a href="https://forms.gle/uVSW131HtsJnKzE17" target='_blank' className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-                                    Inscribirme Ahora
-                                </a>
-                                <a href="#fases" target="_blank" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
+                                <button onClick={openModal} className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
+                                    Elegir Turno
+                                </button>
+                                <a href="#fases" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
                                     Fase Actual
                                 </a>
                             </div>
@@ -458,21 +541,20 @@ export default function Home() {
                 </section>
 
                 {/* Chronogram Section (Phases) */}
-                <section className="py-stack-lg bg-surface relative overflow-hidden" id="fases">
+                <section className="py-stack-lg bg-surface-container-lowest relative overflow-hidden" id="fases">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
                         <div className="text-center mb-stack-lg space-y-4">
                             <h2 className="font-headline-lg text-headline-lg text-on-surface">Fases de SEDInvita</h2>
                             <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
-                                Diseñamos un camino estructurado para identificar el talento de cada estudiante que desea formar parte de SEDIPRO UNT.
+                                Diseñamos un camino estructurado para identificar el talento de cada estudiante. Actualmente nos encontramos en la <strong>Fase 2</strong> del proceso.
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-stack-md">
-                            {/* Phase cards igual que el original... */}
                             <div className={`${CONFIG_FASES[1].clase} p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative`}>
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <span className="font-display-lg text-display-lg font-extrabold text-on-surface">01</span>
                                 </div>
-                                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-stack-sm">
+                                <div className="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-primary mb-stack-sm">
                                     <Image
                                         alt="Background Hito"
                                         width={50}
@@ -483,15 +565,14 @@ export default function Home() {
                                 </div>
                                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 1</h3>
                                 <p className="font-body-md text-body-md text-on-surface-variant">
-                                    Inscripciones abiertas y evaluación preliminar: del 1 al 18 de junio.
+                                    Periodo de inscripciones abiertas. <br /> <strong>Del 1 al 18 de junio.</strong>
                                 </p>
                             </div>
-                            {/* Fase 2, 3, 4... */}
                             <div className={`${CONFIG_FASES[2].clase} p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative`}>
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <span className="font-display-lg text-display-lg font-extrabold text-on-surface">02</span>
                                 </div>
-                                <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary mb-stack-sm">
+                                <div className="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-secondary mb-stack-sm">
                                     <Image
                                         alt="Background Hito"
                                         width={50}
@@ -502,7 +583,7 @@ export default function Home() {
                                 </div>
                                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 2</h3>
                                 <p className="font-body-md text-body-md text-on-surface-variant">
-                                    Inducciones y dinámicas. Integración grupal y perfil profundo.
+                                    Inducción I: Dinámicas.<br /> <strong>27 de junio.</strong>
                                 </p>
                             </div>
                             <div className={`${CONFIG_FASES[3].clase} p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative`}>
@@ -520,14 +601,14 @@ export default function Home() {
                                 </div>
                                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 3</h3>
                                 <p className="font-body-md text-body-md text-on-surface-variant">
-                                    Desarrollo de Proyecto y casos de estudio. Creatividad estratégica y defensa de ideas.
+                                    Inducción II: Desarrollo de proyectos.<br /><strong>Del 1 al 7 de julio.</strong>
                                 </p>
                             </div>
                             <div className={`${CONFIG_FASES[4].clase} p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative`}>
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <span className="font-display-lg text-display-lg font-extrabold text-on-surface">04</span>
                                 </div>
-                                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-stack-sm">
+                                <div className="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-primary mb-stack-sm">
                                     <Image
                                         alt="Background Hito"
                                         width={50}
@@ -538,7 +619,7 @@ export default function Home() {
                                 </div>
                                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 4</h3>
                                 <p className="font-body-md text-body-md text-on-surface-variant">
-                                    Entrevistas personales y bienvenida. Evaluación final y ceremonia de ingreso oficial.
+                                    Etapa de entrevistas personales.<br /> <strong>Del 13 al 18 de julio.</strong>
                                 </p>
                             </div>
                         </div>
@@ -593,52 +674,98 @@ export default function Home() {
                         </div>
                         <div className="lg:col-span-7 grid grid-cols-2 gap-4">
                             <div className="space-y-4 pt-12">
-                                <div className="aspect-square rounded-2xl bg-surface-variant overflow-hidden relative">
+                                <a 
+                                    href="https://www.facebook.com/SediproUNT/posts/pfbid02PjWsMHJDriaFfzskH2fn9TSmxpFtC1gJ8TG7HDKeGfsY2Q55u6f6MSGXpzPBgUwvl" 
+                                    className="aspect-square rounded-2xl bg-surface-variant overflow-hidden relative block hover:opacity-90 transition-opacity"
+                                    target="_blank" // Opcional: abre en nueva pestaña
+                                    rel="noopener noreferrer" // Seguridad para target="_blank"
+                                >
                                     <Image
-                                        alt="Imagen 1"
+                                        alt="Proyectando Vocaciones 3.0"
                                         fill
                                         className="object-cover"
-                                        src="/img/info1.jpg"
+                                        src="/img/beneficios-sedinvita/info1.webp"
                                         sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
-                                </div>
-                                <div className="aspect-[4/3] rounded-2xl overflow-hidden relative">
+                                </a>
+                                <a 
+                                    href="https://www.facebook.com/photo.php?fbid=1276527767972830&set=pb.100068468572320.-2207520000&type=3" 
+                                    className="aspect-[4/3] rounded-2xl overflow-hidden relative block hover:opacity-90 transition-opacity"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
                                     <Image
-                                        alt="Imagen 2"
+                                        alt="SEDIPROYECTA"
                                         fill
                                         className="object-cover"
-                                        src="/img/info33.jpg"
+                                        src="/img/beneficios-sedinvita/info3.webp"
                                         sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
-                                </div>
+                                </a>
                             </div>
                             <div className="space-y-4">
-                                <div className="aspect-[4/3] rounded-2xl overflow-hidden relative">
+                                <a 
+                                    href="https://www.facebook.com/photo.php?fbid=1276582514634022&set=pb.100068468572320.-2207520000&type=3" 
+                                    className="aspect-[4/3] rounded-2xl overflow-hidden relative block hover:opacity-90 transition-opacity"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
                                     <Image
-                                        alt="Imagen 3"
+                                        alt="SEDIEMPLEA"
                                         fill
                                         className="object-cover"
-                                        src="/img/info44.jpg"
+                                        src="/img/beneficios-sedinvita/info4.webp"
                                         sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
-                                </div>
-                                <div className="aspect-square rounded-2xl bg-surface-variant overflow-hidden relative">
+                                </a>
+                                <a 
+                                    href="https://www.facebook.com/photo.php?fbid=1243271171298490&set=pb.100068468572320.-2207520000&type=3" 
+                                    className="aspect-square rounded-2xl bg-surface-variant overflow-hidden relative block hover:opacity-90 transition-opacity"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
                                     <Image
-                                        alt="Imagen 4"
+                                        alt="Directiva SEDIPRO UNT"
                                         fill
                                         className="object-cover"
-                                        src="/img/info2.jpg"
+                                        src="/img/beneficios-sedinvita/info2.webp"
                                         sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
-                                </div>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </section>
 
+                {/* Areas */}
+                <section className="py-stack-lg bg-surface relative overflow-hidden" id="areas">
+                    <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+                        <div className="text-center mb-stack-lg space-y-4">
+                            <h2 className="font-headline-lg text-headline-lg text-on-surface">Áreas de SEDIPRO UNT</h2>
+                            <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+                                Conoce nuestras áreas y atrévete a ser el próximo fichaje de SEDIPRO UNT. Tu próxima gran oportunidad comienza aquí.
+                            </p>
+                        </div>
+                        <MagicBento 
+                            textAutoHide={true}
+                            enableStars
+                            enableSpotlight
+                            enableBorderGlow={true}
+                            enableTilt={false}
+                            enableMagnetism={false}
+                            clickEffect
+                            spotlightRadius={400}
+                            particleCount={30}
+                            glowColor="132, 0, 255"
+                            disableAnimations={false}
+                            showBackgroundImages={true}
+                            imageOpacity={0.8} // Ajusta la opacidad de la imagen (0-1)
+                        />
+                    </div>
+                </section>
+
                 {/* CTA Section */}
                 <section className="py-stack-lg px-margin-mobile relative overflow-hidden">
-                    {/* Imagen de fondo */}
                     <div className="absolute inset-0 z-0">
                         <Image
                             alt="Fondo Sedipro UNT"
@@ -650,27 +777,27 @@ export default function Home() {
                         />
                         <div className="absolute inset-0 bg-black/60"></div>
                     </div>
-
-                    {/* Contenido */}
                     <div className="max-w-container-max mx-auto glass-card-extra-light rounded-[32px] p-stack-lg md:p-24 text-center space-y-stack-md relative z-10 border-white/5 backdrop-blur-sm">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-secondary/10 pointer-events-none rounded-[32px]"></div>
+                        <div className="absolute inset-0 bg-gradient-to-tr from-[#3b0191]/10 via-transparent to-[#6b46c1]/10 pointer-events-none rounded-[32px]"></div>
                         <h2 className="font-display-lg text-headline-lg md:text-[56px] text-on-surface leading-tight relative z-10">
-                            Tu oportunidad <br />te está esperando.
+                            Segunda Fase <br />de Selección.
                         </h2>
                         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto relative z-10">
-                            ¿Estás preparado para el desafío? Inicia tu proceso de postulación hoy mismo y sé parte de la élite académica de la UNT. Inscripciones abiertas: del 1 al 18 de junio.
+                            Participa en las inducciones, dinámicas y evaluaciones que nos permitirán descubrir tu perfil y prepararte para formar parte de SEDIPRO UNT.
                         </p>
                         <div className="pt-4 relative z-10">
-                            <a href="https://forms.gle/uVSW131HtsJnKzE17" target='_blank' className="px-8 py-4 bg-primary text-on-secondary-container rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-                                Inscribirme Ahora
-                            </a>
+                            <button onClick={openModal} className="px-8 py-4 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
+                                Elegir Turno
+                            </button>
                         </div>
                     </div>
                 </section>
             </main>
-
+            
+            <ScrollToTopButton />
             {/* Footer */}
             <footer className="bg-surface-container-lowest border-t border-outline-variant/30 py-12">
+                {/* ... contenido del footer sin cambios ... */}
                 <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-stack-md">
                         <div className="flex flex-col gap-2 items-center md:items-start">
@@ -694,7 +821,6 @@ export default function Home() {
                             </p>
                         </div>
 
-                        {/* Redes Sociales */}
                         <div className="flex gap-4">
                             <a
                                 href="https://www.facebook.com/SediproUNT"
@@ -743,7 +869,6 @@ export default function Home() {
                             </a>
                         </div>
 
-                        {/* Hecho por Área de TI */}
                         <div className="flex items-center gap-2">
                             <span className="font-label-sm text-body-md text-on-surface-variant text-label-sm">
                                 Hecho con
@@ -768,18 +893,25 @@ export default function Home() {
                     </div>
 
                     <div className="mt-10 pt-6 border-t border-outline-variant/20 text-center">
-                        <Link href="/login" className="w-full flex justify-center items-center gap-1 mt-1 group cursor-pointer">
+                        {/* <Link href="/login" className="w-full flex justify-center items-center gap-1 mt-1 group cursor-pointer">
                             <Lock size={14} className="text-outline-variant group-hover:text-primary transition-colors duration-200" />
                             <span className="text-xs text-outline-variant group-hover:text-primary transition-colors duration-200">
                                 Administración
                             </span>
-                        </Link>
+                        </Link> */}
                         <p className="text-xs text-on-surface-variant/60 mt-5">
                             © 2026 SEDIPRO UNT. Todos los derechos reservados.
                         </p>
                     </div>
                 </div>
             </footer>
+
+            {/* Modal de Elegir Turno */}
+            {/* <TurnoModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} /> */}
+            <TurnoTemporalModal 
+                isOpen={showTemporalModal}
+                onClose={() => setShowTemporalModal(false)}
+            />
         </>
     );
 }
