@@ -6,7 +6,7 @@ import { Check, Heart, Menu, X, Lock , ArrowUp} from 'lucide-react';
 import Link from 'next/link'
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTiktok } from 'react-icons/fa';
 
-import TurnoModal from "@/components/TurnoModal";
+// import TurnoModal from "@/components/TurnoModal";
 import TurnoTemporalModal from "@/components/TurnoTemporalModalProps";
 import MagicBento from "@/components/MagicBento";
 
@@ -280,7 +280,7 @@ export default function Home() {
     const [activeSection, setActiveSection] = useState('inicio');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-
+    //Borrar luego
     const [showTemporalModal, setShowTemporalModal] = useState(false);
 
     const CONFIG_FASES = {
@@ -371,7 +371,7 @@ export default function Home() {
     }, [isModalOpen]);
 
     const openModal = () => {
-        setShowTemporalModal(true);
+        setShowTemporalModal(true); // Cambiar por setShowTemporalModal cuando tovia no este activo
     };
 
     return (

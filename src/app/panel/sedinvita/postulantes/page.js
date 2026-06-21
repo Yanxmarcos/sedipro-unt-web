@@ -1,6 +1,245 @@
+// src\app\panel\sedinvita\postulantes\page.js
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+
+export default function Page() {
+    const [dark, setDark] = useState(false)
+    const t = getTheme(dark)
+
+    useEffect(() => {
+        const stored = localStorage.getItem('sedipro_dark')
+        if (stored !== null) setDark(stored === 'true')
+        const onStorage = e => { if (e.key === 'sedipro_dark') setDark(e.newValue === 'true') }
+        window.addEventListener('storage', onStorage)
+        const interval = setInterval(() => {
+            const val = localStorage.getItem('sedipro_dark')
+            setDark(prev => { const next = val === 'true'; return prev !== next ? next : prev })
+        }, 400)
+        return () => { window.removeEventListener('storage', onStorage); clearInterval(interval) }
+    }, [])
+
+    const [data, setData] = useState([])
+    const [edicion, setEdicion] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [search, setSearch] = useState('')
+    const [error, setError] = useState(null)
+
+    const fetchData = useCallback(async () => {
+        setLoading(true)
+        setError(null)
+        try {
+            const res = await fetch('/api/sedinvita/postulantes', { credentials: 'include' })
+            const json = await res.json()
+            if (!res.ok) throw new Error(json.error || 'Error al cargar datos')
+            setData(json.data ?? [])
+            setEdicion(json.edicion ?? null)
+        } catch (err) {
+            console.error(err)
+            setError(err.message)
+        } finally {
+            setLoading(false)
+        }
+    }, [])
+
+    useEffect(() => {
+        fetchData()
+    }, [fetchData])
+
+    const filtered = data.filter(p => {
+        const q = search.toLowerCase()
+        return (
+            p.nombres?.toLowerCase().includes(q) ||
+            p.apellidos?.toLowerCase().includes(q) ||
+            p.correoElectronico?.toLowerCase().includes(q) ||
+            p.codigoMatricula?.toLowerCase().includes(q)
+        )
+    })
+
+    return (
+        <div style={{
+            minHeight: '100%', padding: '20px 16px',
+            backgroundColor: t.pageBg, transition: 'background-color 0.3s',
+            fontFamily: 'Poppins, sans-serif',
+            maxWidth: '1200px', margin: '0 auto',
+        }}>
+            {/* Encabezado */}
+            <div style={{ marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '11px', marginBottom: '4px' }}>
+                    <div>
+                        <h1 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '22px', color: t.titleText, margin: 0, lineHeight: 1.2 }}>
+                            Postulantes
+                        </h1>
+                        <p style={{ fontSize: '13px', color: t.bodyText, marginTop: '4px', marginBottom: 0 }}>
+                            Lista de postulantes en {edicion?.nombre || 'SEDInvita'}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {/* Barra de búsqueda */}
+            <div style={{ marginBottom: '16px' }}>
+                <div style={{ position: 'relative', maxWidth: '400px' }}>
+                    <span style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: t.dividerText, pointerEvents: 'none' }}>
+                        <Ico.Search />
+                    </span>
+                    <input
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder="Buscar postulante..."
+                        className="w-full pl-9 pr-4 py-2.5 text-sm font-poppins rounded-xl border focus:outline-none transition-all"
+                        style={{ backgroundColor: dark ? '#2d2b3e' : '#fff', borderColor: dark ? '#3d3b52' : '#d1d5db', color: dark ? '#e2e8f0' : '#1e293b' }}
+                        onFocus={e => { e.target.style.borderColor = 'var(--color-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(103,37,119,0.13)' }}
+                        onBlur={e => { e.target.style.borderColor = t.inputBorder; e.target.style.boxShadow = 'none' }}
+                    />
+                </div>
+            </div>
+
+            {/* Tabla */}
+            <div style={{
+                backgroundColor: t.cardBg,
+                border: `1px solid ${t.cardBorder}`,
+                boxShadow: t.cardShadow,
+                borderRadius: '14px',
+                overflow: 'hidden',
+            }}>
+                <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '820px' }}>
+                        <thead>
+                            <tr style={{ backgroundColor: t.tableHead }}>
+                                {['Postulante', 'Correo', 'Código UNT', 'Celular', 'Fase', 'Estado'].map(h => (
+                                    <th key={h} style={{
+                                        padding: '11px 14px', textAlign: 'left',
+                                        fontFamily: 'Poppins,sans-serif', fontSize: '11px',
+                                        fontWeight: 700, color: t.tableHeadText,
+                                        textTransform: 'uppercase', letterSpacing: '0.05em',
+                                        whiteSpace: 'nowrap',
+                                        borderBottom: `1px solid ${t.tableBorder}`,
+                                    }}>{h}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <SkeletonRows dark={dark} count={8} />
+                            ) : error ? (
+                                <tr>
+                                    <td colSpan={6} style={{ padding: '56px 20px', textAlign: 'center' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: '#EF4444' }}>
+                                            <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '14px', margin: 0 }}>
+                                                Error: {error}
+                                            </p>
+                                            <button
+                                                onClick={fetchData}
+                                                style={{
+                                                    padding: '8px 16px',
+                                                    borderRadius: '8px',
+                                                    border: 'none',
+                                                    backgroundColor: '#672577',
+                                                    color: '#fff',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                Reintentar
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : filtered.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} style={{ padding: '56px 20px', textAlign: 'center' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: t.dividerText }}>
+                                            <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: t.emptyIcon, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <Ico.Users />
+                                            </div>
+                                            <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '14px', margin: 0 }}>
+                                                {search ? 'No se encontraron resultados' : 'No hay postulantes por el momento.'}
+                                            </p>
+                                            <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', margin: 0, opacity: 0.7 }}>
+                                                {search ? 'Intenta con otra búsqueda' : ''}
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                filtered.map((p, i) => {
+                                    const isEven = i % 2 === 1
+                                    const habilitado = p.estadoGeneral === 'habilitado'
+                                    return (
+                                        <tr
+                                            key={p._id}
+                                            style={{ backgroundColor: isEven ? t.tableRowAlt : t.tableRow, borderBottom: `1px solid ${t.tableBorder}`, transition: 'background-color 0.1s' }}
+                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = t.tableRowHover}
+                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = isEven ? t.tableRowAlt : t.tableRow}
+                                        >
+                                            {/* Postulante */}
+                                            <td style={{ padding: '11px 14px', whiteSpace: 'nowrap' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                    <div>
+                                                        <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '13px', fontWeight: 600, color: dark ? '#EAD8F5' : '#111827', margin: 0 }}>
+                                                            {p.apellidos} {p.nombres}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            {/* Correo */}
+                                            <td style={{ padding: '11px 14px', fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: t.bodyText }}>
+                                                {p.correoElectronico}
+                                            </td>
+                                            {/* Código */}
+                                            <td style={{ padding: '11px 14px' }}>
+                                                <span style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', fontWeight: 600, color: '#672577', backgroundColor: dark ? 'rgba(103,37,119,0.15)' : 'rgba(103,37,119,0.08)', padding: '3px 9px', borderRadius: '8px' }}>
+                                                    {p.codigoMatricula}
+                                                </span>
+                                            </td>
+                                            {/* Celular */}
+                                            <td style={{ padding: '11px 14px', fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: dark ? '#EAD8F5' : '#374151', whiteSpace: 'nowrap' }}>
+                                                {p.numeroCelular || '—'}
+                                            </td>
+                                            {/* Fase */}
+                                            <td style={{ padding: '11px 14px' }}>
+                                                <span style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', fontWeight: 600, color: '#2563EB', backgroundColor: dark ? 'rgba(37,99,235,0.16)' : 'rgba(37,99,235,0.08)', padding: '3px 9px', borderRadius: '8px', textTransform: 'capitalize' }}>
+                                                    {p.faseActual}
+                                                </span>
+                                            </td>
+                                            {/* Estado */}
+                                            <td style={{ padding: '11px 14px' }}>
+                                                <span style={{
+                                                    fontFamily: 'Poppins,sans-serif', fontSize: '12px', fontWeight: 600,
+                                                    color: habilitado ? '#16a34a' : '#dc2626',
+                                                    backgroundColor: habilitado
+                                                        ? (dark ? 'rgba(34,197,94,0.16)' : 'rgba(34,197,94,0.10)')
+                                                        : (dark ? 'rgba(239,68,68,0.16)' : 'rgba(239,68,68,0.10)'),
+                                                    padding: '3px 9px', borderRadius: '8px',
+                                                }}>
+                                                    {habilitado ? 'Habilitado' : 'Inhabilitado'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    )
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+                {!loading && !error && filtered.length > 0 && (
+                    <div style={{ padding: '10px 16px', borderTop: `1px solid ${t.tableBorder}` }}>
+                        <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: t.bodyText, margin: 0 }}>
+                            {filtered.length} postulante{filtered.length !== 1 ? 's' : ''}{search ? ` encontrado${filtered.length !== 1 ? 's' : ''}` : ' registrado' + (filtered.length !== 1 ? 's' : '')}
+                            {data.length !== filtered.length && ` de ${data.length} total`}
+                        </p>
+                    </div>
+                )}
+            </div>
+            <style>{`
+                @keyframes spin { to { transform: rotate(360deg); } }
+                @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+                @keyframes slideUp { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+                @keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.4 } }
+                ::-webkit-scrollbar { width: 0; height: 0; }
+            `}</style>
+        </div>
+    )
+}
 
 // ─────────────────────────────────────────────
 // TEMA
@@ -49,7 +288,7 @@ function SkeletonRows({ dark, count = 5 }) {
     const t = getTheme(dark)
     return Array.from({ length: count }).map((_, i) => (
         <tr key={i} style={{ borderBottom: `1px solid ${t.tableBorder}` }}>
-            {[40, 120, 120, 100].map((w, j) => (
+            {[140, 160, 90, 90, 70, 90].map((w, j) => (
                 <td key={j} style={{ padding: '13px 14px' }}>
                     <div style={{
                         height: '12px', borderRadius: '6px', width: `${w}px`, maxWidth: '100%',
@@ -60,220 +299,4 @@ function SkeletonRows({ dark, count = 5 }) {
             ))}
         </tr>
     ))
-}
-
-export default function Page() {
-    const [dark, setDark] = useState(false)
-    const t = getTheme(dark)
-    useEffect(() => {
-        const stored = localStorage.getItem('sedipro_dark')
-        if (stored !== null) setDark(stored === 'true')
-        const onStorage = e => { if (e.key === 'sedipro_dark') setDark(e.newValue === 'true') }
-        window.addEventListener('storage', onStorage)
-        const interval = setInterval(() => {
-            const val = localStorage.getItem('sedipro_dark')
-            setDark(prev => { const next = val === 'true'; return prev !== next ? next : prev })
-        }, 400)
-        return () => { window.removeEventListener('storage', onStorage); clearInterval(interval) }
-    }, [])
-
-    const [data, setData] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [search, setSearch] = useState('')
-    const [error, setError] = useState(null)
-
-    const fetchData = useCallback(async () => {
-        setLoading(true)
-        setError(null)
-        try {
-            const res = await fetch('/api/sedinvita/sedinvitados', { credentials: 'include' })
-            const json = await res.json()
-            if (!res.ok) throw new Error(json.error || 'Error al cargar datos')
-            setData(json.data ?? [])
-        } catch (err) {
-            console.error(err)
-            setError(err.message)
-        } finally {
-            setLoading(false)
-        }
-    }, [])
-
-    useEffect(() => {
-        fetchData()
-    }, [fetchData])
-
-    // Filtro de búsqueda
-    const filtered = data.filter(inv => {
-        const q = search.toLowerCase()
-        return (
-            inv.nombres?.toLowerCase().includes(q) ||
-            inv.apellidos?.toLowerCase().includes(q) ||
-            inv.correoElectronico?.toLowerCase().includes(q) ||
-            inv.codigoMatricula?.toLowerCase().includes(q)
-        )
-    })
-
-    return (
-        <div style={{
-            minHeight: '100%', padding: '20px 16px',
-            backgroundColor: t.pageBg, transition: 'background-color 0.3s',
-            fontFamily: 'Poppins, sans-serif',
-            maxWidth: '1200px', margin: '0 auto',
-        }}>
-            {/* Encabezado */}
-            <div style={{ marginBottom: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '11px', marginBottom: '4px' }}>
-                    <div>
-                        <h1 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '22px', color: t.titleText, margin: 0, lineHeight: 1.2 }}>
-                            SEDInvitados
-                        </h1>
-                        <p style={{ fontSize: '13px', color: t.bodyText, marginTop: '4px', marginBottom: 0 }}>
-                            Lista de invitados en SEDInvita 2026
-                        </p>
-                    </div>
-                </div>
-            </div>
-            {/* Barra de búsqueda */}
-            <div style={{ marginBottom: '16px' }}>
-                <div style={{ position: 'relative', maxWidth: '400px' }}>
-                    <span style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: t.dividerText, pointerEvents: 'none' }}>
-                        <Ico.Search />
-                    </span>
-                    <input
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                        placeholder="Buscar SEDInvitado..."
-                        className="w-full pl-9 pr-4 py-2.5 text-sm font-poppins rounded-xl border focus:outline-none transition-all"
-                        style={{ backgroundColor: dark ? '#2d2b3e' : '#fff', borderColor: dark ? '#3d3b52' : '#d1d5db', color: dark ? '#e2e8f0' : '#1e293b' }}
-                        onFocus={e => { e.target.style.borderColor = 'var(--color-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(103,37,119,0.13)' }}
-                        onBlur={e => { e.target.style.borderColor = t.inputBorder; e.target.style.boxShadow = 'none' }}
-                    />
-                </div>
-            </div>
-
-            {/* Tabla */}
-            <div style={{
-                backgroundColor: t.cardBg,
-                border: `1px solid ${t.cardBorder}`,
-                boxShadow: t.cardShadow,
-                borderRadius: '14px',
-                overflow: 'hidden',
-            }}>
-                <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
-                        <thead>
-                            <tr style={{ backgroundColor: t.tableHead }}>
-                                {['Estudiante', 'Correo', 'Código UNT', 'Celular'].map(h => (
-                                    <th key={h} style={{
-                                        padding: '11px 14px', textAlign: 'left',
-                                        fontFamily: 'Poppins,sans-serif', fontSize: '11px',
-                                        fontWeight: 700, color: t.tableHeadText,
-                                        textTransform: 'uppercase', letterSpacing: '0.05em',
-                                        whiteSpace: 'nowrap',
-                                        borderBottom: `1px solid ${t.tableBorder}`,
-                                    }}>{h}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loading ? (
-                                <SkeletonRows dark={dark} count={8} />
-                            ) : error ? (
-                                <tr>
-                                    <td colSpan={4} style={{ padding: '56px 20px', textAlign: 'center' }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: '#EF4444' }}>
-                                            <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '14px', margin: 0 }}>
-                                                Error: {error}
-                                            </p>
-                                            <button
-                                                onClick={fetchData}
-                                                style={{
-                                                    padding: '8px 16px',
-                                                    borderRadius: '8px',
-                                                    border: 'none',
-                                                    backgroundColor: '#672577',
-                                                    color: '#fff',
-                                                    cursor: 'pointer'
-                                                }}
-                                            >
-                                                Reintentar
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : filtered.length === 0 ? (
-                                <tr>
-                                    <td colSpan={4} style={{ padding: '56px 20px', textAlign: 'center' }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: t.dividerText }}>
-                                            <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: t.emptyIcon, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <Ico.Users />
-                                            </div>
-                                            <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '14px', margin: 0 }}>
-                                                {search ? 'No se encontraron resultados' : 'No hay SEDInvitados por el momento.'}
-                                            </p>
-                                            <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', margin: 0, opacity: 0.7 }}>
-                                                {search ? 'Intenta con otra búsqueda' : ''}
-                                            </p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : (
-                                filtered.map((inv, i) => {
-                                    const isEven = i % 2 === 1
-                                    return (
-                                        <tr
-                                            key={inv._id}
-                                            style={{ backgroundColor: isEven ? t.tableRowAlt : t.tableRow, borderBottom: `1px solid ${t.tableBorder}`, transition: 'background-color 0.1s' }}
-                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = t.tableRowHover}
-                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = isEven ? t.tableRowAlt : t.tableRow}
-                                        >
-                                            {/* Estudiante */}
-                                            <td style={{ padding: '11px 14px', whiteSpace: 'nowrap' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                    <div>
-                                                        <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '13px', fontWeight: 600, color: dark ? '#EAD8F5' : '#111827', margin: 0 }}>
-                                                            {inv.apellidos} {inv.nombres}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            {/* Correo */}
-                                            <td style={{ padding: '11px 14px', fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: t.bodyText }}>
-                                                {inv.correoElectronico}
-                                            </td>
-                                            {/* Código */}
-                                            <td style={{ padding: '11px 14px' }}>
-                                                <span style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', fontWeight: 600, color: '#672577', backgroundColor: dark ? 'rgba(103,37,119,0.15)' : 'rgba(103,37,119,0.08)', padding: '3px 9px', borderRadius: '8px' }}>
-                                                    {inv.codigoMatricula}
-                                                </span>
-                                            </td>
-                                            {/* Celular */}
-                                            <td style={{ padding: '11px 14px', fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: dark ? '#EAD8F5' : '#374151', whiteSpace: 'nowrap' }}>
-                                                {inv.numeroCelular || '—'}
-                                            </td>
-                                        </tr>
-                                    )
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-                {!loading && !error && filtered.length > 0 && (
-                    <div style={{ padding: '10px 16px', borderTop: `1px solid ${t.tableBorder}` }}>
-                        <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: t.bodyText, margin: 0 }}>
-                            {filtered.length} SEDInvitado{filtered.length !== 1 ? 's' : ''}{search ? ` encontrado${filtered.length !== 1 ? 's' : ''}` : ' registrado' + (filtered.length !== 1 ? 's' : '')}
-                            {data.length !== filtered.length && ` de ${data.length} total`}
-                        </p>
-                    </div>
-                )}
-            </div>
-            <style>{`
-                @keyframes spin { to { transform: rotate(360deg); } }
-                @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-                @keyframes slideUp { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
-                @keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.4 } }
-                ::-webkit-scrollbar { width: 0; height: 0; }
-            `}</style>
-        </div>
-    )
 }

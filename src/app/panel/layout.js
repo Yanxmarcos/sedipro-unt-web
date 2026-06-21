@@ -15,19 +15,35 @@ const NAV_ITEMS = [
         label: 'SEDInvita',
         iconKey: 'SEDInvita',
         children: [
-            { href: '/panel/sedinvita/sedinvitados', label: 'SEDinvitados' },
+            { type: 'label', label: 'Configuración' },
+            { href: '/panel/sedinvita/edicion', label: 'Edicion' },
+            { href: '/panel/sedinvita/postulantes', label: 'Postulantes' },
+            { href: '/panel/sedinvita/turnos', label: 'Turnos' },
+            { href: '/panel/sedinvita/grupos', label: 'Grupos y facilitadores' },
+            { href: '/panel/sedinvita/dinamicas', label: 'Dinamicas' },
+            { type: 'label', label: 'Día del evento' },
             { href: '/panel/sedinvita/asistencia', label: 'Asistencia' },
             { href: '/panel/sedinvita/evaluacion', label: 'Evaluación' },
+            // { type: 'label', label: 'Cierre' },
+            // { href: '/panel/sedinvita/resultados', label: 'Resultados' },
         ],
     },
 ]
 
+// Devuelve true si la ruta actual corresponde a este item de submenú.
+// Los items con exact:true (como "Resumen") solo se activan en coincidencia exacta,
+// para que no "se enciendan" cada vez que la ruta es un hijo más profundo de SEDInvita.
+function isChildActive(child, pathname) {
+    if (!child.href) return false
+    if (child.exact) return pathname === child.href
+    return pathname === child.href || pathname.startsWith(child.href + '/')
+}
+
 function getActiveInfo(pathname) {
     for (const item of NAV_ITEMS) {
         if (item.children) {
-            const child = item.children.find(c => pathname.startsWith(c.href))
-            if (child) return { item, label: item.label, sub: child.label }
-            if (pathname === item.href) return { item, label: item.label, sub: null }
+            const child = item.children.find(c => c.href && isChildActive(c, pathname))
+            if (child) return { item, label: item.label, sub: child.label === 'Resumen' ? null : child.label }
         } else {
             const active = item.exact ? pathname === item.href : pathname.startsWith(item.href)
             if (active) return { item, label: item.label, sub: null }
@@ -38,8 +54,9 @@ function getActiveInfo(pathname) {
 
 function SideNavGroup({ item, pathname, hideLabel, theme, open, onToggle, onLinkClick }) {
     const IconComp = Icon[item.iconKey]
-    const childActive = item.children.some(c => pathname.startsWith(c.href))
+    const childActive = item.children.some(c => c.href && isChildActive(c, pathname))
     const parentActive = childActive
+    const submenuHeight = item.children.reduce((acc, c) => acc + (c.type === 'label' ? 32 : 42), 0) + 12
 
     return (
         <div className="sdp-navgroup" style={{ marginBottom: '2px', position: 'relative' }}>
@@ -89,10 +106,10 @@ function SideNavGroup({ item, pathname, hideLabel, theme, open, onToggle, onLink
                     </span>
                     <span style={{
                         flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
+                        transform: open ? 'rotate(-90deg)' : 'rotate(0deg)',
                         transition: 'transform 0.2s',
                     }}>
-                        <Icon.ChevronRight />
+                        <Icon.ChevronLeft />
                     </span>
                 </button>
             )}
@@ -101,12 +118,24 @@ function SideNavGroup({ item, pathname, hideLabel, theme, open, onToggle, onLink
             {!hideLabel && (
                 <div style={{
                     overflow: 'hidden',
-                    maxHeight: open ? `${item.children.length * 38 + 8}px` : '0px',
+                    maxHeight: open ? `${submenuHeight}px` : '0px',
                     transition: 'max-height 0.25s ease',
                 }}>
                     <div style={{ paddingLeft: '0px', paddingTop: '4px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {item.children.map(child => {
-                            const active = pathname.startsWith(child.href)
+                            if (child.type === 'label') {
+                                return (
+                                    <p key={child.label} style={{
+                                        fontFamily: 'Poppins,sans-serif', fontSize: '10px', fontWeight: 600,
+                                        textTransform: 'uppercase', letterSpacing: '0.05em',
+                                        color: theme.bodyText, opacity: 0.75,
+                                        margin: '6px 0 0 16px', padding: 0,
+                                    }}>
+                                        {child.label}
+                                    </p>
+                                )
+                            }
+                            const active = isChildActive(child, pathname)
                             return (
                                 <Link
                                     key={child.href} href={child.href} onClick={onLinkClick}
@@ -121,11 +150,18 @@ function SideNavGroup({ item, pathname, hideLabel, theme, open, onToggle, onLink
                                     onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = theme.navHoverBg }}
                                     onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = '' }}
                                 >
-                                    <span style={{
-                                        width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0,
-                                        backgroundColor: active ? '#fff' : theme.navText,
-                                        opacity: active ? 1 : 0.5,
-                                    }} />
+                                    <span
+                                        style={{
+                                            width: '8px',
+                                            height: '8px',
+                                            borderRadius: '50%',
+                                            flexShrink: 0,
+                                            border: `2px solid ${active ? '#fff' : theme.navText}`,
+                                            background: 'transparent',
+                                            opacity: active ? 1 : 0.6,
+                                            boxSizing: 'border-box',
+                                        }}
+                                    />
                                     {child.label}
                                 </Link>
                             )
@@ -140,13 +176,25 @@ function SideNavGroup({ item, pathname, hideLabel, theme, open, onToggle, onLink
                     position: 'absolute', left: 'calc(100% + 12px)', top: 0,
                     backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}`,
                     borderRadius: '12px', boxShadow: theme.cardShadow,
-                    minWidth: '160px', padding: '6px', zIndex: 99,
+                    minWidth: '190px', padding: '6px', zIndex: 99,
                 }}>
                     <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '11px', fontWeight: 600, color: theme.labelText, margin: '4px 8px 6px' }}>
                         {item.label}
                     </p>
                     {item.children.map(child => {
-                        const active = pathname.startsWith(child.href)
+                        if (child.type === 'label') {
+                            return (
+                                <p key={child.label} style={{
+                                    fontFamily: 'Poppins,sans-serif', fontSize: '10px', fontWeight: 600,
+                                    textTransform: 'uppercase', letterSpacing: '0.05em',
+                                    color: theme.bodyText, opacity: 0.75,
+                                    margin: '8px 8px 4px',
+                                }}>
+                                    {child.label}
+                                </p>
+                            )
+                        }
+                        const active = isChildActive(child, pathname)
                         return (
                             <Link
                                 key={child.href} href={child.href} onClick={onLinkClick}
@@ -501,7 +549,7 @@ export default function PanelLayout({ children }) {
 
     useEffect(() => {
         NAV_ITEMS.forEach(item => {
-            if (item.children?.some(c => pathname.startsWith(c.href))) {
+            if (item.children?.some(c => c.href && isChildActive(c, pathname))) {
                 setOpenMenus(prev => prev[item.href] ? prev : { ...prev, [item.href]: true })
             }
         })

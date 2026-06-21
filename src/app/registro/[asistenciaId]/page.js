@@ -1,3 +1,4 @@
+// src\app\registro\[asistenciaId]\page.js
 'use client'
 
 import { useState, useEffect, useRef } from 'react'

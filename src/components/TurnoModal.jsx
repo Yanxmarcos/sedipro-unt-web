@@ -1,14 +1,19 @@
+// src/components/TurnoModal.jsx
 'use client';
-import React, { useState } from 'react';
-import { Check, XCircle, AlertCircle, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Check, XCircle, AlertCircle, ChevronRight, Clock, Calendar, Users } from 'lucide-react';
+import {
+  FaWhatsapp
+} from 'react-icons/fa';
 import Image from 'next/image';
 
-const DNIInput = ({ value, onChange, error, isLoading }) => {
+// Componente de input de código
+const CodigoInput = ({ value, onChange, error, isLoading }) => {
     const handleChange = (e) => {
-        const input = e.target.value.replace(/\D/g, '').slice(0, 11);
+        const input = e.target.value.replace(/\D/g, '').slice(0, 10);
         onChange(input);
     };
- 
+
     return (
         <div className="space-y-3">
             <div className="relative">
@@ -33,7 +38,7 @@ const DNIInput = ({ value, onChange, error, isLoading }) => {
                 </div>
             </div>
             <p className="text-xs text-[#d0bcff]/60 text-center">
-                {value.length}/10 dígitos (Código de Matrícula)
+                {value.length}/10 dígitos (Código de Matrícula UNT)
             </p>
             {error && (
                 <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/50 flex items-center gap-2">
@@ -45,43 +50,66 @@ const DNIInput = ({ value, onChange, error, isLoading }) => {
     );
 };
 
-const TurnoSelector = ({ turnos, selectedTurno, onSelect, isLoading, codigo }) => {
+// Componente selector de turnos
+const TurnoSelector = ({ turnos, selectedTurno, onSelect, isLoading, postulante }) => {
+    // Filtrar turnos disponibles (con cupo)
+    const turnosDisponibles = turnos.filter(t => t.inscritos < t.maximo);
+    const turnosLlenos = turnos.filter(t => t.inscritos >= t.maximo);
+
     return (
         <div className="space-y-4">
-            <div className="bg-[#3b0191]/30 border border-[#6b46c1]/30 rounded-lg p-4">
-                <p className="text-sm text-[#d0bcff] mb-2">Información del Participante</p>
-                <p className="text-xs text-[#d0bcff]/70 break-all"> <strong>Código:</strong> {codigo}</p>
-                <p className="text-xs text-[#d0bcff]/70 break-all"> <strong>Nombre:</strong> Yanxmarcos Chan Vásquez</p>
+            <div className="bg-[#3b0191]/30 border border-[#6b46c1]/30 rounded-lg p-4 text-center">
+                <p className="text-sm text-[#d0bcff] mb-2">Información del Estudiante</p>
+                <p className="text-sm font-mono text-[#d0bcff]/70 break-all">
+                    <strong>Código:</strong> {postulante?.codigoMatricula || '---'}
+                </p>
+                <p className="text-sm font-mono text-[#d0bcff]/70 break-all">
+                    <strong>Estudiante:</strong> {postulante?.nombres || ''} {postulante?.apellidos || ''}
+                </p>
+                {/* <p className="text-xs text-[#d0bcff]/70 mt-1">
+                    <strong>Fase:</strong> {postulante?.faseActual || 'fase2'}
+                </p> */}
             </div>
             
             <div>
-                <p className="text-sm font-semibold text-[#d0bcff] mb-3">Selecciona tu turno</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto pr-2">
-                    {turnos.map((turno) => (
+                <p className="text-sm font-semibold text-[#d0bcff] mb-3 flex items-center gap-2">
+                    <Calendar size={16} />
+                    Día: Sábado 27 de Junio.
+                </p>
+                
+                {turnosDisponibles.length === 0 && turnosLlenos.length === 0 && (
+                    <div className="text-center py-8 text-[#d0bcff]/60">
+                        <p>No hay turnos disponibles en este momento</p>
+                    </div>
+                )}
+
+                <div className="space-y-1 max-h-64 overflow-y-auto pr-2">
+                    {/* Turnos disponibles */}
+                    {turnosDisponibles.map((turno) => (
                         <button
                             key={turno.id}
                             onClick={() => onSelect(turno)}
-                            disabled={turno.inscritos >= turno.maximo || isLoading}
-                            className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
+                            disabled={isLoading}
+                            className={`w-full p-4 rounded-lg border-2 transition-all duration-300 text-left ${
                                 selectedTurno?.id === turno.id
                                     ? 'border-[#05df72] bg-[#05df72]/20 shadow-lg shadow-[#05df72]/20'
-                                    : turno.inscritos >= turno.maximo
-                                    ? 'border-red-500/30 bg-red-500/10 cursor-not-allowed opacity-50'
                                     : 'border-white/10 bg-[#0b1326]/40 hover:border-[#6b46c1]/50 hover:bg-[#0b1326]/60'
                             }`}
                         >
                             <div className="flex justify-between items-start gap-2">
                                 <div className="flex-1">
-                                    <p className="font-semibold text-[#d0bcff]">{turno.hora}</p>
-                                    <p className="text-xs text-[#d0bcff]/70 mt-1">{turno.dia}</p>
+                                    <p className="font-semibold text-[#d0bcff]">{turno.nombre}</p>
+                                    <p className="text-xs text-[#d0bcff]/70 mt-1 flex items-center gap-1">
+                                        <Clock size={12} />
+                                        De {turno.hora_inicio} a {turno.hora_fin}
+                                    </p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-xs text-[#d0bcff]/60">
+                                    <p className="text-xs text-[#d0bcff]/60 flex items-center gap-1">
+                                        <Users size={12} />
                                         {turno.inscritos}/{turno.maximo}
                                     </p>
-                                    {turno.inscritos >= turno.maximo && (
-                                        <p className="text-xs text-red-400 font-semibold mt-1">LLENO</p>
-                                    )}
+                                    <p className="text-xs text-green-400 font-semibold mt-1">DISPONIBLE</p>
                                 </div>
                             </div>
                             {selectedTurno?.id === turno.id && (
@@ -92,13 +120,47 @@ const TurnoSelector = ({ turnos, selectedTurno, onSelect, isLoading, codigo }) =
                             )}
                         </button>
                     ))}
+
+                    {/* Turnos llenos */}
+                    {turnosLlenos.map((turno) => (
+                        <button
+                            key={turno.id}
+                            disabled
+                            className="w-full p-4 rounded-lg border-2 border-red-500/30 bg-red-500/10 cursor-not-allowed opacity-50 text-left"
+                        >
+                            <div className="flex justify-between items-start gap-2">
+                                <div className="flex-1">
+                                    <p className="font-semibold text-[#d0bcff]">{turno.nombre}</p>
+                                    <p className="text-xs text-[#d0bcff]/70 mt-1 flex items-center gap-1">
+                                        <Clock size={12} />
+                                        De {turno.hora_inicio} a {turno.hora_fin}
+                                    </p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-xs text-[#d0bcff]/60 flex items-center gap-1">
+                                        <Users size={12} />
+                                        {turno.inscritos}/{turno.maximo}
+                                    </p>
+                                    <p className="text-xs text-red-400 font-semibold mt-1">LLENO</p>
+                                </div>
+                            </div>
+                        </button>
+                    ))}
                 </div>
             </div>
         </div>
     );
 };
 
-const ConfirmationMessage = ({ codigo, turno, onExit }) => {
+// Componente de confirmación
+const ConfirmationMessage = ({ postulante, turno, onExit }) => {
+    // URL del grupo de WhatsApp de Segunda Fase
+    const WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/FzMKPpdtimK4xetowyxRTZ";
+
+    const handleJoinWhatsApp = () => {
+        window.open(WHATSAPP_GROUP_URL, '_blank');
+    };
+
     return (
         <div className="space-y-6 text-center">
             <div className="flex justify-center">
@@ -114,21 +176,40 @@ const ConfirmationMessage = ({ codigo, turno, onExit }) => {
                 
                 <div className="bg-[#3b0191]/30 border border-[#6b46c1]/30 rounded-lg p-4 space-y-3">
                     <div>
-                        <p className="text-sm font-mono text-[#d0bcff] break-all"> <strong>Código:</strong> {codigo}</p>
-                        <p className="text-sm font-mono text-[#d0bcff] break-all"><strong>Nombre:</strong> Yanxmarcos Chan Vásquez</p>
+                        <p className="text-sm font-mono text-[#d0bcff] break-all">
+                            <strong>Código:</strong> {postulante?.codigoMatricula || '---'}
+                        </p>
+                        <p className="text-sm font-mono text-[#d0bcff] break-all">
+                            <strong>Estudiante:</strong> {postulante?.nombres || ''} {postulante?.apellidos || ''}
+                        </p>
                     </div>
                     <div className="pt-3 border-t border-[#6b46c1]/20">
                         <p className="text-xs text-[#d0bcff]/60 mb-2 text-center">Tu Turno</p>
                         <div className="flex flex-col items-center justify-center text-center">
-                            <p className="text-lg font-bold text-[#d0bcff]">{turno.hora}</p>
-                            <p className="text-sm text-[#d0bcff]/70">{turno.dia}</p>
+                            <p className="text-lg font-bold text-[#d0bcff]">{turno?.nombre}</p>
+                            <p className="text-sm text-[#d0bcff]/70">De {turno?.hora_inicio} a {turno?.hora_fin}</p>
+                            <p className="text-xs text-[#d0bcff]/50 mt-1">
+                                Cupo: {turno?.inscritos || 0}/{turno?.maximo || 0}
+                            </p>
                         </div>
                     </div>
                 </div>
+                
                 <div className="bg-amber-500/20 border border-amber-500/30 rounded-lg p-4 space-y-2">
-                    <p className="text-sm text-amber-200"> <strong>Nota:</strong> Por favor, <strong>llega 10 minutos antes</strong> de la hora establecida</p>
+                    <p className="text-xs text-amber-200">
+                        Por favor, <strong>llega 10 minutos antes</strong> de la hora establecida
+                    </p>
                 </div>
             </div>
+
+            {/* ⭐ NUEVO BOTÓN: Unirme al grupo de WhatsApp */}
+            <button
+                onClick={handleJoinWhatsApp}
+                className="w-full mb-4 px-6 py-3 bg-[#25D366] hover:bg-[#1DA851] text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+            >
+                <FaWhatsapp size={25} />
+                Unirme al grupo de Fase 2
+            </button>
             
             <button
                 onClick={onExit}
@@ -140,26 +221,40 @@ const ConfirmationMessage = ({ codigo, turno, onExit }) => {
     );
 };
 
-export default function TurnoModal ({ isOpen, onClose }) {
-    const [step, setStep] = useState(1); // 1: DNI, 2: Turno, 3: Confirmación
+// Componente principal
+export default function TurnoModal({ isOpen, onClose }) {
+    const [step, setStep] = useState(1); // 1: Código, 2: Turno, 3: Confirmación
     const [codigo, setCodigo] = useState('');
+    const [postulante, setPostulante] = useState(null);
+    const [turnos, setTurnos] = useState([]);
     const [selectedTurno, setSelectedTurno] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    
-    // Datos mockeados de turnos - Reemplazar con datos reales de API
-    const turnos = [
-        { id: 1, hora: '08:00 AM', dia: 'Sábado 27 de Junio', inscritos: 28, maximo: 30 },
-        { id: 2, hora: '10:00 AM', dia: 'Sábado 27 de Junio', inscritos: 30, maximo: 30 },
-        { id: 3, hora: '02:00 PM', dia: 'Sábado 27 de Junio', inscritos: 15, maximo: 30 },
-        { id: 4, hora: '04:00 PM', dia: 'Sábado 27 de Junio', inscritos: 22, maximo: 30 },
-    ];
- 
-    const handleDNISubmit = async () => {
+    const [edicionInfo, setEdicionInfo] = useState(null);
+
+    // Resetear estado al cerrar
+    useEffect(() => {
+        if (!isOpen) {
+            resetModal();
+        }
+    }, [isOpen]);
+
+    const resetModal = () => {
+        setStep(1);
+        setCodigo('');
+        setPostulante(null);
+        setTurnos([]);
+        setSelectedTurno(null);
+        setError('');
+        setIsLoading(false);
+    };
+
+    // Validar código y obtener información del postulante
+    const handleCodigoSubmit = async () => {
         setError('');
         
         if (!codigo.trim()) {
-            setError('Por favor ingresa tu número');
+            setError('Por favor ingresa tu código de matrícula');
             return;
         }
         
@@ -167,50 +262,151 @@ export default function TurnoModal ({ isOpen, onClose }) {
             setError('Debes ingresar 10 dígitos exactamente');
             return;
         }
- 
+
         setIsLoading(true);
-        
-        // Simular validación con API
-        setTimeout(() => {
-            setIsLoading(false);
+
+        try {
+            const response = await fetch('/api/sedinvita/public/validar-postulante', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ codigoMatricula: codigo }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                if (result.code === 'YA_TIENE_TURNO') {
+                    // El postulante ya tiene turno
+                    setError(`Ya tienes un turno asignado: ${result.data?.turnoActual ? `${result.data.turnoActual.nombre} (De ${result.data.turnoActual.horarioInicio} a  ${result.data.turnoActual.horarioFin})` : ''}`);
+                    // Mostrar opción para ver su turno actual
+                } else {
+                    setError(result.error || 'Error al validar el código');
+                }
+                setIsLoading(false);
+                return;
+            }
+
+            // Guardar información del postulante
+            setPostulante(result.data.postulante);
+            setEdicionInfo(result.data.edicion);
+
+            // Cargar turnos disponibles
+            await cargarTurnos(result.data.postulante.faseActual || 'fase2');
+
+            // Avanzar al paso 2
             setStep(2);
-        }, 800);
+
+        } catch (error) {
+            console.error('Error:', error);
+            setError('Error de conexión. Por favor, intenta de nuevo.');
+        } finally {
+            setIsLoading(false);
+        }
     };
- 
+
+    // Cargar turnos disponibles
+    const cargarTurnos = async (fase = 'fase2') => {
+        try {
+            const response = await fetch(`/api/sedinvita/public/turnos?fase=${fase}`);
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                setError(result.error || 'Error al cargar los turnos');
+                return;
+            }
+
+            setTurnos(result.data.turnos);
+            setEdicionInfo(result.data.edicion);
+
+            // Actualizar fase del postulante si es necesario
+            if (postulante && !postulante.faseActual) {
+                setPostulante(prev => ({ ...prev, faseActual: result.data.fase }));
+            }
+
+        } catch (error) {
+            console.error('Error al cargar turnos:', error);
+            setError('Error de conexión al cargar los turnos');
+        }
+    };
+
+    // Seleccionar turno y registrar
     const handleTurnoSelect = async () => {
         if (!selectedTurno) {
             setError('Por favor selecciona un turno');
             return;
         }
- 
+
         setIsLoading(true);
-        
-        // Simular registro en API
-        setTimeout(() => {
-            setIsLoading(false);
-            setStep(3);
-        }, 1200);
-    };
- 
-    const handleExit = () => {
-        setStep(1);
-        setCodigo('');
-        setSelectedTurno(null);
         setError('');
+
+        try {
+            const response = await fetch('/api/sedinvita/public/registrar-turno', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    codigoMatricula: codigo,
+                    turnoId: selectedTurno.id,
+                    fase: postulante?.faseActual || 'fase2',
+                }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                if (result.code === 'TURNO_LLENO') {
+                    // Si el turno se llenó justo en ese momento, recargar turnos
+                    await cargarTurnos(postulante?.faseActual || 'fase2');
+                    setError('El turno seleccionado se llenó. Por favor, elige otro.');
+                    setSelectedTurno(null);
+                } else if (result.code === 'YA_TIENE_TURNO') {
+                    setError('Ya tienes un turno asignado. No puedes seleccionar otro.');
+                } else {
+                    setError(result.error || 'Error al registrar el turno');
+                }
+                setIsLoading(false);
+                return;
+            }
+
+            // Actualizar información del postulante y turno
+            setPostulante(result.data.postulante);
+            setSelectedTurno({
+                ...selectedTurno,
+                inscritos: result.data.turno.inscritos,
+                maximo: result.data.turno.maximo,
+                estado: result.data.turno.estado
+            });
+
+            // Avanzar a confirmación
+            setStep(3);
+
+        } catch (error) {
+            console.error('Error al registrar turno:', error);
+            setError('Error de conexión al registrar el turno');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleExit = () => {
+        resetModal();
         onClose();
     };
- 
+
     const handleBackToTurnos = () => {
         setStep(2);
         setSelectedTurno(null);
         setError('');
     };
- 
+
     if (!isOpen) return null;
- 
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
-            {/* Fondo oscuro - IMPORTANTE: Permitir clicks solo en el fondo */}
+            {/* Fondo oscuro */}
             <div 
                 className="fixed inset-0 bg-black/40 z-40" 
                 onClick={(e) => {
@@ -239,16 +435,14 @@ export default function TurnoModal ({ isOpen, onClose }) {
             )}
 
             {/* Modal */}
-            <div className={`relative z-50 w-full max-w-lg mx-4 my-auto rounded-2xl transition-all duration-500 overflow-hidden ${
-                step === 1 ? 'animate-fadeInUp' : step === 2 ? 'animate-fadeInUp' : 'animate-fadeInUp'
-            }`}
+            <div className={`relative z-50 w-full max-w-lg mx-4 my-auto rounded-2xl transition-all duration-500 overflow-hidden animate-fadeInUp`}
                 style={{
                     background: 'linear-gradient(135deg, rgba(11, 19, 38, 0.95), rgba(59, 1, 145, 0.85))',
                     backdropFilter: 'blur(20px)',
                     border: '1px solid rgba(107, 70, 193, 0.3)',
                     boxShadow: '0 25px 50px -12px rgba(59, 1, 145, 0.5)'
-                }}>
-                
+                }}
+            >
                 <div className="p-6 md:p-8">
                     {/* Header */}
                     <div className="text-center mb-8">
@@ -262,10 +456,12 @@ export default function TurnoModal ({ isOpen, onClose }) {
                                 priority
                             />
                         </div>
-                        <h2 className="text-2xl md:text-3xl font-bold mb-2 text-on-surface"
-                            >
-                            SEDInvita 2026
+                        <h2 className="text-2xl md:text-3xl font-bold mb-2 text-[#d0bcff]">
+                            SEDInvita {edicionInfo?.anio || '2026'}
                         </h2>
+                        <p className="text-xs text-[#d0bcff]/50">
+                            {edicionInfo?.nombre || 'Edición'}
+                        </p>
                         
                         {/* Indicador de paso */}
                         <div className="flex items-center justify-center gap-2 mt-4">
@@ -274,15 +470,15 @@ export default function TurnoModal ({ isOpen, onClose }) {
                             <div className={`h-1 flex-1 rounded-full transition-all ${step >= 3 ? 'bg-[#6b46c1]' : 'bg-white/10'}`}></div>
                         </div>
                     </div>
- 
+
                     {/* Contenido por paso */}
                     {step === 1 && (
                         <div className="space-y-6 animate-fadeIn">
                             <div>
                                 <p className="text-[#d0bcff] text-sm mb-4">
-                                    Para seleccionar un turno, primero ingrese tu código de matrícula UNT:
+                                    Para seleccionar un turno, ingresa tu código de matrícula UNT:
                                 </p>
-                                <DNIInput 
+                                <CodigoInput 
                                     value={codigo}
                                     onChange={setCodigo}
                                     error={error}
@@ -291,7 +487,7 @@ export default function TurnoModal ({ isOpen, onClose }) {
                             </div>
                             
                             <button
-                                onClick={handleDNISubmit}
+                                onClick={handleCodigoSubmit}
                                 disabled={isLoading || codigo.length !== 10}
                                 className="w-full px-6 py-3 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-lg font-semibold hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg active:scale-95"
                             >
@@ -309,7 +505,7 @@ export default function TurnoModal ({ isOpen, onClose }) {
                             </button>
                         </div>
                     )}
- 
+
                     {step === 2 && (
                         <div className="space-y-6 animate-fadeIn">
                             <TurnoSelector 
@@ -317,7 +513,7 @@ export default function TurnoModal ({ isOpen, onClose }) {
                                 selectedTurno={selectedTurno}
                                 onSelect={setSelectedTurno}
                                 isLoading={isLoading}
-                                codigo={codigo}
+                                postulante={postulante}
                             />
                             
                             {error && (
@@ -326,10 +522,10 @@ export default function TurnoModal ({ isOpen, onClose }) {
                                     <span className="text-red-200 text-xs">{error}</span>
                                 </div>
                             )}
- 
+
                             <div className="flex gap-3">
                                 <button
-                                    onClick={handleBackToTurnos}
+                                    onClick={() => { setStep(1); setSelectedTurno(null); setError(''); }}
                                     className="flex-1 px-4 py-3 border border-white/20 text-white rounded-lg font-semibold hover:bg-white/5 transition-all duration-300 active:scale-95"
                                 >
                                     Atrás
@@ -346,36 +542,47 @@ export default function TurnoModal ({ isOpen, onClose }) {
                                         </div>
                                     ) : (
                                         <div className="flex items-center justify-center gap-2">
-                                            <span>Registrar</span>
+                                            <span>Registrar Turno</span>
                                         </div>
                                     )}
                                 </button>
                             </div>
                         </div>
                     )}
- 
+
                     {step === 3 && (
                         <div className="animate-fadeIn">
                             <ConfirmationMessage 
-                                codigo={codigo}
+                                postulante={postulante}
                                 turno={selectedTurno}
                                 onExit={handleExit}
                             />
                         </div>
                     )}
- 
+
                     {/* Footer */}
                     <p className="text-[#d0bcff]/50 text-xs text-center mt-8">
-                        © 2026 SEDIPRO UNT. Todos los derechos reservados.
+                        © {new Date().getFullYear()} SEDIPRO UNT. Todos los derechos reservados.
                     </p>
                 </div>
             </div>
- 
+
             <style jsx>{`
                 @keyframes fadeInUp {
                     from {
                         opacity: 0;
-                        transform: translateY(20px);
+                        transform: translateY(20px) scale(0.95);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0) scale(1);
+                    }
+                }
+                
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px);
                     }
                     to {
                         opacity: 1;
@@ -383,17 +590,8 @@ export default function TurnoModal ({ isOpen, onClose }) {
                     }
                 }
                 
-                @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                    }
-                    to {
-                        opacity: 1;
-                    }
-                }
-                
                 .animate-fadeInUp {
-                    animation: fadeInUp 0.5s ease-out;
+                    animation: fadeInUp 0.4s ease-out;
                 }
                 
                 .animate-fadeIn {
@@ -402,4 +600,4 @@ export default function TurnoModal ({ isOpen, onClose }) {
             `}</style>
         </div>
     );
-};
+}
