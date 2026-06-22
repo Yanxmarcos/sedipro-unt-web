@@ -526,7 +526,7 @@ export default function Home() {
                                     Elegir Turno
                                 </button>
                                 <a href="#fases" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
-                                    Fase Actual I
+                                    Fase Actual
                                 </a>
                             </div>
                         </div>
