@@ -9,7 +9,7 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTiktok } from 'rea
 import TurnoModal from "@/components/TurnoModal";
 // import TurnoTemporalModal from "@/components/TurnoTemporalModalProps";
 import MagicBento from "@/components/MagicBento";
-import ResultadosFase1 from "@/components/ResultadosFase1";
+// import ResultadosFase1 from "@/components/ResultadosFase1";
 
 const ShaderBackground = () => {
     const canvasRef = useRef(null);
@@ -470,13 +470,13 @@ export default function Home() {
                         >
                             Fases
                         </a>
-                        <a
+                        {/* <a
                             href="#resultados"
                             onClick={() => setMobileMenuOpen(false)}
                             className="font-semibold text-on-surface"
                         >
                             Resultados
-                        </a>
+                        </a> */}
                         <a
                             href="#beneficios"
                             onClick={() => setMobileMenuOpen(false)}
@@ -525,8 +525,8 @@ export default function Home() {
                                 <button onClick={openModal} className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
                                     Elegir Turno
                                 </button>
-                                <a href="#resultados" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
-                                    Resultados Fase I
+                                <a href="#fases" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
+                                    Fase Actual I
                                 </a>
                             </div>
                         </div>
@@ -634,7 +634,7 @@ export default function Home() {
                 </section>
                 
                 {/* PUBLICACION DE RESULTADOS */}
-                <section className="py-stack-lg bg-surface-container-lowest relative overflow-hidden" id="resultados">
+                {/* <section className="py-stack-lg bg-surface-container-lowest relative overflow-hidden" id="resultados">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
                         <div className="text-center mb-stack-lg space-y-4">
                             <h2 className="font-headline-lg text-headline-lg text-on-surface">Resultados de la Fase 1</h2>
@@ -644,7 +644,7 @@ export default function Home() {
                         </div>
                         <ResultadosFase1 />
                     </div>
-                </section>
+                </section> */}
 
                 {/* Benefits Section */}
                 <section className="py-stack-lg bg-surface relative overflow-hidden" id="beneficios">
