@@ -460,7 +460,8 @@ export default function TurnoModal({ isOpen, onClose }) {
                             SEDInvita {edicionInfo?.anio || '2026'}
                         </h2>
                         <p className="text-xs text-[#d0bcff]/50">
-                            {edicionInfo?.nombre || 'Edición'}
+                            {/* {edicionInfo?.nombre || 'Edición'} */}
+                            Selección de Turnos
                         </p>
                         
                         {/* Indicador de paso */}
@@ -561,9 +562,20 @@ export default function TurnoModal({ isOpen, onClose }) {
                     )}
 
                     {/* Footer */}
-                    <p className="text-[#d0bcff]/50 text-xs text-center mt-8">
-                        © {new Date().getFullYear()} SEDIPRO UNT. Todos los derechos reservados.
-                    </p>
+                    <div className="text-center mt-8">
+                        <p className="text-[#d0bcff]/50 text-xs">
+                            © {new Date().getFullYear()} SEDIPRO UNT. Todos los derechos reservados.
+                        </p>
+                        <a 
+                            href="https://wa.me/51963159172?text=Hola,%20tengo%20un%20problema%20con%20mi%20registro%20de%20turno."
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-red-500/50 hover:text-red-500 text-xs hover:scale-105 transition-all duration-200 mt-1.5"
+                        >
+                            <AlertCircle className="w-3.5 h-3.5" />
+                            Reportar un problema
+                        </a>
+                    </div>
                 </div>
             </div>
 

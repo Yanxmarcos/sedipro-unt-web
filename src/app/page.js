@@ -6,9 +6,10 @@ import { Check, Heart, Menu, X, Lock , ArrowUp} from 'lucide-react';
 import Link from 'next/link'
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTiktok } from 'react-icons/fa';
 
-// import TurnoModal from "@/components/TurnoModal";
-import TurnoTemporalModal from "@/components/TurnoTemporalModalProps";
+import TurnoModal from "@/components/TurnoModal";
+// import TurnoTemporalModal from "@/components/TurnoTemporalModalProps";
 import MagicBento from "@/components/MagicBento";
+import ResultadosFase1 from "@/components/ResultadosFase1";
 
 const ShaderBackground = () => {
     const canvasRef = useRef(null);
@@ -371,7 +372,7 @@ export default function Home() {
     }, [isModalOpen]);
 
     const openModal = () => {
-        setShowTemporalModal(true); // Cambiar por setShowTemporalModal cuando tovia no este activo
+        setIsModalOpen(true); // Cambiar por setShowTemporalModal cuando tovia no este activo o setIsModalOpen
     };
 
     return (
@@ -412,7 +413,6 @@ export default function Home() {
                     >
                         Fases
                     </a>
-
                     <a
                         href="#beneficios"
                         className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'beneficios'
@@ -471,6 +471,13 @@ export default function Home() {
                             Fases
                         </a>
                         <a
+                            href="#resultados"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="font-semibold text-on-surface"
+                        >
+                            Resultados
+                        </a>
+                        <a
                             href="#beneficios"
                             onClick={() => setMobileMenuOpen(false)}
                             className="font-semibold text-on-surface"
@@ -518,8 +525,8 @@ export default function Home() {
                                 <button onClick={openModal} className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
                                     Elegir Turno
                                 </button>
-                                <a href="#fases" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
-                                    Fase Actual
+                                <a href="#resultados" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
+                                    Resultados Fase I
                                 </a>
                             </div>
                         </div>
@@ -623,6 +630,19 @@ export default function Home() {
                                 </p>
                             </div>
                         </div>
+                    </div>
+                </section>
+                
+                {/* PUBLICACION DE RESULTADOS */}
+                <section className="py-stack-lg bg-surface-container-lowest relative overflow-hidden" id="resultados">
+                    <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+                        <div className="text-center mb-stack-lg space-y-4">
+                            <h2 className="font-headline-lg text-headline-lg text-on-surface">Resultados de la Fase 1</h2>
+                            <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+                                En esta sección se encuentran los estudiantes que superaron la Fase 1 y han sido habilitados para participar en la <strong>Fase 2.</strong>
+                            </p>
+                        </div>
+                        <ResultadosFase1 />
                     </div>
                 </section>
 
@@ -907,11 +927,11 @@ export default function Home() {
             </footer>
 
             {/* Modal de Elegir Turno */}
-            {/* <TurnoModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} /> */}
-            <TurnoTemporalModal 
+            <TurnoModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+            {/* <TurnoTemporalModal 
                 isOpen={showTemporalModal}
                 onClose={() => setShowTemporalModal(false)}
-            />
+            /> */}
         </>
     );
 }
