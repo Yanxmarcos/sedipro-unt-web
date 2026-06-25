@@ -294,7 +294,8 @@ export default function Page() {
                                                 {e.nombres} {e.apellidos}
                                             </p>
                                             <p style={{ fontSize: '11px', color: t.bodyText, margin: '2px 0 0 0' }}>
-                                                DNI: {e.dni} · {e.area || 'Sin área'}
+                                                DNI: {e.dni} 
+                                                {/* · {e.area || 'Sin área'} */}
                                             </p>
                                         </div>
                                         <button 

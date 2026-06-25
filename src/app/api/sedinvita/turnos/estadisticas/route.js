@@ -54,7 +54,7 @@ export async function GET(request) {
             edicionId: edicionActiva._id,
             estadoGeneral: 'habilitado',
             faseActual: fase,
-            estadoOperativo: 'turno_elegido',
+            // estadoOperativo: 'turno_elegido',
             turnoId: { $ne: null }
         });
 

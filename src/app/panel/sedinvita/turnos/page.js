@@ -51,6 +51,13 @@ export default function Page() {
     const [loadingStats, setLoadingStats] = useState(false)
     const [loadingPostulantes, setLoadingPostulantes] = useState(false)
     const [mensajeConfirmacion, setMensajeConfirmacion] = useState(null)
+    const [filtroTurnoEspecifico, setFiltroTurnoEspecifico] = useState('todos')
+
+    const opcionesTurnos = useMemo(() => {
+        // Obtener nombres de turnos únicos
+        const nombresTurnos = [...new Set(turnos.map(t => t.nombre))]
+        return ['todos', ...nombresTurnos]
+    }, [turnos])
 
     // Filtrar postulantes localmente (client-side)
     const postulantesFiltrados = useMemo(() => {
@@ -68,8 +75,15 @@ export default function Page() {
             )
         }
         
+        // Filtrar por turno específico (nuevo)
+        if (filtroTurnoEspecifico !== 'todos') {
+            resultado = resultado.filter(p => 
+                p.tieneTurno && p.turno?.nombre === filtroTurnoEspecifico
+            )
+        }
+        
         return resultado
-    }, [postulantes, busquedaPostulante])
+    }, [postulantes, busquedaPostulante, filtroTurnoEspecifico])
 
     // Cargar edición activa
     const fetchEdicionActiva = useCallback(async () => {
@@ -876,12 +890,28 @@ export default function Page() {
                         marginBottom: '16px',
                         flexWrap: 'wrap',
                         gap: '12px'
-                    }}>
+                    }}> 
                         <h3 style={{ fontSize: '14px', fontWeight: 600, color: t.titleText, margin: 0 }}>
                             Postulantes por turno
                             {postulantes.length > 0 && (
                                 <span style={{ fontSize: '12px', fontWeight: 'normal', color: t.bodyText, marginLeft: '8px' }}>
-                                    ({postulantes.length} total)
+                                    {filtroPostulantes !== 'todos' || filtroTurnoEspecifico !== 'todos' ? (
+                                        // Filtro activo
+                                        <>
+                                            Mostrando {postulantesFiltrados.length} de {postulantes.length} 
+                                            {filtroTurnoEspecifico !== 'todos' && ` (${filtroTurnoEspecifico})`}
+                                            {filtroTurnoEspecifico === 'todos' && filtroPostulantes !== 'todos' && 
+                                                ` (${filtroPostulantes === 'con_turno' ? 'con turno' : 'sin turno'})`}
+                                        </>
+                                    ) : (
+                                        // Sin filtro
+                                        `${postulantes.length} total`
+                                    )}
+                                </span>
+                            )}
+                            {postulantes.length === 0 && !loadingPostulantes && (
+                                <span style={{ fontSize: '12px', fontWeight: 'normal', color: t.bodyText, marginLeft: '8px' }}>
+                                    (0 postulantes)
                                 </span>
                             )}
                         </h3>
@@ -893,7 +923,7 @@ export default function Page() {
                                     setBusquedaPostulante('') // Limpiar búsqueda al cambiar filtro
                                 }}
                                 style={{
-                                    padding: '6px 12px',
+                                    padding: '6px 12px 24 6px',
                                     borderRadius: '8px',
                                     border: `1px solid ${t.inputBorder}`,
                                     backgroundColor: dark ? '#2d2b3e' : '#fff',
@@ -905,6 +935,29 @@ export default function Page() {
                                 <option value="todos">Todos</option>
                                 <option value="con_turno">Con turno</option>
                                 <option value="sin_turno">Sin turno</option>
+                            </select>
+                            <select
+                                value={filtroTurnoEspecifico}
+                                onChange={e => {
+                                    setFiltroTurnoEspecifico(e.target.value)
+                                    setBusquedaPostulante('') // Limpiar búsqueda al cambiar filtro
+                                }}
+                                style={{
+                                    padding: '6px 12px 24 6px',
+                                    borderRadius: '8px',
+                                    border: `1px solid ${t.inputBorder}`,
+                                    backgroundColor: dark ? '#2d2b3e' : '#fff',
+                                    color: t.inputText,
+                                    fontSize: '12px',
+                                    cursor: 'pointer',
+                                    minWidth: '140px'
+                                }}
+                            >
+                                {opcionesTurnos.map(opcion => (
+                                    <option key={opcion} value={opcion}>
+                                        {opcion === 'todos' ? 'Todos los turnos' : opcion}
+                                    </option>
+                                ))}
                             </select>
                             <input
                                 type="text"
