@@ -1,4 +1,7 @@
 // src/app/api/sedinvita/turnos/postulantes/route.js
+// VERSIÓN MEJORADA: La verdad viene de las relaciones (turnoId, grupoId),
+// no de estadoOperativo
+
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import SedinvitaPostulante from '@/models/sedinvita/SedinvitaPostulante';
@@ -38,6 +41,7 @@ export async function GET(request) {
         }
 
         // Construir filtro
+        // La VERDAD viene de turnoId, no de estadoOperativo
         const match = {
             edicionId: edicionActiva._id,
             estadoGeneral: 'habilitado',
@@ -45,16 +49,15 @@ export async function GET(request) {
         };
 
         if (filtro === 'con_turno') {
-            match.estadoOperativo = 'turno_elegido';
+            // Un postulante "tiene turno" si turnoId está asignado
             match.turnoId = { $ne: null };
         } else if (filtro === 'sin_turno') {
-            match.$or = [
-                { estadoOperativo: { $ne: 'turno_elegido' } },
-                { turnoId: null }
-            ];
+            // Un postulante "sin turno" si turnoId es null
+            match.turnoId = null;
         }
+        // Si filtro === 'todos', no se agrega restricción de turnoId
 
-        // Búsqueda
+        // Búsqueda por texto
         if (busqueda) {
             match.$or = [
                 { codigoMatricula: { $regex: busqueda, $options: 'i' } },
@@ -68,7 +71,7 @@ export async function GET(request) {
             .sort({ apellidos: 1, nombres: 1 })
             .lean();
 
-        // Obtener información de turnos
+        // Obtener información de turnos para los postulantes que tienen turno
         const turnosIds = postulantes
             .filter(p => p.turnoId)
             .map(p => p.turnoId);
@@ -85,24 +88,27 @@ export async function GET(request) {
         }
 
         // Formatear respuesta
+        // La verdad: si turnoId !== null, tiene turno
         const postulantesFormateados = postulantes.map(p => {
-            const tieneTurno = p.estadoOperativo === 'turno_elegido' && p.turnoId;
+            const tieneTurno = p.turnoId !== null;  // ← VERDAD SIMPLE
             const turno = tieneTurno ? turnosMap.get(p.turnoId.toString()) : null;
 
             return {
+                _id: p._id,
                 codigoMatricula: p.codigoMatricula,
                 nombres: p.nombres,
                 apellidos: p.apellidos,
                 correoElectronico: p.correoElectronico,
                 numeroCelular: p.numeroCelular,
-                tieneTurno,
+                tieneTurno,           // ← Deducible de turnoId
+                tieneGrupo: p.grupoId !== null,  // ← Bonus: también deducible
                 turno: turno ? {
                     id: turno._id,
                     nombre: turno.nombre,
                     horarioInicio: turno.horarioInicio,
                     horarioFin: turno.horarioFin
                 } : null,
-                estadoOperativo: p.estadoOperativo
+                // No incluir estadoOperativo - es redundante
             };
         });
 

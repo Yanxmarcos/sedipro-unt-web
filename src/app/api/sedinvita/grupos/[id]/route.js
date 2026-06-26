@@ -46,9 +46,11 @@ export async function PATCH(request, { params }) {
         }
 
         if (postulantes !== undefined) {
+            // FIX: Desasignar postulantes del grupo anterior SIN resetear turnoId
+            // El turnoId es crítico para asistencia y debe permanecer intacto
             await SedinvitaPostulante.updateMany(
                 { grupoId: id },
-                { $unset: { grupoId: '' }, estadoOperativo: 'turno_elegido' }
+                { $unset: { grupoId: '' } }  // Solo desasigna grupo, preserva turnoId
             );
 
             grupo.postulantes = postulantes;
@@ -96,6 +98,7 @@ export async function DELETE(request, { params }) {
         }
 
         if (grupo.postulantes && grupo.postulantes.length > 0) {
+            // Desasignar grupo pero preservar turnoId
             await SedinvitaPostulante.updateMany(
                 { grupoId: id },
                 { $unset: { grupoId: '' }, estadoOperativo: 'turno_elegido' }

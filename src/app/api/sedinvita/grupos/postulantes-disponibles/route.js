@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import SedinvitaPostulante from '@/models/sedinvita/SedinvitaPostulante';
 import SedinvitaTurno from '@/models/sedinvita/SedinvitaTurno';
+import { ObjectId } from 'mongodb';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/jwt';
 
@@ -41,19 +42,33 @@ export async function GET(request) {
             return NextResponse.json({ error: 'Turno no encontrado' }, { status: 404 });
         }
 
-        // Construir filtro
-        const filter = {
-            turnoId: turnoId,
+        // FIX: Filtrar correctamente postulantes disponibles
+        // Los postulantes disponibles son:
+        // 1. Los que tienen este turnoId asignado
+        // 2. Que están habilitados en la fase actual
+        // 3. Que NO están asignados a otros grupos (o están en el grupoId si estamos editando)
+        
+        let filter = {
+            turnoId: new ObjectId(turnoId),
             faseActual: turno.fase,
             estadoGeneral: 'habilitado',
         };
 
-        // Si hay grupoId, excluir postulantes que ya están en ese grupo
+        // Si hay grupoId (estamos editando un grupo), permitir:
+        // - Postulantes sin grupo (grupoId: null)
+        // - Postulantes que YA están en este grupo (grupoId: grupoId)
         if (grupoId) {
-            filter.grupoId = { $ne: grupoId };
+            const grupoObjectId = new ObjectId(grupoId);
+            filter.$or = [
+                { grupoId: { $eq: null } },
+                { grupoId: grupoObjectId }
+            ];
+        } else {
+            // Si NO hay grupoId (crear nuevo grupo), solo postulantes sin grupo asignado
+            filter.grupoId = { $eq: null };
         }
 
-        // Obtener postulantes habilitados de este turno que no tienen grupo
+        // Obtener postulantes disponibles ordenados por apellido
         const postulantes = await SedinvitaPostulante.find(filter)
             .sort({ apellidos: 1, nombres: 1 })
             .lean();

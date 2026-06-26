@@ -25,6 +25,7 @@ export default function Page() {
     const [grupos, setGrupos] = useState([])
     const [facilitadores, setFacilitadores] = useState([])
     const [postulantesDisponibles, setPostulantesDisponibles] = useState([])
+    const [loadingFacilitadores, setLoadingFacilitadores] = useState(true);
 
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
@@ -83,12 +84,15 @@ export default function Page() {
     useEffect(() => { fetchData() }, [fetchData])
 
     const fetchFacilitadores = async (edicionId) => {
+        setLoadingFacilitadores(true); // Activar skeleton
         try {
             const res = await fetch(`/api/sedinvita/facilitadores?edicionId=${edicionId}`, { credentials: 'include' })
             const json = await res.json()
             if (res.ok) setFacilitadores(json.data || [])
         } catch (err) {
             console.error('Error al cargar facilitadores:', err)
+        } finally {
+            setLoadingFacilitadores(false); // Desactivar skeleton
         }
     }
 
@@ -502,8 +506,8 @@ export default function Page() {
                                                             <span style={{ fontSize: '12px', color: t.inputText }}>{grupo.postulantes?.length || 0} postulantes</span>
                                                             {grupo.postulantes && grupo.postulantes.length > 0 && (
                                                                 <div style={{ fontSize: '11px', color: t.bodyText, marginTop: '4px' }}>
-                                                                    {grupo.postulantes.slice(0, 3).map(p => `${p.apellidos} ${p.nombres}`).join(', ')}
-                                                                    {grupo.postulantes.length > 3 && ` y ${grupo.postulantes.length - 3} más`}
+                                                                    {grupo.postulantes.map(p => `${p.apellidos} ${p.nombres}`).join(' | ')}
+                                                                    {/* {grupo.postulantes.length > 3 && ` y ${grupo.postulantes.length - 3} más`} */}
                                                                 </div>
                                                             )}
                                                         </td>
@@ -569,7 +573,9 @@ export default function Page() {
                             </button>
                         </div>
 
-                        {facilitadores.length === 0 ? (
+                        {loadingFacilitadores ? (
+                            <SkeletonList dark={dark} count={3} />
+                        ) : facilitadores.length === 0 ? (
                             <p style={{ fontSize: '13px', color: t.dividerText, textAlign: 'center', padding: '20px 0' }}>
                                 Aún no hay facilitadores asignados
                             </p>
@@ -848,4 +854,58 @@ function SkeletonRows({ dark, count = 5 }) {
             ))}
         </tr>
     ))
+}
+
+// ─────────────────────────────────────────────
+// SKELETON LIST (para facilitadores)
+// ─────────────────────────────────────────────
+function SkeletonList({ dark, count = 5 }) {
+    const t = getTheme(dark)
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {Array.from({ length: count }).map((_, i) => (
+                <div 
+                    key={i} 
+                    style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between',
+                        padding: '10px 12px', 
+                        borderRadius: '10px',
+                        backgroundColor: dark ? 'rgba(103,37,119,0.10)' : 'rgba(103,37,119,0.04)'
+                    }}
+                >
+                    <div style={{ flex: 1 }}>
+                        {/* Skeleton para nombre */}
+                        <div style={{ 
+                            height: '14px', 
+                            borderRadius: '6px', 
+                            width: '60%', 
+                            maxWidth: '100%',
+                            backgroundColor: dark ? 'rgba(103,37,119,0.12)' : 'rgba(103,37,119,0.07)',
+                            animation: 'pulse 1.4s ease-in-out infinite',
+                            marginBottom: '6px'
+                        }} />
+                        {/* Skeleton para detalles (DNI, grupos) */}
+                        <div style={{ 
+                            height: '11px', 
+                            borderRadius: '6px', 
+                            width: '70%', 
+                            maxWidth: '100%',
+                            backgroundColor: dark ? 'rgba(103,37,119,0.12)' : 'rgba(103,37,119,0.07)',
+                            animation: 'pulse 1.4s ease-in-out infinite'
+                        }} />
+                    </div>
+                    {/* Skeleton para botón "Quitar" */}
+                    <div style={{ 
+                        height: '28px', 
+                        borderRadius: '8px', 
+                        width: '60px',
+                        backgroundColor: dark ? 'rgba(103,37,119,0.12)' : 'rgba(103,37,119,0.07)',
+                        animation: 'pulse 1.4s ease-in-out infinite'
+                    }} />
+                </div>
+            ))}
+        </div>
+    )
 }

@@ -6,8 +6,8 @@ import { Check, Heart, Menu, X, Lock , ArrowUp} from 'lucide-react';
 import Link from 'next/link'
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTiktok } from 'react-icons/fa';
 
-import TurnoModal from "@/components/TurnoModal";
-// import TurnoTemporalModal from "@/components/TurnoTemporalModalProps";
+// import TurnoModal from "@/components/TurnoModal";
+import TurnoTemporalModal from "@/components/TurnoTemporalModalProps";
 import MagicBento from "@/components/MagicBento";
 // import ResultadosFase1 from "@/components/ResultadosFase1";
 
@@ -372,7 +372,7 @@ export default function Home() {
     }, [isModalOpen]);
 
     const openModal = () => {
-        setIsModalOpen(true); // Cambiar por setShowTemporalModal cuando tovia no este activo o setIsModalOpen
+        setShowTemporalModal(true); // Cambiar por setShowTemporalModal cuando tovia no este activo o setIsModalOpen
     };
 
     return (
@@ -927,11 +927,11 @@ export default function Home() {
             </footer>
 
             {/* Modal de Elegir Turno */}
-            <TurnoModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-            {/* <TurnoTemporalModal 
+            {/* <TurnoModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} /> */}
+            <TurnoTemporalModal 
                 isOpen={showTemporalModal}
                 onClose={() => setShowTemporalModal(false)}
-            /> */}
+            />
         </>
     );
 }

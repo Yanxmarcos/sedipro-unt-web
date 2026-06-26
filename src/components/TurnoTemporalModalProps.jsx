@@ -84,13 +84,13 @@ const TurnoTemporalModal = ({ isOpen, onClose }) => {
                             </h3>
 
                             <div className="bg-[#3b0191]/30 border border-[#6b46c1]/30 rounded-xl p-6 space-y-4">
-                                <div className="flex items-center justify-center gap-2 text-[#d0bcff]">
+                                {/* <div className="flex items-center justify-center gap-2 text-[#d0bcff]">
                                     <Calendar size={20} className="text-amber-400/80" />
                                     <span className="text-xs text-amber-400/80 font-medium">Próximamente</span>
-                                </div>
+                                </div> */}
 
                                 <p className="text-[#d0bcff]/80 text-sm leading-relaxed">
-                                    Muy pronto podrás seleccionar tu turno para la segunda fase. Mantente atento a nuestros canales oficiales.
+                                    La selección de turnos ha finalizado.
                                     
                                 </p>
                             </div>
