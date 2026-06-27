@@ -28,7 +28,7 @@ const sedinvitaAsistenciaSchema = new mongoose.Schema({
     },
     estado: {
         type: String,
-        enum: ['presente', 'ausente'],
+        enum: ['presente', 'tardanza', 'ausente'],
         default: 'ausente',
     },
     // Quién tomó la asistencia (facilitador/admin que registró)

@@ -36,6 +36,31 @@ const Ico = {
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </svg>
     ),
+    Search: () => (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+    ),
+    User: () => (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+        </svg>
+    ),
+    Group: () => (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+    ),
+    Present: () => (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+    ),
+    Late: () => (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+        </svg>
+    ),
 }
 
 export default function RegistroTurnoPage() {
@@ -46,12 +71,18 @@ export default function RegistroTurnoPage() {
     const [encargado, setEncargado] = useState(null)
     const [turno, setTurno] = useState(null)
     const [authLoading, setAuthLoading] = useState(true)
-    const [authError, setAuthError] = useState(null) // null | 'wrong_turno' | 'revoked'
+    const [authError, setAuthError] = useState(null)
     const [codigo, setCodigo] = useState('')
     const [submitting, setSubmitting] = useState(false)
     const [feedback, setFeedback] = useState(null)
     const [registrados, setRegistrados] = useState([])
     const [showLogout, setShowLogout] = useState(false)
+    
+    // Nuevos estados
+    const [postulanteEncontrado, setPostulanteEncontrado] = useState(null)
+    const [buscando, setBuscando] = useState(false)
+    const [estadoSeleccionado, setEstadoSeleccionado] = useState('presente')
+    const [codigoBuscado, setCodigoBuscado] = useState('')
 
     const inputRef = useRef(null)
 
@@ -88,10 +119,63 @@ export default function RegistroTurnoPage() {
         return () => clearTimeout(timer)
     }, [feedback])
 
+    // Función para buscar postulante al presionar el botón
+    async function handleBuscar() {
+        const codigoClean = codigo.trim()
+        if (!codigoClean || codigoClean.length !== 10) {
+            setFeedback({ type: 'warn', msg: 'Ingresa un código de matrícula de 10 dígitos' })
+            return
+        }
+
+        setBuscando(true)
+        setPostulanteEncontrado(null)
+        setFeedback(null)
+
+        try {
+            const res = await fetch(`/api/sedinvita/registro/${turnoId}?codigo=${encodeURIComponent(codigoClean)}`)
+            const data = await res.json()
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    setFeedback({ type: 'warn', msg: 'No se encontró postulante con ese código' })
+                } else if (res.status === 400) {
+                    setFeedback({ type: 'warn', msg: data.message || 'El postulante no pertenece a este turno' })
+                } else if (res.status === 401 || res.status === 403) {
+                    setAuthError('revoked')
+                    return
+                } else {
+                    setFeedback({ type: 'error', msg: data.message || 'Error al buscar postulante' })
+                }
+                setBuscando(false)
+                return
+            }
+
+            if (data.success && data.postulante) {
+                setPostulanteEncontrado(data.postulante)
+                setCodigoBuscado(codigoClean)
+                // Si ya tiene asistencia, seleccionar ese estado
+                if (data.asistencia) {
+                    setEstadoSeleccionado(data.asistencia.estado)
+                } else {
+                    setEstadoSeleccionado('presente')
+                }
+                setFeedback({ type: 'success', msg: `Postulante encontrado: ${data.postulante.nombres} ${data.postulante.apellidos}` })
+            }
+        } catch (error) {
+            console.error('Error al buscar postulante:', error)
+            setFeedback({ type: 'error', msg: 'Error de conexión al buscar postulante' })
+        } finally {
+            setBuscando(false)
+        }
+    }
+
     async function handleSubmit(e) {
         e.preventDefault()
-        const codigoClean = codigo.trim()
-        if (!codigoClean) return
+        
+        if (!postulanteEncontrado) {
+            setFeedback({ type: 'warn', msg: 'Primero busca un postulante válido' })
+            return
+        }
 
         setSubmitting(true)
         setFeedback(null)
@@ -100,7 +184,10 @@ export default function RegistroTurnoPage() {
             const res = await fetch(`/api/sedinvita/registro/${turnoId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ codigoMatricula: codigoClean }),
+                body: JSON.stringify({ 
+                    codigoMatricula: codigoBuscado,
+                    estado: estadoSeleccionado
+                }),
             })
             const data = await res.json()
 
@@ -112,23 +199,49 @@ export default function RegistroTurnoPage() {
 
             if (data.yaRegistrado) {
                 setFeedback({ type: 'warn', msg: data.message })
+                // Actualizar el estado en la lista si cambió
+                if (data.estadoActual) {
+                    setRegistrados(prev => {
+                        const index = prev.findIndex(r => r.codigo === codigoBuscado)
+                        if (index !== -1) {
+                            const newList = [...prev]
+                            newList[index] = {
+                                ...newList[index],
+                                estado: data.estadoActual,
+                            }
+                            return newList
+                        }
+                        return prev
+                    })
+                }
+                setPostulanteEncontrado(null)
+                setCodigo('')
+                setCodigoBuscado('')
+                setTimeout(() => inputRef.current?.focus(), 50)
                 return
             }
 
             setFeedback({ type: 'success', msg: data.message })
-            setRegistrados(prev => [
-                {
-                    nombre: `${data.postulante.nombres} ${data.postulante.apellidos}`,
-                    codigo: data.postulante.codigoMatricula,
-                    hora: new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
-                },
-                ...prev,
-            ])
+            
+            // Agregar a la lista de registrados
+            const nuevoRegistro = {
+                nombre: `${data.postulante.nombres} ${data.postulante.apellidos}`,
+                codigo: data.postulante.codigoMatricula,
+                grupo: data.postulante.grupo || null,
+                estado: data.estadoActual || estadoSeleccionado,
+                hora: new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
+            }
+            
+            setRegistrados(prev => [nuevoRegistro, ...prev])
+            setPostulanteEncontrado(null)
+            setCodigo('')
+            setCodigoBuscado('')
+            setEstadoSeleccionado('presente')
+            
         } catch {
             setFeedback({ type: 'error', msg: 'Error de conexión. Intenta de nuevo.' })
         } finally {
             setSubmitting(false)
-            setCodigo('')
             setTimeout(() => inputRef.current?.focus(), 50)
         }
     }
@@ -190,6 +303,9 @@ export default function RegistroTurnoPage() {
         error:   { bg: 'rgba(239,68,68,0.10)',  border: 'rgba(239,68,68,0.30)',  text: '#991B1B', icon: '#EF4444' },
     }
 
+    const codigoLength = codigo.replace(/\D/g, '').length
+    const isValidLength = codigoLength === 10
+
     return (
         <div style={{ minHeight: '100vh', backgroundColor: '#f8f5fa', fontFamily: 'Poppins, sans-serif' }}>
 
@@ -235,48 +351,287 @@ export default function RegistroTurnoPage() {
                     )}
 
                     <form onSubmit={handleSubmit}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', fontWeight: 600, color: '#4A1A5E', marginBottom: '8px' }}>
-                            <Ico.IdCard /> Código de matrícula
-                        </label>
-                        <input
-                            ref={inputRef}
-                            value={codigo}
-                            onChange={e => {
-                                // Solo permitir números y máximo 10 dígitos
-                                const value = e.target.value.replace(/\D/g, '').slice(0, 10)
-                                setCodigo(value)
-                            }}
-                            placeholder="0000000000"
-                            disabled={submitting}
-                            maxLength={10}
-                            inputMode="numeric"
-                            pattern="[0-9]*"
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', fontWeight: 600, color: '#4A1A5E' }}>
+                                <Ico.IdCard /> Código de matrícula
+                            </label>
+                            <span style={{
+                                fontSize: '12px',
+                                fontWeight: 600,
+                                color: isValidLength ? '#10B981' : codigoLength > 0 ? '#EF4444' : '#9CA3AF',
+                                transition: 'color 0.2s ease'
+                            }}>
+                                {codigoLength}/10
+                            </span>
+                        </div>
+
+                        <div style={{
+                            position: 'relative',
+                            display: 'flex',
+                            alignItems: 'center',
+                            backgroundColor: '#fff',
+                            borderRadius: '12px',
+                            border: `2px solid ${
+                                isValidLength 
+                                    ? '#10B981' 
+                                    : codigoLength > 0 
+                                        ? '#EF4444' 
+                                        : '#e5d9ef'
+                            }`,
+                            transition: 'border-color 0.2s ease',
+                            overflow: 'hidden'
+                        }}>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '2px',
+                                padding: '0 8px',
+                                flex: 1,
+                            }}>
+                                {Array.from({ length: 10 }, (_, i) => {
+                                    const digit = codigo[i] || ''
+                                    const isFilled = digit !== ''
+                                    return (
+                                        <div
+                                            key={i}
+                                            style={{
+                                                width: '28px',
+                                                height: '48px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '20px',
+                                                fontWeight: 700,
+                                                fontFamily: 'monospace',
+                                                color: isFilled ? '#1F1030' : '#D1D5DB',
+                                                borderBottom: `2px solid ${
+                                                    isFilled 
+                                                        ? isValidLength 
+                                                            ? '#10B981' 
+                                                            : '#EF4444'
+                                                        : '#E5E7EB'
+                                                }`,
+                                                transition: 'all 0.15s ease',
+                                                background: isFilled ? 'rgba(103,37,119,0.04)' : 'transparent'
+                                            }}
+                                        >
+                                            {digit || '•'}
+                                        </div>
+                                    )
+                                })}
+                            </div>
+
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                value={codigo}
+                                onChange={e => {
+                                    const value = e.target.value.replace(/\D/g, '').slice(0, 10)
+                                    setCodigo(value)
+                                }}
+                                placeholder=""
+                                disabled={submitting || buscando}
+                                maxLength={10}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                style={{
+                                    position: 'absolute',
+                                    inset: 0,
+                                    opacity: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    cursor: 'pointer',
+                                    zIndex: 10,
+                                }}
+                                autoComplete="off"
+                            />
+                        </div>
+
+                        <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{
+                                flex: 1,
+                                height: '4px',
+                                borderRadius: '2px',
+                                backgroundColor: '#F3F4F6',
+                                overflow: 'hidden'
+                            }}>
+                                <div style={{
+                                    width: `${(codigoLength / 10) * 100}%`,
+                                    height: '100%',
+                                    backgroundColor: isValidLength ? '#10B981' : codigoLength > 0 ? '#EF4444' : '#E5E7EB',
+                                    transition: 'width 0.2s ease, background-color 0.2s ease',
+                                    borderRadius: '2px'
+                                }} />
+                            </div>
+                            <span style={{
+                                fontSize: '11px',
+                                fontWeight: 500,
+                                color: isValidLength ? '#10B981' : codigoLength > 0 ? '#EF4444' : '#9CA3AF',
+                                minWidth: '40px',
+                                textAlign: 'right'
+                            }}>
+                                {isValidLength ? '✓ Listo' : codigoLength > 0 ? `${10 - codigoLength} restante` : '—'}
+                            </span>
+                        </div>
+
+                        {/* Botón Buscar */}
+                        <button
+                            type="button"
+                            onClick={handleBuscar}
+                            disabled={!isValidLength || buscando}
                             style={{
-                                width: '100%', padding: '14px 16px', borderRadius: '12px',
-                                border: '1px solid #e5d9ef', fontSize: '18px', fontWeight: 600,
-                                letterSpacing: '0.05em', textAlign: 'center',
-                                fontFamily: 'Poppins, sans-serif', color: '#1F1030',
-                                marginBottom: '14px',
+                                width: '100%',
+                                padding: '12px',
+                                borderRadius: '12px',
+                                border: 'none',
+                                marginTop: '12px',
+                                backgroundColor: !isValidLength || buscando ? '#E5E7EB' : '#4A1A5E',
+                                color: !isValidLength || buscando ? '#9CA3AF' : '#fff',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px',
+                                fontWeight: 600,
+                                cursor: !isValidLength || buscando ? 'not-allowed' : 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                transition: 'all 0.2s ease',
                             }}
-                        />
+                        >
+                            {buscando ? <Ico.Spinner /> : <Ico.Search />}
+                            {buscando ? 'Buscando...' : 'Buscar postulante'}
+                        </button>
+
+                        {/* Información del postulante encontrado */}
+                        {postulanteEncontrado && (
+                            <div style={{
+                                marginTop: '16px',
+                                padding: '14px 16px',
+                                backgroundColor: 'rgba(103,37,119,0.05)',
+                                borderRadius: '12px',
+                                border: '1px solid rgba(103,37,119,0.15)',
+                                animation: 'fadeIn 0.3s ease'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                    <Ico.User />
+                                    <span style={{ fontWeight: 600, color: '#1F1030', fontSize: '14px' }}>
+                                        {postulanteEncontrado.nombres} {postulanteEncontrado.apellidos}
+                                    </span>
+                                </div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', fontSize: '13px', color: '#4B5563' }}>
+                                    <span>Código: <strong>{postulanteEncontrado.codigoMatricula}</strong></span>
+                                    {postulanteEncontrado.grupo && (
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <Ico.Group /> Grupo: <strong>{postulanteEncontrado.grupo}</strong>
+                                        </span>
+                                    )}
+                                    {postulanteEncontrado.correoElectronico && (
+                                        <span>📧 {postulanteEncontrado.correoElectronico}</span>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Selección de estado (Presente / Tardanza) */}
+                        {postulanteEncontrado && (
+                            <div style={{ marginTop: '16px' }}>
+                                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#4A1A5E', marginBottom: '8px' }}>
+                                    Estado de asistencia
+                                </label>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setEstadoSeleccionado('presente')}
+                                        style={{
+                                            flex: 1,
+                                            padding: '10px 16px',
+                                            borderRadius: '10px',
+                                            border: `2px solid ${estadoSeleccionado === 'presente' ? '#10B981' : '#E5E7EB'}`,
+                                            backgroundColor: estadoSeleccionado === 'presente' ? 'rgba(16,185,129,0.10)' : '#fff',
+                                            color: estadoSeleccionado === 'presente' ? '#065F46' : '#6B7280',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontWeight: 600,
+                                            fontSize: '13px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '6px',
+                                            transition: 'all 0.2s ease',
+                                        }}
+                                    >
+                                        <Ico.Present /> Presente
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setEstadoSeleccionado('tardanza')}
+                                        style={{
+                                            flex: 1,
+                                            padding: '10px 16px',
+                                            borderRadius: '10px',
+                                            border: `2px solid ${estadoSeleccionado === 'tardanza' ? '#F59E0B' : '#E5E7EB'}`,
+                                            backgroundColor: estadoSeleccionado === 'tardanza' ? 'rgba(245,158,11,0.10)' : '#fff',
+                                            color: estadoSeleccionado === 'tardanza' ? '#92400E' : '#6B7280',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontWeight: 600,
+                                            fontSize: '13px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '6px',
+                                            transition: 'all 0.2s ease',
+                                        }}
+                                    >
+                                        <Ico.Late /> Tardanza
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                         <button
                             type="submit"
-                            disabled={submitting || !codigo.trim()}
+                            disabled={submitting || !postulanteEncontrado}
                             style={{
-                                width: '100%', padding: '14px', borderRadius: '12px', border: 'none',
-                                backgroundColor: submitting || !codigo.trim() ? '#E5E7EB' : '#672577',
-                                color: submitting || !codigo.trim() ? '#9CA3AF' : '#fff',
-                                fontFamily: 'Poppins, sans-serif', fontSize: '14px', fontWeight: 700,
-                                cursor: submitting || !codigo.trim() ? 'not-allowed' : 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                width: '100%', 
+                                padding: '14px', 
+                                borderRadius: '12px', 
+                                border: 'none',
+                                marginTop: '16px',
+                                backgroundColor: !postulanteEncontrado || submitting ? '#E5E7EB' : '#672577',
+                                color: !postulanteEncontrado || submitting ? '#9CA3AF' : '#fff',
+                                fontFamily: 'Poppins, sans-serif', 
+                                fontSize: '14px', 
+                                fontWeight: 700,
+                                cursor: !postulanteEncontrado || submitting ? 'not-allowed' : 'pointer',
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center', 
+                                gap: '8px',
+                                transition: 'all 0.2s ease',
+                                transform: postulanteEncontrado && !submitting ? 'scale(1)' : 'scale(0.98)',
+                                opacity: postulanteEncontrado && !submitting ? 1 : 0.6
                             }}
                         >
                             {submitting ? <Ico.Spinner /> : <Ico.Check />}
-                            Marcar presente
+                            {submitting ? 'Registrando...' : postulanteEncontrado ? `Marcar como ${estadoSeleccionado}` : 'Busca un postulante primero'}
                         </button>
-                        <label className="mt-4 text-center" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 500, color: '#9C2007', marginBottom: '8px' }}>
-                            Nota: No olvides SALIR cuando termines.  
-                        </label>
+                        
+                        <div style={{ 
+                            marginTop: '12px', 
+                            padding: '10px 14px', 
+                            backgroundColor: 'rgba(156, 32, 7, 0.06)', 
+                            borderRadius: '10px',
+                            borderLeft: '3px solid #9C2007',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                        }}>
+                            <span style={{ fontSize: '12px', fontWeight: 500, color: '#9C2007' }}>
+                                No olvides darle al botón <strong>"Salir"</strong> cuando termines.
+                            </span>
+                        </div>
                     </form>
                 </div>
 
@@ -289,14 +644,29 @@ export default function RegistroTurnoPage() {
                         <ul style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: '280px', overflowY: 'auto' }}>
                             {registrados.map((r, i) => (
                                 <li key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 18px', borderBottom: i < registrados.length - 1 ? '1px solid rgba(214,182,223,0.30)' : 'none' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10B981', flexShrink: 0 }} />
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+                                        <div style={{
+                                            width: '8px',
+                                            height: '8px',
+                                            borderRadius: '50%',
+                                            backgroundColor: r.estado === 'presente' ? '#10B981' : r.estado === 'tardanza' ? '#F59E0B' : '#9CA3AF',
+                                            flexShrink: 0
+                                        }} />
                                         <div>
                                             <p style={{ fontSize: '13px', fontWeight: 600, color: '#111827', margin: 0 }}>{r.nombre}</p>
-                                            <p style={{ fontSize: '11px', color: '#9880B0', margin: 0 }}>{r.codigo}</p>
+                                            <div style={{ display: 'flex', gap: '10px', fontSize: '11px', color: '#9880B0' }}>
+                                                <span>{r.codigo}</span>
+                                                {r.grupo && <span>• Grupo: {r.grupo}</span>}
+                                                <span style={{
+                                                    fontWeight: 600,
+                                                    color: r.estado === 'presente' ? '#10B981' : r.estado === 'tardanza' ? '#F59E0B' : '#9CA3AF'
+                                                }}>
+                                                    {r.estado === 'presente' ? '✓ Presente' : r.estado === 'tardanza' ? 'Tardanza' : ''}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <span style={{ fontSize: '11px', color: '#9CA3AF' }}>{r.hora}</span>
+                                    <span style={{ fontSize: '11px', color: '#9CA3AF', flexShrink: 0 }}>{r.hora}</span>
                                 </li>
                             ))}
                         </ul>
@@ -304,7 +674,10 @@ export default function RegistroTurnoPage() {
                 )}
             </main>
 
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } } @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }`}</style>
+            <style>{`
+                @keyframes spin { to { transform: rotate(360deg); } } 
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+            `}</style>
         </div>
     )
 }

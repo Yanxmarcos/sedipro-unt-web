@@ -70,8 +70,8 @@ export async function POST(request) {
         const body = await request.json();
         const { postulanteId, turnoId, estado } = body;
 
-        if (!postulanteId || !turnoId || !['presente', 'ausente'].includes(estado)) {
-            return NextResponse.json({ error: 'postulanteId, turnoId y estado (presente/ausente) son requeridos' }, { status: 400 });
+        if (!postulanteId || !turnoId || !['presente', 'tardanza', 'ausente'].includes(estado)) {
+            return NextResponse.json({ error: 'postulanteId, turnoId y estado (presente/tardanza/ausente) son requeridos' }, { status: 400 });
         }
 
         await connectToDatabase();
