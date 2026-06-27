@@ -77,6 +77,7 @@ export default function EvaluarPage() {
         router.replace('/sedinvita/facilitador/login')
     }
 
+    // FIX 2: Actualizar SOLO la evaluación localmente sin recargar
     async function guardarEvaluacion(dinamicaId, payload) {
         try {
             const res = await fetch('/api/sedinvita/evaluaciones', {
@@ -86,8 +87,23 @@ export default function EvaluarPage() {
             })
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Error al guardar')
+            
             setFeedback({ type: 'success', msg: 'Evaluación guardada ✓' })
-            fetchDetalle(grupoId)
+            
+            // FIX 2: Actualizar SOLO la evaluación en el estado local
+            // Sin recargar todo, sin cambiar de postulante
+            const evaluacionGuardada = data.data || data.evaluacion
+            setDetalle(prev => {
+                // Filtrar evaluaciones anteriores del mismo postulante y dinámica
+                const evaluacionesActualizadas = prev.evaluaciones.filter(
+                    e => !(e.postulanteId === postulanteId && e.dinamicaId === dinamicaId)
+                )
+                // Agregar la nueva evaluación
+                return {
+                    ...prev,
+                    evaluaciones: [...evaluacionesActualizadas, evaluacionGuardada]
+                }
+            })
         } catch (err) {
             setFeedback({ type: 'error', msg: err.message })
         }
@@ -237,13 +253,11 @@ function DinamicaCard({ dinamica, evaluacionExistente, onGuardar }) {
     )
     const [puntajes, setPuntajes] = useState(inicial)
     const [comentario, setComentario] = useState(evaluacionExistente?.comentario || '')
-    const [opinionInfiltrado, setOpinionInfiltrado] = useState(evaluacionExistente?.opinionInfiltrado || '')
     const [saving, setSaving] = useState(false)
 
     useEffect(() => {
         setPuntajes(Object.fromEntries(dinamica.competencias.map(c => [c, evaluacionExistente?.puntajes?.find(p => p.competencia === c)?.puntaje || 0])))
         setComentario(evaluacionExistente?.comentario || '')
-        setOpinionInfiltrado(evaluacionExistente?.opinionInfiltrado || '')
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [evaluacionExistente, dinamica._id])
 
@@ -254,9 +268,18 @@ function DinamicaCard({ dinamica, evaluacionExistente, onGuardar }) {
         await onGuardar({
             puntajes: dinamica.competencias.map(c => ({ competencia: c, puntaje: puntajes[c] })),
             comentario,
-            opinionInfiltrado,
+            // Backend ignora esto si viene de facilitador, pero lo mandamos vacío de todas formas
+            opinionInfiltrado: '',
         })
         setSaving(false)
+    }
+
+    // FIX 1: Toggle de puntajes - poder deseleccionar
+    function togglePuntaje(competencia, valor) {
+        setPuntajes(prev => ({
+            ...prev,
+            [competencia]: prev[competencia] === valor ? 0 : valor
+        }))
     }
 
     return (
@@ -275,13 +298,16 @@ function DinamicaCard({ dinamica, evaluacionExistente, onGuardar }) {
                         {ESCALA.map(opt => {
                             const activo = puntajes[c] === opt.valor
                             return (
-                                <button key={opt.valor} onClick={() => setPuntajes(prev => ({ ...prev, [c]: opt.valor }))}
+                                <button 
+                                    key={opt.valor} 
+                                    onClick={() => togglePuntaje(c, opt.valor)}
                                     style={{
                                         padding: '8px 4px', borderRadius: '8px',
                                         border: activo ? '2px solid #672577' : '1px solid #e5d9ef',
                                         backgroundColor: activo ? 'rgba(103,37,119,0.10)' : '#f9f6fb',
                                         color: activo ? '#4A1A5E' : '#6B7280',
                                         fontSize: '11px', fontWeight: 600, cursor: 'pointer',
+                                        transition: 'all 0.15s ease-in-out',
                                     }}>
                                     {opt.valor} · {opt.etiqueta}
                                 </button>
@@ -291,11 +317,6 @@ function DinamicaCard({ dinamica, evaluacionExistente, onGuardar }) {
                 </div>
             ))}
 
-            <div style={{ marginBottom: '10px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#4A1A5E', display: 'block', marginBottom: '4px' }}>Opinión del infiltrado</label>
-                <textarea value={opinionInfiltrado} onChange={e => setOpinionInfiltrado(e.target.value)} rows={2}
-                    style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid #e5d9ef', fontSize: '12px', fontFamily: 'Poppins, sans-serif', resize: 'vertical' }} />
-            </div>
             <div style={{ marginBottom: '14px' }}>
                 <label style={{ fontSize: '12px', fontWeight: 600, color: '#4A1A5E', display: 'block', marginBottom: '4px' }}>Comentario adicional</label>
                 <textarea value={comentario} onChange={e => setComentario(e.target.value)} rows={2}
@@ -308,6 +329,7 @@ function DinamicaCard({ dinamica, evaluacionExistente, onGuardar }) {
                     backgroundColor: !completo || saving ? '#E5E7EB' : '#672577',
                     color: !completo || saving ? '#9CA3AF' : '#fff',
                     fontSize: '13px', fontWeight: 700, cursor: !completo || saving ? 'not-allowed' : 'pointer',
+                    transition: 'background-color 0.2s ease-in-out',
                 }}>
                 {saving ? 'Guardando…' : 'Guardar evaluación'}
             </button>
