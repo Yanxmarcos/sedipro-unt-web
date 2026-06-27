@@ -221,28 +221,33 @@ export default function Page() {
     }
 
     async function asignarEncargado(sedipranoId) {
-        setAsignando(true)
-        try {
-            const res = await fetch('/api/sedinvita/encargados-asistencia', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ turnoId, sedipranoId })
+    setAsignando(true)
+    setErrorMsg('')
+    try {
+        const res = await fetch('/api/sedinvita/encargados-asistencia', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ 
+                turnoId, 
+                edicionId: edicionActiva?._id,  // ← AGREGAR ESTO
+                sedipranoId 
             })
-            const json = await res.json()
-            if (res.ok) {
-                setEncargados(prev => [...prev, json.data])
-                setShowAsignar(false)
-                setBuscarSediprano('')
-            } else {
-                setErrorMsg(json.error || 'Error')
-            }
-        } catch (err) {
-            setErrorMsg(err.message)
-        } finally {
-            setAsignando(false)
+        })
+        const json = await res.json()
+        if (res.ok) {
+            setEncargados(prev => [...prev, json.data])
+            setShowAsignar(false)
+            setBuscarSediprano('')
+        } else {
+            setErrorMsg(json.error || 'Error')
         }
+    } catch (err) {
+        setErrorMsg(err.message)
+    } finally {
+        setAsignando(false)
     }
+}
 
     async function eliminarEncargado(id) {
         if (!confirm('¿Eliminar este encargado?')) return
