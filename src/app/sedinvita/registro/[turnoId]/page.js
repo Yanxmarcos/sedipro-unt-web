@@ -471,7 +471,7 @@ export default function RegistroTurnoPage() {
                                 minWidth: '40px',
                                 textAlign: 'right'
                             }}>
-                                {isValidLength ? '✓ Listo' : codigoLength > 0 ? `${10 - codigoLength} restante` : '—'}
+                                {isValidLength ? 'Listo' : codigoLength > 0 ? `${10 - codigoLength} restante` : '—'}
                             </span>
                         </div>
 

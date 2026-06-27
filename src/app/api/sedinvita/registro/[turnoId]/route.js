@@ -101,6 +101,8 @@ export async function POST(request, { params }) {
             postulanteId: postulante._id,
         })
 
+        const encargadoActual = encargados.find(e => e.dni === decoded.dni)
+
         if (asistenciaExistente) {
             const estadoActual = asistenciaExistente.estado
 
@@ -125,7 +127,7 @@ export async function POST(request, { params }) {
             // Si está ausente, actualizar
             asistenciaExistente.estado = estado
             asistenciaExistente.hora = new Date()
-            asistenciaExistente.registradoPor = `${encargados[0].nombres} ${encargados[0].apellidos}`
+            asistenciaExistente.registradoPor = `${encargadoActual.nombres} ${encargadoActual.apellidos}`
             await asistenciaExistente.save()
 
             const etiquetaEstado = estado === 'tardanza' ? 'tardanza ⏰' : 'presente ✓'
@@ -149,7 +151,7 @@ export async function POST(request, { params }) {
             turnoId: turnoId,
             postulanteId: postulante._id,
             estado: estado,
-            registradoPor: `${encargados[0].nombres} ${encargados[0].apellidos}`,
+            registradoPor: `${encargadoActual.nombres} ${encargadoActual.apellidos}`,
             hora: new Date(),
             registroManual: false,
         })
