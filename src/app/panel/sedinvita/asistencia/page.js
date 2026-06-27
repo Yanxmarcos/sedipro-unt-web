@@ -200,7 +200,7 @@ export default function Page() {
     }
 
     async function copiarLink() {
-        const link = `${window.location.origin}/sedinvita/encargado/asistencia/${turnoId}`
+        const link = `${window.location.origin}/sedinvita/login`
         try {
             await navigator.clipboard.writeText(link)
             setCopied(true)
