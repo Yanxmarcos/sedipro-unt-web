@@ -7,9 +7,10 @@ import Link from 'next/link'
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTiktok } from 'react-icons/fa';
 
 // import TurnoModal from "@/components/TurnoModal";
-import TurnoTemporalModal from "@/components/TurnoTemporalModalProps";
+// import TurnoTemporalModal from "@/components/TurnoTemporalModalProps";
+import ResultadoFase2Modal from "@/components/ResultadosFase2Modal";
+
 import MagicBento from "@/components/MagicBento";
-// import ResultadosFase1 from "@/components/ResultadosFase1";
 
 const ShaderBackground = () => {
     const canvasRef = useRef(null);
@@ -282,12 +283,12 @@ export default function Home() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     //Borrar luego
-    const [showTemporalModal, setShowTemporalModal] = useState(false);
+    // const [showTemporalModal, setShowTemporalModal] = useState(false);
 
     const CONFIG_FASES = {
         1: { clase: 'glass-card' },
-        2: { clase: 'glass-card-selected-glow' },
-        3: { clase: 'glass-card' },
+        2: { clase: 'glass-card' },
+        3: { clase: 'glass-card-selected-glow' },
         4: { clase: 'glass-card' }
     }
 
@@ -372,7 +373,7 @@ export default function Home() {
     }, [isModalOpen]);
 
     const openModal = () => {
-        setShowTemporalModal(true); // Cambiar por setShowTemporalModal cuando tovia no este activo o setIsModalOpen
+        setIsModalOpen(true); // Cambiar por setShowTemporalModal cuando tovia no este activo o setIsModalOpen
     };
 
     return (
@@ -438,7 +439,7 @@ export default function Home() {
                     <button 
                     onClick={openModal}
                     className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-full font-label-md text-label-md font-bold active:scale-105 hover:scale-105 transform transition-transform duration-200 shadow-lg">
-                        Elegir Turno
+                        Resultados Fase 2
                     </button>
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -492,7 +493,7 @@ export default function Home() {
                             Áreas
                         </a>
                         <button onClick={openModal} className="mt-2 px-6 py-3 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-xl font-bold">
-                            Elegir Turno
+                            Resultados Fase 2
                         </button>
                     </div>
                 </div>
@@ -523,7 +524,7 @@ export default function Home() {
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
                                 <button onClick={openModal} className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-                                    Elegir Turno
+                                    Resultados Fase 2
                                 </button>
                                 <a href="#fases" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
                                     Fase Actual
@@ -553,7 +554,7 @@ export default function Home() {
                         <div className="text-center mb-stack-lg space-y-4">
                             <h2 className="font-headline-lg text-headline-lg text-on-surface">Fases de SEDInvita</h2>
                             <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
-                                Diseñamos un camino estructurado para identificar el talento de cada estudiante. Actualmente nos encontramos en la <strong>Fase 2</strong> del proceso.
+                                Diseñamos un camino estructurado para identificar el talento de cada estudiante. Actualmente nos encontramos en la <strong>Fase 3</strong> del proceso.
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-stack-md">
@@ -800,14 +801,14 @@ export default function Home() {
                     <div className="max-w-container-max mx-auto glass-card-extra-light rounded-[32px] p-stack-lg md:p-24 text-center space-y-stack-md relative z-10 border-white/5 backdrop-blur-sm">
                         <div className="absolute inset-0 bg-gradient-to-tr from-[#3b0191]/10 via-transparent to-[#6b46c1]/10 pointer-events-none rounded-[32px]"></div>
                         <h2 className="font-display-lg text-headline-lg md:text-[56px] text-on-surface leading-tight relative z-10">
-                            Segunda Fase <br />de Selección.
+                            Tercera Fase <br />de Selección.
                         </h2>
                         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto relative z-10">
-                            Participa en las inducciones, dinámicas y evaluaciones que nos permitirán descubrir tu perfil y prepararte para formar parte de SEDIPRO UNT.
+                            ¡Es momento de demostrar tu potencial! Participa en la Inducción II: Desarrollo de proyectos.
                         </p>
                         <div className="pt-4 relative z-10">
                             <button onClick={openModal} className="px-8 py-4 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-                                Elegir Turno
+                                Resultados Fase 2
                             </button>
                         </div>
                     </div>
@@ -926,12 +927,13 @@ export default function Home() {
                 </div>
             </footer>
 
-            {/* Modal de Elegir Turno */}
+            {/* Modales */}
             {/* <TurnoModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} /> */}
-            <TurnoTemporalModal 
+            {/* <TurnoTemporalModal 
                 isOpen={showTemporalModal}
                 onClose={() => setShowTemporalModal(false)}
-            />
+            /> */}
+            <ResultadoFase2Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </>
     );
 }

@@ -24,6 +24,7 @@ export default function Page() {
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
     const [error, setError] = useState(null)
+    const [faseSeleccionada, setFaseSeleccionada] = useState('fase3')
 
     const fetchData = useCallback(async () => {
         setLoading(true)
@@ -46,15 +47,60 @@ export default function Page() {
         fetchData()
     }, [fetchData])
 
+    // Filtrar por fase (lógica de filtrado progresivo)
+    const filtrarPorFase = (postulantes, fase) => {
+        if (fase === 'fase2') {
+            // Fase 2: TODOS los postulantes
+            return postulantes
+        } else if (fase === 'fase3') {
+            // Fase 3: SOLO los que están en fase 3 o superior
+            return postulantes.filter(p => p.faseActual === 'fase3' || p.faseActual === 'fase4')
+        } else if (fase === 'fase4') {
+            // Fase 4: SOLO los que están en fase 4
+            return postulantes.filter(p => p.faseActual === 'fase4')
+        }
+        return postulantes
+    }
+
+    // Aplicar filtros: primero fase, luego búsqueda
     const filtered = data.filter(p => {
         const q = search.toLowerCase()
-        return (
+        const matchSearch = 
             p.nombres?.toLowerCase().includes(q) ||
             p.apellidos?.toLowerCase().includes(q) ||
             p.correoElectronico?.toLowerCase().includes(q) ||
-            p.codigoMatricula?.toLowerCase().includes(q)
-        )
+            p.codigoMatricula?.toLowerCase().includes(q) ||
+            p.numeroCelular?.toLowerCase().includes(q)
+        
+        return matchSearch
     })
+
+    // Aplicar filtro de fase después
+    const filteredByFase = filtrarPorFase(filtered, faseSeleccionada)
+
+    // Contadores (mostrar cuántos hay en cada fase)
+    const contarPorFase = (fase) => {
+        if (fase === 'fase2') {
+            return data.length // Todos
+        } else if (fase === 'fase3') {
+            return data.filter(p => p.faseActual === 'fase3' || p.faseActual === 'fase4').length
+        } else if (fase === 'fase4') {
+            return data.filter(p => p.faseActual === 'fase4').length
+        }
+        return 0
+    }
+
+    const fase2Count = contarPorFase('fase2')
+    const fase3Count = contarPorFase('fase3')
+    const fase4Count = contarPorFase('fase4')
+
+    // Obtener el nombre de la fase actual para mostrar
+    const getFaseNombre = (fase) => {
+        if (fase === 'fase2') return 'Fase 2'
+        if (fase === 'fase3') return 'Fase 3'
+        if (fase === 'fase4') return 'Fase 4'
+        return fase
+    }
 
     return (
         <div style={{
@@ -71,11 +117,137 @@ export default function Page() {
                             Postulantes
                         </h1>
                         <p style={{ fontSize: '13px', color: t.bodyText, marginTop: '4px', marginBottom: 0 }}>
-                            Lista de postulantes en {edicion?.nombre || 'SEDInvita'}
+                            Lista de postulantes en {edicion?.nombre || 'SEDInvita'} - Mostrando {getFaseNombre(faseSeleccionada)}
                         </p>
                     </div>
                 </div>
             </div>
+
+            {/* Selector de Fase y Contadores */}
+            <div style={{ 
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                gap: '12px', 
+                marginBottom: '16px',
+                alignItems: 'center'
+            }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <button
+                        onClick={() => setFaseSeleccionada('fase2')}
+                        style={{
+                            padding: '8px 20px',
+                            borderRadius: '20px',
+                            border: faseSeleccionada === 'fase2' 
+                                ? '2px solid #2563EB' 
+                                : `1px solid ${t.cardBorder}`,
+                            backgroundColor: faseSeleccionada === 'fase2' 
+                                ? '#2563EB' 
+                                : t.cardBg,
+                            color: faseSeleccionada === 'fase2' 
+                                ? '#ffffff' 
+                                : t.bodyText,
+                            cursor: 'pointer',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            transition: 'all 0.2s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                        }}
+                    >
+                        Fase 2
+                        <span style={{
+                            fontSize: '11px',
+                            opacity: 0.9,
+                            backgroundColor: faseSeleccionada === 'fase2' 
+                                ? 'rgba(255,255,255,0.2)' 
+                                : 'rgba(103,37,119,0.1)',
+                            padding: '2px 10px',
+                            borderRadius: '12px',
+                        }}>
+                            {fase2Count}
+                        </span>
+                    </button>
+
+                    <button
+                        onClick={() => setFaseSeleccionada('fase3')}
+                        style={{
+                            padding: '8px 20px',
+                            borderRadius: '20px',
+                            border: faseSeleccionada === 'fase3' 
+                                ? '2px solid #7C3AED' 
+                                : `1px solid ${t.cardBorder}`,
+                            backgroundColor: faseSeleccionada === 'fase3' 
+                                ? '#7C3AED' 
+                                : t.cardBg,
+                            color: faseSeleccionada === 'fase3' 
+                                ? '#ffffff' 
+                                : t.bodyText,
+                            cursor: 'pointer',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            transition: 'all 0.2s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                        }}
+                    >
+                        Fase 3
+                        <span style={{
+                            fontSize: '11px',
+                            opacity: 0.9,
+                            backgroundColor: faseSeleccionada === 'fase3' 
+                                ? 'rgba(255,255,255,0.2)' 
+                                : 'rgba(103,37,119,0.1)',
+                            padding: '2px 10px',
+                            borderRadius: '12px',
+                        }}>
+                            {fase3Count}
+                        </span>
+                    </button>
+
+                    <button
+                        onClick={() => setFaseSeleccionada('fase4')}
+                        style={{
+                            padding: '8px 20px',
+                            borderRadius: '20px',
+                            border: faseSeleccionada === 'fase4' 
+                                ? '2px solid #D946EF' 
+                                : `1px solid ${t.cardBorder}`,
+                            backgroundColor: faseSeleccionada === 'fase4' 
+                                ? '#D946EF' 
+                                : t.cardBg,
+                            color: faseSeleccionada === 'fase4' 
+                                ? '#ffffff' 
+                                : t.bodyText,
+                            cursor: 'pointer',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            transition: 'all 0.2s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                        }}
+                    >
+                        Fase 4
+                        <span style={{
+                            fontSize: '11px',
+                            opacity: 0.9,
+                            backgroundColor: faseSeleccionada === 'fase4' 
+                                ? 'rgba(255,255,255,0.2)' 
+                                : 'rgba(103,37,119,0.1)',
+                            padding: '2px 10px',
+                            borderRadius: '12px',
+                        }}>
+                            {fase4Count}
+                        </span>
+                    </button>
+                </div>
+            </div>
+
             {/* Barra de búsqueda */}
             <div style={{ marginBottom: '16px' }}>
                 <div style={{ position: 'relative', maxWidth: '400px' }}>
@@ -144,7 +316,7 @@ export default function Page() {
                                         </div>
                                     </td>
                                 </tr>
-                            ) : filtered.length === 0 ? (
+                            ) : filteredByFase.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} style={{ padding: '56px 20px', textAlign: 'center' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: t.dividerText }}>
@@ -152,7 +324,7 @@ export default function Page() {
                                                 <Ico.Users />
                                             </div>
                                             <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '14px', margin: 0 }}>
-                                                {search ? 'No se encontraron resultados' : 'No hay postulantes por el momento.'}
+                                                {search ? 'No se encontraron resultados' : `No hay postulantes en ${getFaseNombre(faseSeleccionada)}`}
                                             </p>
                                             <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', margin: 0, opacity: 0.7 }}>
                                                 {search ? 'Intenta con otra búsqueda' : ''}
@@ -161,7 +333,7 @@ export default function Page() {
                                     </td>
                                 </tr>
                             ) : (
-                                filtered.map((p, i) => {
+                                filteredByFase.map((p, i) => {
                                     const isEven = i % 2 === 1
                                     const habilitado = p.estadoGeneral === 'habilitado'
                                     return (
@@ -171,7 +343,6 @@ export default function Page() {
                                             onMouseEnter={e => e.currentTarget.style.backgroundColor = t.tableRowHover}
                                             onMouseLeave={e => e.currentTarget.style.backgroundColor = isEven ? t.tableRowAlt : t.tableRow}
                                         >
-                                            {/* Postulante */}
                                             <td style={{ padding: '11px 14px', whiteSpace: 'nowrap' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                                     <div>
@@ -181,27 +352,33 @@ export default function Page() {
                                                     </div>
                                                 </div>
                                             </td>
-                                            {/* Correo */}
                                             <td style={{ padding: '11px 14px', fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: t.bodyText }}>
                                                 {p.correoElectronico}
                                             </td>
-                                            {/* Código */}
                                             <td style={{ padding: '11px 14px' }}>
                                                 <span style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', fontWeight: 600, color: '#672577', backgroundColor: dark ? 'rgba(103,37,119,0.15)' : 'rgba(103,37,119,0.08)', padding: '3px 9px', borderRadius: '8px' }}>
                                                     {p.codigoMatricula}
                                                 </span>
                                             </td>
-                                            {/* Celular */}
                                             <td style={{ padding: '11px 14px', fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: dark ? '#EAD8F5' : '#374151', whiteSpace: 'nowrap' }}>
                                                 {p.numeroCelular || '—'}
                                             </td>
-                                            {/* Fase */}
                                             <td style={{ padding: '11px 14px' }}>
-                                                <span style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', fontWeight: 600, color: '#2563EB', backgroundColor: dark ? 'rgba(37,99,235,0.16)' : 'rgba(37,99,235,0.08)', padding: '3px 9px', borderRadius: '8px', textTransform: 'capitalize' }}>
-                                                    {p.faseActual}
+                                                <span style={{ 
+                                                    fontFamily: 'Poppins,sans-serif', 
+                                                    fontSize: '12px', 
+                                                    fontWeight: 600, 
+                                                    color: p.faseActual === 'fase2' ? '#2563EB' : p.faseActual === 'fase3' ? '#7C3AED' : '#D946EF',
+                                                    backgroundColor: dark 
+                                                        ? `rgba(${p.faseActual === 'fase2' ? '37,99,235' : p.faseActual === 'fase3' ? '124,58,237' : '217,70,239'}, 0.16)` 
+                                                        : `rgba(${p.faseActual === 'fase2' ? '37,99,235' : p.faseActual === 'fase3' ? '124,58,237' : '217,70,239'}, 0.08)`,
+                                                    padding: '3px 9px', 
+                                                    borderRadius: '8px', 
+                                                    textTransform: 'capitalize' 
+                                                }}>
+                                                    {p.faseActual === 'fase2' ? 'Fase 2' : p.faseActual === 'fase3' ? 'Fase 3' : p.faseActual === 'fase4' ? 'Fase 4' : p.faseActual}
                                                 </span>
                                             </td>
-                                            {/* Estado */}
                                             <td style={{ padding: '11px 14px' }}>
                                                 <span style={{
                                                     fontFamily: 'Poppins,sans-serif', fontSize: '12px', fontWeight: 600,
@@ -221,11 +398,11 @@ export default function Page() {
                         </tbody>
                     </table>
                 </div>
-                {!loading && !error && filtered.length > 0 && (
+                {!loading && !error && filteredByFase.length > 0 && (
                     <div style={{ padding: '10px 16px', borderTop: `1px solid ${t.tableBorder}` }}>
                         <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: t.bodyText, margin: 0 }}>
-                            {filtered.length} postulante{filtered.length !== 1 ? 's' : ''}{search ? ` encontrado${filtered.length !== 1 ? 's' : ''}` : ' registrado' + (filtered.length !== 1 ? 's' : '')}
-                            {data.length !== filtered.length && ` de ${data.length} total`}
+                            {filteredByFase.length} postulante{filteredByFase.length !== 1 ? 's' : ''} en {getFaseNombre(faseSeleccionada)}
+                            {search && ` (filtrado por búsqueda)`}
                         </p>
                     </div>
                 )}

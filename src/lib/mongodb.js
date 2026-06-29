@@ -56,8 +56,9 @@ async function loadModels() {
             import('@/models/sedinvita/SedinvitaFacilitador'),
             import('@/models/sedinvita/SedinvitaEncargadoAsistencia'),
             import('@/models/sedinvita/SedinvitaDinamica'),
-            import('@/models/sedinvita/SedinvitaEvaluacion'),
+            import('@/models/sedinvita/SedinvitaEvaluacion'), 
             import('@/models/sedinvita/SedinvitaAsistencia'),
+            import('@/models/sedinvita/SedinvitaPostulanteArea'),
             
             // Otros modelos
             import('@/models/User'),

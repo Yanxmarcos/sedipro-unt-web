@@ -19,6 +19,7 @@ const NAV_ITEMS = [
             { href: '/panel/sedinvita/edicion', label: 'Edicion' },
             { href: '/panel/sedinvita/postulantes', label: 'Postulantes' },
             { href: '/panel/sedinvita/turnos', label: 'Turnos' },
+            { href: '/panel/sedinvita/areas', label: 'Áreas' },
             { href: '/panel/sedinvita/grupos', label: 'Grupos y facilitadores' },
             { href: '/panel/sedinvita/dinamicas', label: 'Dinamicas' },
             { type: 'label', label: 'Día del evento' },

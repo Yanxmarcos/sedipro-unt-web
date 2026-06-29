@@ -1,7 +1,7 @@
-// src/app/api/sedinvita/turnos/estadisticas/route.js
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import SedinvitaPostulante from '@/models/sedinvita/SedinvitaPostulante';
+import SedinvitaGrupo from '@/models/sedinvita/SedinvitaGrupo';
 import SedinvitaTurno from '@/models/sedinvita/SedinvitaTurno';
 import SedinvitaEdicion from '@/models/sedinvita/SedinvitaEdicion';
 import { cookies } from 'next/headers';
@@ -17,9 +17,7 @@ async function authenticate() {
 export async function GET(request) {
     try {
         const payload = await authenticate();
-        if (!payload) {
-            return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-        }
+        if (!payload) return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
 
         await connectToDatabase();
 
@@ -27,48 +25,40 @@ export async function GET(request) {
         const fase = searchParams.get('fase') || 'fase2';
         const edicionId = searchParams.get('edicionId');
 
-        // Si no se pasa edicionId, buscar la activa
-        let edicionActiva;
-        if (edicionId) {
-            edicionActiva = await SedinvitaEdicion.findById(edicionId).lean();
-        } else {
-            edicionActiva = await SedinvitaEdicion.findOne({ activa: true }).lean();
-        }
+        const edicionActiva = edicionId
+            ? await SedinvitaEdicion.findById(edicionId).lean()
+            : await SedinvitaEdicion.findOne({ activa: true }).lean();
 
         if (!edicionActiva) {
-            return NextResponse.json(
-                { success: false, error: 'No hay una edición activa' },
-                { status: 404 }
-            );
+            return NextResponse.json({ success: false, error: 'No hay una edición activa' }, { status: 404 });
         }
 
-        // Total postulantes habilitados en esta fase
-        const totalPostulantes = await SedinvitaPostulante.countDocuments({
+        // Para fase2 (histórico): los postulantes que avanzaron ya tienen faseActual:'fase3',
+        // así que no se puede filtrar por faseActual. SedinvitaGrupo es la fuente de verdad
+        // histórica de quién participó en cada turno de cada fase.
+        //
+        // Para fase3 en adelante: igual, siempre usamos grupos como referencia.
+        const gruposDeFase = await SedinvitaGrupo.find({
             edicionId: edicionActiva._id,
-            estadoGeneral: 'habilitado',
-            faseActual: fase
-        });
+            fase,
+        }).lean();
 
-        // Postulantes con turno elegido
-        const conTurno = await SedinvitaPostulante.countDocuments({
-            edicionId: edicionActiva._id,
-            estadoGeneral: 'habilitado',
-            faseActual: fase,
-            // estadoOperativo: 'turno_elegido',
-            turnoId: { $ne: null }
-        });
+        // IDs únicos de postulantes que participaron en esta fase
+        const postulanteIdSet = new Set(
+            gruposDeFase.flatMap(g => g.postulantes.map(id => id.toString()))
+        );
+        const totalPostulantes = postulanteIdSet.size;
 
-        const sinTurno = totalPostulantes - conTurno;
+        // "Con turno" = todos los que están en grupos (tuvieron turno asignado)
+        const conTurno = totalPostulantes;
+        const sinTurno = 0; // Si están en el grupo, tenían turno. Los que no avanzaron no cuentan.
 
-        // Turnos de la fase
+        // Turnos de la fase con sus contadores originales (no se tocaron)
         const turnos = await SedinvitaTurno.find({
             edicionId: edicionActiva._id,
-            fase: fase
-        })
-        .sort({ horarioInicio: 1 })
-        .lean();
+            fase,
+        }).sort({ horarioInicio: 1 }).lean();
 
-        // Estadísticas por turno
         const turnosStats = turnos.map(t => ({
             id: t._id,
             nombre: t.nombre,
@@ -77,11 +67,10 @@ export async function GET(request) {
             cupo: t.cupo || 0,
             estado: t.estado,
             disponible: (t.cupo || 0) - (t.inscritos || 0),
-            porcentaje: t.cupo > 0 ? Math.round(((t.inscritos || 0) / t.cupo) * 100) : 0
+            porcentaje: t.cupo > 0 ? Math.round(((t.inscritos || 0) / t.cupo) * 100) : 0,
         }));
 
-        // Totales de cupos
-        const totalCupos = turnosStats.reduce((sum, t) => sum + t.cupo, 0);
+        const totalCupos     = turnosStats.reduce((sum, t) => sum + t.cupo, 0);
         const totalInscritos = turnosStats.reduce((sum, t) => sum + t.inscritos, 0);
 
         return NextResponse.json({
@@ -90,7 +79,7 @@ export async function GET(request) {
                 edicion: {
                     id: edicionActiva._id,
                     nombre: edicionActiva.nombre,
-                    anio: edicionActiva.anio
+                    anio: edicionActiva.anio,
                 },
                 fase,
                 resumen: {
@@ -101,17 +90,14 @@ export async function GET(request) {
                     totalCupos,
                     totalInscritos,
                     cuposDisponibles: totalCupos - totalInscritos,
-                    porcentajeOcupacion: totalCupos > 0 ? Math.round((totalInscritos / totalCupos) * 100) : 0
+                    porcentajeOcupacion: totalCupos > 0 ? Math.round((totalInscritos / totalCupos) * 100) : 0,
                 },
-                turnos: turnosStats
-            }
+                turnos: turnosStats,
+            },
         });
 
     } catch (error) {
         console.error('Error al obtener estadísticas:', error);
-        return NextResponse.json(
-            { success: false, error: 'Error interno del servidor' },
-            { status: 500 }
-        );
+        return NextResponse.json({ success: false, error: 'Error interno del servidor' }, { status: 500 });
     }
 }

@@ -1,10 +1,8 @@
 // src/app/api/sedinvita/turnos/postulantes/route.js
-// VERSIÓN MEJORADA: La verdad viene de las relaciones (turnoId, grupoId),
-// no de estadoOperativo
-
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import SedinvitaPostulante from '@/models/sedinvita/SedinvitaPostulante';
+import SedinvitaGrupo from '@/models/sedinvita/SedinvitaGrupo';
 import SedinvitaTurno from '@/models/sedinvita/SedinvitaTurno';
 import SedinvitaEdicion from '@/models/sedinvita/SedinvitaEdicion';
 import { cookies } from 'next/headers';
@@ -20,95 +18,103 @@ async function authenticate() {
 export async function GET(request) {
     try {
         const payload = await authenticate();
-        if (!payload) {
-            return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-        }
+        if (!payload) return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
 
         await connectToDatabase();
 
         const { searchParams } = new URL(request.url);
-        const fase = searchParams.get('fase') || 'fase2';
-        const filtro = searchParams.get('filtro') || 'todos'; // todos, con_turno, sin_turno
+        const fase     = searchParams.get('fase') || 'fase2';
+        const filtro   = searchParams.get('filtro') || 'todos'; // todos | con_turno | sin_turno
         const busqueda = searchParams.get('busqueda') || '';
 
-        // Obtener edición activa
         const edicionActiva = await SedinvitaEdicion.findOne({ activa: true }).lean();
         if (!edicionActiva) {
-            return NextResponse.json(
-                { success: false, error: 'No hay una edición activa' },
-                { status: 404 }
-            );
+            return NextResponse.json({ success: false, error: 'No hay una edición activa' }, { status: 404 });
         }
 
-        // Construir filtro
-        // La VERDAD viene de turnoId, no de estadoOperativo
+        const edicionId = edicionActiva._id;
+
+        // ── Fuente de verdad histórica ──────────────────────────────────────
+        // SedinvitaGrupo guarda qué postulantes estuvieron en qué turno y fase.
+        // Esto no cambia cuando el postulante avanza de fase, a diferencia de
+        // postulante.turnoId y postulante.faseActual que son campos operativos.
+        const gruposDeFase = await SedinvitaGrupo.find({ edicionId, fase }).lean();
+
+        // Mapa: postulanteId → { turnoId, grupoId } para esta fase
+        const postulanteEnGrupo = new Map(); // postulanteId.str → { turnoId, grupoId }
+        for (const grupo of gruposDeFase) {
+            for (const postulanteId of grupo.postulantes) {
+                postulanteEnGrupo.set(postulanteId.toString(), {
+                    turnoId: grupo.turnoId,
+                    grupoId: grupo._id,
+                });
+            }
+        }
+
+        const conTurnoIds = [...postulanteEnGrupo.keys()]; // los que tuvieron turno en esta fase
+
+        // ── Construir query de postulantes ─────────────────────────────────
+        // NO filtramos por faseActual porque los que avanzaron ya cambiaron de fase.
+        // Filtramos por edicionId y estadoGeneral únicamente.
         const match = {
-            edicionId: edicionActiva._id,
+            edicionId,
             estadoGeneral: 'habilitado',
-            faseActual: fase
         };
 
         if (filtro === 'con_turno') {
-            // Un postulante "tiene turno" si turnoId está asignado
-            match.turnoId = { $ne: null };
+            // Solo los que aparecen en algún grupo de esta fase
+            match._id = { $in: conTurnoIds.map(id => new (require('mongoose').Types.ObjectId)(id)) };
         } else if (filtro === 'sin_turno') {
-            // Un postulante "sin turno" si turnoId es null
-            match.turnoId = null;
+            // Los que NO aparecen en ningún grupo de esta fase
+            match._id = { $nin: conTurnoIds.map(id => new (require('mongoose').Types.ObjectId)(id)) };
         }
-        // Si filtro === 'todos', no se agrega restricción de turnoId
+        // filtro === 'todos' → sin restricción de _id
 
-        // Búsqueda por texto
         if (busqueda) {
             match.$or = [
                 { codigoMatricula: { $regex: busqueda, $options: 'i' } },
-                { nombres: { $regex: busqueda, $options: 'i' } },
-                { apellidos: { $regex: busqueda, $options: 'i' } }
+                { nombres:         { $regex: busqueda, $options: 'i' } },
+                { apellidos:       { $regex: busqueda, $options: 'i' } },
             ];
         }
 
-        // Obtener postulantes
         const postulantes = await SedinvitaPostulante.find(match)
             .sort({ apellidos: 1, nombres: 1 })
             .lean();
 
-        // Obtener información de turnos para los postulantes que tienen turno
-        const turnosIds = postulantes
-            .filter(p => p.turnoId)
-            .map(p => p.turnoId);
+        // ── Cargar turnos referenciados ────────────────────────────────────
+        const turnoIdsUnicos = [...new Set(
+            gruposDeFase.map(g => g.turnoId.toString())
+        )];
 
-        const turnosMap = new Map();
-        if (turnosIds.length > 0) {
-            const turnos = await SedinvitaTurno.find({
-                _id: { $in: turnosIds }
-            }).lean();
+        const turnosArr = await SedinvitaTurno.find({
+            _id: { $in: turnoIdsUnicos },
+        }).lean();
 
-            turnos.forEach(t => {
-                turnosMap.set(t._id.toString(), t);
-            });
-        }
+        const turnosMap = new Map(turnosArr.map(t => [t._id.toString(), t]));
 
-        // Formatear respuesta
-        // La verdad: si turnoId !== null, tiene turno
+        // ── Formatear respuesta ────────────────────────────────────────────
         const postulantesFormateados = postulantes.map(p => {
-            const tieneTurno = p.turnoId !== null;  // ← VERDAD SIMPLE
-            const turno = tieneTurno ? turnosMap.get(p.turnoId.toString()) : null;
+            const enGrupo    = postulanteEnGrupo.get(p._id.toString());
+            const tieneTurno = !!enGrupo;
+            const turno      = tieneTurno ? turnosMap.get(enGrupo.turnoId.toString()) : null;
 
             return {
-                _id: p._id,
-                codigoMatricula: p.codigoMatricula,
-                nombres: p.nombres,
-                apellidos: p.apellidos,
+                _id:               p._id,
+                codigoMatricula:   p.codigoMatricula,
+                nombres:           p.nombres,
+                apellidos:         p.apellidos,
                 correoElectronico: p.correoElectronico,
-                numeroCelular: p.numeroCelular,
-                tieneTurno,           // ← Deducible de turnoId
-                tieneGrupo: p.grupoId !== null,  // ← Bonus: también deducible
+                numeroCelular:     p.numeroCelular,
+                faseActual:        p.faseActual,   // útil para saber si avanzó
+                tieneTurno,
+                tieneGrupo:        tieneTurno,
                 turno: turno ? {
-                    id: turno._id,
-                    nombre: turno.nombre,
+                    id:            turno._id,
+                    nombre:        turno.nombre,
                     horarioInicio: turno.horarioInicio,
-                    horarioFin: turno.horarioFin
+                    horarioFin:    turno.horarioFin,
                 } : null,
-                // No incluir estadoOperativo - es redundante
             };
         });
 
@@ -116,21 +122,18 @@ export async function GET(request) {
             success: true,
             data: {
                 edicion: {
-                    id: edicionActiva._id,
+                    id:     edicionActiva._id,
                     nombre: edicionActiva.nombre,
-                    anio: edicionActiva.anio
+                    anio:   edicionActiva.anio,
                 },
                 fase,
-                total: postulantesFormateados.length,
-                postulantes: postulantesFormateados
-            }
+                total:       postulantesFormateados.length,
+                postulantes: postulantesFormateados,
+            },
         });
 
     } catch (error) {
         console.error('Error al obtener postulantes:', error);
-        return NextResponse.json(
-            { success: false, error: 'Error interno del servidor' },
-            { status: 500 }
-        );
+        return NextResponse.json({ success: false, error: 'Error interno del servidor' }, { status: 500 });
     }
 }
