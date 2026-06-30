@@ -23,7 +23,22 @@ const sedinvitaPostulanteAreaSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    // Historial de cambios de área
+
+    // ── NUEVO: Área de segunda opción ───────────────────────────────────────
+    // Opcional. null hasta que el postulante (que ya tiene su área principal)
+    // decida elegir una segunda opción. Una vez elegida, queda fija
+    // (no se permite editar - regla de negocio confirmada con directiva).
+    areaSecundaria: {
+        type: String,
+        enum: ['gth', 'pmo', 'ti', 'mkt', 'ltkyfnz'],
+        default: null,
+    },
+    areaSecundariaFecha: {
+        type: Date,
+        default: null,
+    },
+
+    // Historial de cambios de área (se mantiene igual, sin cambios)
     historial: [{
         area: {
             type: String,
@@ -50,11 +65,11 @@ const sedinvitaPostulanteAreaSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Un postulante solo puede tener un área por edición
+// Un postulante solo puede tener un área por edición (sin cambios)
 sedinvitaPostulanteAreaSchema.index(
     { edicionId: 1, postulanteId: 1 },
     { unique: true }
 );
 
-export default mongoose.models.SedinvitaPostulanteArea || 
+export default mongoose.models.SedinvitaPostulanteArea ||
     mongoose.model('SedinvitaPostulanteArea', sedinvitaPostulanteAreaSchema);

@@ -22,50 +22,43 @@ export async function POST(request) {
     try {
         await connectToDatabase();
 
-        const { codigo, area } = await request.json();
+        const { codigo, area, tipo } = await request.json();
+        // tipo: 'principal' (default, compatibilidad con llamadas antiguas) | 'secundaria'
+        const esSecundaria = tipo === 'secundaria';
 
-        // Validaciones
+        // ── Validaciones comunes ────────────────────────────────────────────
         if (!codigo) {
-            return NextResponse.json(
-                { error: 'Código de matrícula requerido' },
-                { status: 400 }
-            );
+            await session.abortTransaction();
+            session.endSession();
+            return NextResponse.json({ error: 'Código de matrícula requerido' }, { status: 400 });
         }
 
         if (!area) {
-            return NextResponse.json(
-                { error: 'Área requerida' },
-                { status: 400 }
-            );
+            await session.abortTransaction();
+            session.endSession();
+            return NextResponse.json({ error: 'Área requerida' }, { status: 400 });
         }
 
         if (!AREAS_VALIDAS.includes(area)) {
-            return NextResponse.json(
-                { error: 'Área no válida' },
-                { status: 400 }
-            );
+            await session.abortTransaction();
+            session.endSession();
+            return NextResponse.json({ error: 'Área no válida' }, { status: 400 });
         }
 
         const codigoLimpio = codigo.replace(/\D/g, '');
         if (codigoLimpio.length !== 10) {
-            return NextResponse.json(
-                { error: 'El código debe tener exactamente 10 dígitos' },
-                { status: 400 }
-            );
+            await session.abortTransaction();
+            session.endSession();
+            return NextResponse.json({ error: 'El código debe tener exactamente 10 dígitos' }, { status: 400 });
         }
 
-        // Obtener edición activa
         const edicion = await SedinvitaEdicion.findOne({ activa: true }).session(session);
         if (!edicion) {
             await session.abortTransaction();
             session.endSession();
-            return NextResponse.json(
-                { error: 'No hay edición activa' },
-                { status: 404 }
-            );
+            return NextResponse.json({ error: 'No hay edición activa' }, { status: 404 });
         }
 
-        // Buscar postulante
         const postulante = await SedinvitaPostulante.findOne({
             edicionId: edicion._id,
             codigoMatricula: codigoLimpio
@@ -74,13 +67,9 @@ export async function POST(request) {
         if (!postulante) {
             await session.abortTransaction();
             session.endSession();
-            return NextResponse.json(
-                { error: 'Código no encontrado' },
-                { status: 404 }
-            );
+            return NextResponse.json({ error: 'Código no encontrado' }, { status: 404 });
         }
 
-        // Verificar que esté en Fase 3
         if (postulante.faseActual !== 'fase3') {
             await session.abortTransaction();
             session.endSession();
@@ -90,12 +79,74 @@ export async function POST(request) {
             );
         }
 
-        // Verificar que no haya elegido ya
         const areaExistente = await SedinvitaPostulanteArea.findOne({
             edicionId: edicion._id,
             postulanteId: postulante._id
         }).session(session);
 
+        // ──────────────────────────────────────────────────────────────────
+        // FLUJO: ÁREA SECUNDARIA
+        // ──────────────────────────────────────────────────────────────────
+        if (esSecundaria) {
+            // Debe existir ya su área principal
+            if (!areaExistente) {
+                await session.abortTransaction();
+                session.endSession();
+                return NextResponse.json(
+                    { error: 'Debes elegir primero tu área principal' },
+                    { status: 400 }
+                );
+            }
+
+            // No se puede editar una vez elegida (regla de negocio confirmada)
+            if (areaExistente.areaSecundaria) {
+                await session.abortTransaction();
+                session.endSession();
+                return NextResponse.json(
+                    {
+                        error: 'Ya has elegido tu área de segunda opción',
+                        areaSecundariaActual: areaExistente.areaSecundaria,
+                        nombreAreaSecundaria: NOMBRES_AREAS[areaExistente.areaSecundaria]
+                    },
+                    { status: 400 }
+                );
+            }
+
+            // El área secundaria debe ser distinta a la principal
+            if (area === areaExistente.area) {
+                await session.abortTransaction();
+                session.endSession();
+                return NextResponse.json(
+                    { error: 'El área de segunda opción debe ser diferente a tu área principal' },
+                    { status: 400 }
+                );
+            }
+
+            areaExistente.areaSecundaria = area;
+            areaExistente.areaSecundariaFecha = new Date();
+            await areaExistente.save({ session });
+
+            await session.commitTransaction();
+            session.endSession();
+
+            return NextResponse.json({
+                success: true,
+                mensaje: 'Área de segunda opción registrada exitosamente',
+                area: areaExistente.area,
+                nombreArea: NOMBRES_AREAS[areaExistente.area],
+                areaSecundaria: area,
+                nombreAreaSecundaria: NOMBRES_AREAS[area],
+                postulante: {
+                    codigoMatricula: postulante.codigoMatricula,
+                    nombres: postulante.nombres,
+                    apellidos: postulante.apellidos,
+                }
+            });
+        }
+
+        // ──────────────────────────────────────────────────────────────────
+        // FLUJO: ÁREA PRINCIPAL (sin cambios respecto al original)
+        // ──────────────────────────────────────────────────────────────────
         if (areaExistente) {
             await session.abortTransaction();
             session.endSession();
@@ -109,7 +160,6 @@ export async function POST(request) {
             );
         }
 
-        // Crear registro de área
         const nuevoRegistro = new SedinvitaPostulanteArea({
             edicionId: edicion._id,
             postulanteId: postulante._id,
@@ -123,7 +173,6 @@ export async function POST(request) {
 
         await nuevoRegistro.save({ session });
 
-        // Commit de la transacción
         await session.commitTransaction();
         session.endSession();
 
@@ -132,6 +181,7 @@ export async function POST(request) {
             mensaje: 'Área registrada exitosamente',
             area: area,
             nombreArea: NOMBRES_AREAS[area],
+            areaSecundaria: null,
             postulante: {
                 codigoMatricula: postulante.codigoMatricula,
                 nombres: postulante.nombres,
@@ -143,9 +193,6 @@ export async function POST(request) {
         await session.abortTransaction();
         session.endSession();
         console.error('Error en registrar-area:', error);
-        return NextResponse.json(
-            { error: 'Error interno del servidor' },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
     }
 }

@@ -13,30 +13,19 @@ export async function GET(request) {
         const codigo = searchParams.get('codigo');
 
         if (!codigo) {
-            return NextResponse.json(
-                { error: 'Código de matrícula requerido' },
-                { status: 400 }
-            );
+            return NextResponse.json({ error: 'Código de matrícula requerido' }, { status: 400 });
         }
 
         const codigoLimpio = codigo.replace(/\D/g, '');
         if (codigoLimpio.length !== 10) {
-            return NextResponse.json(
-                { error: 'El código debe tener exactamente 10 dígitos' },
-                { status: 400 }
-            );
+            return NextResponse.json({ error: 'El código debe tener exactamente 10 dígitos' }, { status: 400 });
         }
 
-        // Obtener edición activa
         const edicion = await SedinvitaEdicion.findOne({ activa: true });
         if (!edicion) {
-            return NextResponse.json(
-                { error: 'No hay edición activa' },
-                { status: 404 }
-            );
+            return NextResponse.json({ error: 'No hay edición activa' }, { status: 404 });
         }
 
-        // Buscar postulante
         const postulante = await SedinvitaPostulante.findOne({
             edicionId: edicion._id,
             codigoMatricula: codigoLimpio
@@ -67,13 +56,11 @@ export async function GET(request) {
 
         // Caso 2: Está en Fase 3 o superior
         if (postulante.faseActual === 'fase3' || postulante.faseActual === 'fase4') {
-            // Verificar si ya eligió área
             const areaRegistro = await SedinvitaPostulanteArea.findOne({
                 edicionId: edicion._id,
                 postulanteId: postulante._id
             });
 
-            // Si está en Fase 4, ya no puede elegir área
             if (postulante.faseActual === 'fase4') {
                 return NextResponse.json({
                     success: true,
@@ -83,6 +70,8 @@ export async function GET(request) {
                     faseActual: postulante.faseActual,
                     yaEligio: !!areaRegistro,
                     area: areaRegistro?.area || null,
+                    // NUEVO
+                    areaSecundaria: areaRegistro?.areaSecundaria || null,
                     postulante: {
                         codigoMatricula: postulante.codigoMatricula,
                         nombres: postulante.nombres,
@@ -100,6 +89,8 @@ export async function GET(request) {
                 faseActual: postulante.faseActual,
                 yaEligio: !!areaRegistro,
                 area: areaRegistro?.area || null,
+                // NUEVO
+                areaSecundaria: areaRegistro?.areaSecundaria || null,
                 postulante: {
                     codigoMatricula: postulante.codigoMatricula,
                     nombres: postulante.nombres,
@@ -108,16 +99,10 @@ export async function GET(request) {
             });
         }
 
-        return NextResponse.json(
-            { error: 'Estado del postulante no válido' },
-            { status: 400 }
-        );
+        return NextResponse.json({ error: 'Estado del postulante no válido' }, { status: 400 });
 
     } catch (error) {
         console.error('Error en verificar-fase3:', error);
-        return NextResponse.json(
-            { error: 'Error interno del servidor' },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
     }
 }

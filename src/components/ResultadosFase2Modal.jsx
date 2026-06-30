@@ -108,53 +108,78 @@ const CodigoInput = ({ value, onChange, error, isLoading }) => {
 };
 
 // Componente de área selector
-const AreaSelector = ({ selectedArea, onSelect, isLoading, estudiante }) => {
+// disabledAreaId: si se pasa, esa área se muestra bloqueada (no se puede elegir).
+// Se usa en el paso de área secundaria para impedir repetir la principal.
+// mostrarEncabezado: oculta el bloque "¡Felicidades!" cuando ya se mostró antes (paso secundaria).
+const AreaSelector = ({
+    selectedArea,
+    onSelect,
+    isLoading,
+    estudiante,
+    disabledAreaId = null,
+    mostrarEncabezado = true,
+    textoSubtitulo = null,
+}) => {
     return (
         <div className="space-y-4">
-            <div className="flex justify-center">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-500/30 to-emerald-500/30 border-2 border-green-500/50 flex items-center justify-center animate-pulse">
-                    <Sparkles size={36} className="text-green-400" />
-                </div>
-            </div>
+            {mostrarEncabezado && (
+                <>
+                    <div className="flex justify-center">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-500/30 to-emerald-500/30 border-2 border-green-500/50 flex items-center justify-center animate-pulse">
+                            <Sparkles size={36} className="text-green-400" />
+                        </div>
+                    </div>
 
-            <div className="space-y-3 text-center animate-fadeIn">
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-                    ¡Felicidades!
-                </h3>
-                <p className="text-[#d0bcff] text-sm">
-                    Has superado exitosamente la Fase 2 del proceso de selección.
-                </p>
+                    <div className="space-y-3 text-center animate-fadeIn">
+                        <h3 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                            ¡Felicidades!
+                        </h3>
+                        <p className="text-[#d0bcff] text-sm">
+                            Has superado exitosamente la Fase 2 del proceso de selección.
+                        </p>
 
-                <div className="bg-[#3b0191]/30 border border-[#6b46c1]/30 rounded-lg p-4 space-y-2">
-                    <p className="text-sm font-mono text-[#d0bcff] break-all">
-                        <strong>Código:</strong> {estudiante?.codigoMatricula || '---'}
-                    </p>
-                    <p className="text-sm font-mono text-[#d0bcff] break-all">
-                        <strong>Estudiante:</strong> {estudiante?.nombres || ''} {estudiante?.apellidos || ''}
-                    </p>
-                </div>
-            </div>
-            
+                        <div className="bg-[#3b0191]/30 border border-[#6b46c1]/30 rounded-lg p-4 space-y-2">
+                            <p className="text-sm font-mono text-[#d0bcff] break-all">
+                                <strong>Código:</strong> {estudiante?.codigoMatricula || '---'}
+                            </p>
+                            <p className="text-sm font-mono text-[#d0bcff] break-all">
+                                <strong>Estudiante:</strong> {estudiante?.nombres || ''} {estudiante?.apellidos || ''}
+                            </p>
+                        </div>
+                    </div>
+                </>
+            )}
+
             <div className="bg-[#3b0191]/30 border border-[#6b46c1]/30 rounded-lg p-4 text-center">
                 <p className="text-[#d0bcff] text-sm">
-                    Ahora selecciona el <strong>área</strong> a la que deseas postular:
+                    {textoSubtitulo || (<>Ahora selecciona el <strong>Área</strong> a la que deseas postular:</>)}
                 </p>
             </div>
 
             <div className="grid grid-cols-1 gap-3 max-h-64 overflow-y-auto pr-2">
                 {AREAS_DISPONIBLES.map((area) => {
                     const isSelected = selectedArea?.id === area.id;
+                    const isBlocked = disabledAreaId === area.id;
                     return (
                         <button
                             key={area.id}
-                            onClick={() => onSelect(area)}
-                            disabled={isLoading}
-                            className={`w-full p-4 rounded-lg border-2 transition-all duration-300 text-left ${
-                                isSelected
-                                    ? `${area.borderSelected} ${area.bgSelected} shadow-lg`
-                                    : 'border-white/10 bg-[#0b1326]/40 hover:border-[#6b46c1]/50 hover:bg-[#0b1326]/60'
+                            onClick={() => !isBlocked && onSelect(area)}
+                            disabled={isLoading || isBlocked}
+                            className={`relative w-full p-4 rounded-lg border-2 transition-all duration-300 text-left ${
+                                isBlocked
+                                    ? 'border-white/5 bg-[#0b1326]/20 opacity-40 cursor-not-allowed grayscale'
+                                    : isSelected
+                                        ? `${area.borderSelected} ${area.bgSelected} shadow-lg`
+                                        : 'border-white/10 bg-[#0b1326]/40 hover:border-[#6b46c1]/50 hover:bg-[#0b1326]/60'
                             }`}
                         >
+                            {isBlocked && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-[#0b1326]/70 rounded-lg backdrop-blur-[1px] z-10">
+                                    <span className="text-[10px] font-semibold text-white/80 bg-black/60 px-2 py-1 rounded-full uppercase tracking-wide">
+                                        Tu área de primera elección
+                                    </span>
+                                </div>
+                            )}
                             <div className="flex justify-between items-center">
                                 <div className="flex-1">
                                     <p className={`font-semibold transition-colors duration-300 ${
@@ -182,7 +207,7 @@ const AreaSelector = ({ selectedArea, onSelect, isLoading, estudiante }) => {
                                     />
                                 </div>
                             </div>
-                            {isSelected && (
+                            {isSelected && !isBlocked && (
                                 <div className={`flex items-center gap-1 mt-3 ${area.checkColor}`}>
                                     <Check size={14} />
                                     <span className="text-xs font-semibold">Seleccionado</span>
@@ -197,7 +222,9 @@ const AreaSelector = ({ selectedArea, onSelect, isLoading, estudiante }) => {
 };
 
 // Componente de resultado - Pasó
-const ResultadoExitoso = ({ estudiante, areaSeleccionada, onExit }) => {
+// areaSecundaria: objeto del área ya elegida como segunda opción (o null si aún no la eligió)
+// onElegirSecundaria: callback para ir al paso de elección de área secundaria
+const ResultadoExitoso = ({ estudiante, areaSeleccionada, areaSecundaria, onElegirSecundaria, onExit }) => {
     const WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/FUoKXYbQ2C41bZtU2JDE35";
 
     const handleJoinWhatsApp = () => {
@@ -229,19 +256,38 @@ const ResultadoExitoso = ({ estudiante, areaSeleccionada, onExit }) => {
                     </p>
                     {areaSeleccionada && (
                         <div className="pt-3 border-t border-[#6b46c1]/20">
-                            <p className="text-xs text-[#d0bcff]/60 mb-1">Área seleccionada</p>
+                            <p className="text-xs text-[#d0bcff]/60 mb-1">Área seleccionada (principal)</p>
                             <p className="text-sm font-semibold text-[#d0bcff]">{areaSeleccionada.nombre}</p>
                             <p className="text-sm text-[#d0bcff]">{areaSeleccionada.corto}</p>
                         </div>
                     )}
+                    {areaSecundaria && (
+                        <div className="pt-3 border-t border-[#6b46c1]/20">
+                            <p className="text-xs text-[#d0bcff]/60 mb-1">Área de segunda opción</p>
+                            <p className="text-sm font-semibold text-[#d0bcff]">{areaSecundaria.nombre}</p>
+                            <p className="text-sm text-[#d0bcff]">{areaSecundaria.corto}</p>
+                        </div>
+                    )}
                 </div>
 
-                <div className="bg-amber-500/20 border border-amber-500/30 rounded-lg p-4 space-y-2">
+                {/* <div className="bg-amber-500/20 border border-amber-500/30 rounded-lg p-4 space-y-2">
                     <p className="text-xs text-amber-200 flex items-center justify-center gap-2">
                         <span>Tu área seleccionada ha sido registrada exitosamente.</span>
                     </p>
-                </div>
+                </div> */}
             </div>
+
+            {/* Botón de área secundaria: solo si ya tiene principal y aún no eligió la segunda */}
+            {areaSeleccionada && !areaSecundaria && onElegirSecundaria && (
+                <button
+                    onClick={onElegirSecundaria}
+                    className="w-full px-6 py-3 border-2 border-[#6b46c1]/50 text-[#d0bcff] rounded-lg font-semibold hover:bg-[#6b46c1]/10 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2"
+                >
+                    {/* <Sparkles size={16} /> */}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart-plus-icon lucide-heart-plus"><path d="m14.479 19.374-.971.939a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5a5.2 5.2 0 0 1-.219 1.49"/><path d="M15 15h6"/><path d="M18 12v6"/></svg>
+                    Elegir Área de Segunda Opción
+                </button>
+            )}
 
             <button
                 onClick={handleJoinWhatsApp}
@@ -313,7 +359,7 @@ const ResultadoNoExitoso = ({ estudiante, onExit }) => {
 
 // Componente principal
 export default function ResultadosFase2Modal({ isOpen, onClose }) {
-    const [step, setStep] = useState(0); // 0: Input código, 1: Seleccionar área, 2: Resultado éxito, 3: Resultado no éxito
+    const [step, setStep] = useState(0); // 0: Input código, 1: Seleccionar área, 2: Resultado éxito, 3: Resultado no éxito, 4: Seleccionar área secundaria
     const [codigo, setCodigo] = useState('');
     const [estudiante, setEstudiante] = useState(null);
     const [selectedArea, setSelectedArea] = useState(null);
@@ -321,6 +367,9 @@ export default function ResultadosFase2Modal({ isOpen, onClose }) {
     const [error, setError] = useState('');
     const [yaEligio, setYaEligio] = useState(false);
     const [areaElegida, setAreaElegida] = useState(null);
+    // NUEVO: área de segunda opción
+    const [areaSecundaria, setAreaSecundaria] = useState(null); // ya confirmada en DB
+    const [selectedAreaSecundaria, setSelectedAreaSecundaria] = useState(null); // en proceso de elegir (step 4)
 
     useEffect(() => {
         if (!isOpen) {
@@ -337,6 +386,8 @@ export default function ResultadosFase2Modal({ isOpen, onClose }) {
         setIsLoading(false);
         setYaEligio(false);
         setAreaElegida(null);
+        setAreaSecundaria(null);
+        setSelectedAreaSecundaria(null);
     };
 
     // Verificar código con el endpoint real
@@ -379,6 +430,12 @@ export default function ResultadosFase2Modal({ isOpen, onClose }) {
                 setStep(3);
             } else if (data.paso === true) {
                 // Pasó a Fase 3
+                // NUEVO: cargar área secundaria si ya la había elegido antes
+                const secundariaEncontrada = data.areaSecundaria
+                    ? AREAS_DISPONIBLES.find(a => a.id === data.areaSecundaria)
+                    : null;
+                setAreaSecundaria(secundariaEncontrada || null);
+
                 if (data.yaEligio) {
                     // Ya eligió área
                     setYaEligio(true);
@@ -451,6 +508,62 @@ export default function ResultadosFase2Modal({ isOpen, onClose }) {
     const handleExit = () => {
         resetModal();
         onClose();
+    };
+
+    // NUEVO: ir al paso de elección de área secundaria
+    const handleElegirAreaSecundaria = () => {
+        setSelectedAreaSecundaria(null);
+        setError('');
+        setStep(4);
+    };
+
+    // NUEVO: confirmar selección de área secundaria con el endpoint real
+    const handleConfirmAreaSecundaria = async () => {
+        if (!selectedAreaSecundaria) {
+            setError('Por favor selecciona un área');
+            return;
+        }
+
+        setIsLoading(true);
+        setError('');
+
+        try {
+            const res = await fetch('/api/sedinvita/public/registrar-area', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    codigo: codigo,
+                    area: selectedAreaSecundaria.id,
+                    tipo: 'secundaria'
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Error al registrar el área secundaria');
+            }
+
+            if (!data.success) {
+                throw new Error(data.error || 'Error al registrar el área secundaria');
+            }
+
+            setAreaSecundaria(selectedAreaSecundaria);
+            setStep(2);
+
+        } catch (err) {
+            console.error(err);
+            setError(err.message || 'Error al registrar el área secundaria');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // NUEVO: volver del paso de área secundaria al resultado exitoso
+    const handleBackFromSecundaria = () => {
+        setSelectedAreaSecundaria(null);
+        setError('');
+        setStep(2);
     };
 
     const handleBackToInput = () => {
@@ -538,7 +651,7 @@ export default function ResultadosFase2Modal({ isOpen, onClose }) {
                         <div className="space-y-6 animate-fadeIn">
                             <div>
                                 <p className="text-[#d0bcff] text-sm mb-4">
-                                    Ingresa tu código de matrícula UNT para conocer tu resultado:
+                                    Ingresa tu código de matrícula UNT para conocer tu resultado y elegir tu área de postulación:
                                 </p>
                                 <CodigoInput
                                     value={codigo}
@@ -560,7 +673,7 @@ export default function ResultadosFase2Modal({ isOpen, onClose }) {
                                     </div>
                                 ) : (
                                     <div className="flex items-center justify-center gap-2">
-                                        <span>Verificar Resultado</span>
+                                        <span>Elegir Área</span>
                                         <ChevronRight size={18} />
                                     </div>
                                 )}
@@ -615,6 +728,8 @@ export default function ResultadosFase2Modal({ isOpen, onClose }) {
                         <ResultadoExitoso
                             estudiante={estudiante}
                             areaSeleccionada={selectedArea || areaElegida}
+                            areaSecundaria={areaSecundaria}
+                            onElegirSecundaria={handleElegirAreaSecundaria}
                             onExit={handleExit}
                         />
                     )}
@@ -626,23 +741,68 @@ export default function ResultadosFase2Modal({ isOpen, onClose }) {
                         />
                     )}
 
-                    {/* Footer */}
-                    {step !== 2 && step !== 3 && (
-                        <div className="text-center mt-8">
-                            <p className="text-[#d0bcff]/50 text-xs">
-                                © {new Date().getFullYear()} SEDIPRO UNT. Todos los derechos reservados.
-                            </p>
-                            <a
-                                href="https://wa.me/51963159172?text=Hola,%20tengo%20un%20problema"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 text-red-500/50 hover:text-red-500 text-xs hover:scale-105 transition-all duration-200 mt-1.5"
-                            >
-                                <AlertCircle className="w-3 h-3" />
-                                Reportar un problema
-                            </a>
+                    {/* NUEVO: Paso 4 - Elegir área de segunda opción */}
+                    {step === 4 && (
+                        <div className="space-y-6 animate-fadeIn">
+                            <AreaSelector
+                                selectedArea={selectedAreaSecundaria}
+                                onSelect={setSelectedAreaSecundaria}
+                                isLoading={isLoading}
+                                estudiante={estudiante}
+                                disabledAreaId={(selectedArea || areaElegida)?.id}
+                                mostrarEncabezado={false}
+                                textoSubtitulo={<>Elige tu <strong>área de segunda opción</strong>:</>}
+                            />
+
+                            {error && (
+                                <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/50 flex items-center gap-2">
+                                    <AlertCircle size={16} className="text-red-400 flex-shrink-0" />
+                                    <span className="text-red-200 text-xs">{error}</span>
+                                </div>
+                            )}
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={handleBackFromSecundaria}
+                                    className="flex-1 px-4 py-3 border border-white/20 text-white rounded-lg font-semibold hover:bg-white/5 transition-all duration-300 active:scale-95"
+                                >
+                                    Atrás
+                                </button>
+                                <button
+                                    onClick={handleConfirmAreaSecundaria}
+                                    disabled={isLoading || !selectedAreaSecundaria}
+                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-lg font-semibold hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg active:scale-95"
+                                >
+                                    {isLoading ? (
+                                        <div className="flex items-center justify-center gap-2">
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            <span>Registrando...</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center justify-center gap-2">
+                                            <span>Confirmar Segunda Opción</span>
+                                        </div>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     )}
+
+                    {/* Footer */}
+                    <div className="text-center mt-8">
+                        <p className="text-[#d0bcff]/50 text-xs">
+                            © {new Date().getFullYear()} SEDIPRO UNT. Todos los derechos reservados.
+                        </p>
+                        <a
+                            href="https://wa.me/51963159172?text=Hola,%20tengo%20un%20problema"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-red-500/50 hover:text-red-500 text-xs hover:scale-105 transition-all duration-200 mt-1.5"
+                        >
+                            <AlertCircle className="w-3 h-3" />
+                            Reportar un problema
+                        </a>
+                    </div>    
                 </div>
             </div>
 

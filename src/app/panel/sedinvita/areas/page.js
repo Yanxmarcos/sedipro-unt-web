@@ -31,6 +31,14 @@ export default function Page() {
     const [areaSeleccionada, setAreaSeleccionada] = useState(null)
     const [mensajeConfirmacion, setMensajeConfirmacion] = useState(null)
 
+    // NUEVO: pestaña activa — 'principal' | 'secundaria'
+    const [vista, setVista] = useState('principal')
+    // NUEVO: data de segunda opción (viene en la misma respuesta de por-area)
+    const [areasSecundaria, setAreasSecundaria] = useState([])
+    const [totalSecundaria, setTotalSecundaria] = useState(0)
+    const [postulantesSinSecundaria, setPostulantesSinSecundaria] = useState([])
+    const [areaSecundariaSeleccionada, setAreaSecundariaSeleccionada] = useState(null)
+
     // Cargar edición activa
     const fetchEdicionActiva = useCallback(async () => {
         try {
@@ -76,6 +84,10 @@ export default function Page() {
 
             setAreas(areasJson.areas || [])
             setPostulantesSinArea(sinAreaJson.data || [])
+            // NUEVO: datos de área secundaria (misma respuesta de por-area, sin round-trip extra)
+            setAreasSecundaria(areasJson.areasSecundaria || [])
+            setTotalSecundaria(areasJson.totalSecundaria || 0)
+            setPostulantesSinSecundaria(areasJson.postulantesSinSecundaria || [])
         } catch (err) {
             console.error(err)
             setError(err.message)
@@ -113,6 +125,40 @@ export default function Page() {
             setTimeout(() => setMensajeConfirmacion(null), 4000)
 
             // Recargar datos
+            await cargarDatos()
+
+        } catch (err) {
+            console.error(err)
+            setError(err.message)
+        } finally {
+            setLoadingAction(false)
+        }
+    }
+
+    // NUEVO: Quitar solo el área secundaria de un postulante (mantiene la principal intacta)
+    const handleQuitarAreaSecundaria = async (codigoMatricula, nombreCompleto) => {
+        if (!confirm(`¿Estás seguro de quitar el área de segunda opción de ${nombreCompleto} (${codigoMatricula})? Su área principal no se verá afectada.`)) {
+            return
+        }
+
+        setLoadingAction(true)
+        setError(null)
+
+        try {
+            const res = await fetch(
+                `/api/sedinvita/admin/quitar-area?codigo=${codigoMatricula}&tipo=secundaria`,
+                {
+                    method: 'DELETE',
+                    credentials: 'include'
+                }
+            )
+
+            const json = await res.json()
+            if (!res.ok) throw new Error(json.error || 'Error al quitar área de segunda opción')
+
+            setMensajeConfirmacion(`Área de segunda opción quitada correctamente de ${nombreCompleto}`)
+            setTimeout(() => setMensajeConfirmacion(null), 4000)
+
             await cargarDatos()
 
         } catch (err) {
@@ -163,6 +209,23 @@ export default function Page() {
         return resultado
     }, [postulantesSinArea, busquedaPostulante])
 
+    // NUEVO: Filtrar postulantes sin área secundaria (mismo patrón que arriba)
+    const postulantesSinSecundariaFiltrados = useMemo(() => {
+        let resultado = postulantesSinSecundaria
+        if (busquedaPostulante.trim()) {
+            const busqueda = busquedaPostulante.trim().toLowerCase()
+            resultado = resultado.filter(p =>
+                p.codigoMatricula?.toLowerCase().includes(busqueda) ||
+                p.nombres?.toLowerCase().includes(busqueda) ||
+                p.apellidos?.toLowerCase().includes(busqueda) ||
+                `${p.apellidos} ${p.nombres}`.toLowerCase().includes(busqueda) ||
+                p.correoElectronico?.toLowerCase().includes(busqueda) ||
+                p.numeroCelular?.toLowerCase().includes(busqueda)
+            )
+        }
+        return resultado
+    }, [postulantesSinSecundaria, busquedaPostulante])
+
     const totalConArea = areas.reduce((acc, area) => acc + area.postulantes.length, 0)
 
     return (
@@ -183,10 +246,61 @@ export default function Page() {
                             Postulantes agrupados por área seleccionada
                             {edicionActiva && ` • ${edicionActiva.nombre} (${edicionActiva.anio})`}
                             {!loading && ` • ${totalConArea} con área • ${postulantesSinArea.length} sin área`}
+                            {!loading && ` • ${totalSecundaria} con 2ª opción`}
                         </p>
                     </div>
                 </div>
             </div>
+
+            {/* NUEVO: Selector de pestañas Primera Opción / Segunda Opción */}
+            {edicionActiva && !loading && (
+                <div style={{
+                    display: 'inline-flex',
+                    gap: '4px',
+                    padding: '4px',
+                    backgroundColor: t.tabBg,
+                    border: `1px solid ${t.tabBorder}`,
+                    borderRadius: '10px',
+                    marginBottom: '20px',
+                }}>
+                    <button
+                        onClick={() => { setVista('principal'); setAreaSeleccionada(null) }}
+                        style={{
+                            padding: '7px 16px',
+                            borderRadius: '7px',
+                            border: 'none',
+                            backgroundColor: vista === 'principal' ? t.tabActive : 'transparent',
+                            color: vista === 'principal' ? t.titleText : t.bodyText,
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px',
+                            fontWeight: vista === 'principal' ? 600 : 500,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            boxShadow: vista === 'principal' ? t.cardShadow : 'none',
+                        }}
+                    >
+                        Primera Opción
+                    </button>
+                    <button
+                        onClick={() => { setVista('secundaria'); setAreaSecundariaSeleccionada(null) }}
+                        style={{
+                            padding: '7px 16px',
+                            borderRadius: '7px',
+                            border: 'none',
+                            backgroundColor: vista === 'secundaria' ? t.tabActive : 'transparent',
+                            color: vista === 'secundaria' ? t.titleText : t.bodyText,
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px',
+                            fontWeight: vista === 'secundaria' ? 600 : 500,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            boxShadow: vista === 'secundaria' ? t.cardShadow : 'none',
+                        }}
+                    >
+                        Segunda Opción
+                    </button>
+                </div>
+            )}
 
             {mensajeConfirmacion && (
                 <div style={{ 
@@ -240,6 +354,8 @@ export default function Page() {
 
             {edicionActiva && (
                 <>
+                    {vista === 'principal' && (
+                    <>
                     {/* Tarjetas de resumen */}
                     {!loading && areas.length > 0 && (
                         <div style={{
@@ -604,6 +720,370 @@ export default function Page() {
                                 </div>
                             )}
                         </div>
+                    )}
+                    </>
+                    )}
+
+                    {/* ============================================================ */}
+                    {/* NUEVO: VISTA SEGUNDA OPCIÓN — mismo patrón visual que arriba */}
+                    {/* ============================================================ */}
+                    {vista === 'secundaria' && (
+                    <>
+                        {/* Tarjetas de resumen — segunda opción */}
+                        {!loading && areasSecundaria.length > 0 && (
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                                gap: '12px',
+                                marginBottom: '20px'
+                            }}>
+                                {areasSecundaria.map(area => {
+                                    const colors = getAreaColors(area.area)
+                                    const count = area.postulantes.length
+                                    const isSelected = areaSecundariaSeleccionada === area.area
+                                    return (
+                                        <div
+                                            key={area.area}
+                                            onClick={() => setAreaSecundariaSeleccionada(isSelected ? null : area.area)}
+                                            style={{
+                                                backgroundColor: isSelected ? colors.bg : t.cardBg,
+                                                border: `1px solid ${isSelected ? colors.border : t.cardBorder}`,
+                                                borderRadius: '12px',
+                                                padding: '14px',
+                                                textAlign: 'center',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s',
+                                                boxShadow: isSelected ? `0 0 0 2px ${colors.border}` : t.cardShadow,
+                                                transform: isSelected ? 'scale(1.02)' : 'scale(1)'
+                                            }}
+                                        >
+                                            <p style={{ fontSize: '11px', color: t.bodyText, margin: 0 }}>{getAreaNombre(area.area)}</p>
+                                            <p style={{ fontSize: '22px', fontWeight: 700, color: t.bodyText, margin: '4px 0' }}>
+                                                {count}
+                                            </p>
+                                            <p style={{ fontSize: '10px', color: t.bodyText, margin: 0, opacity: 0.6 }}>
+                                                postulantes
+                                            </p>
+                                        </div>
+                                    )
+                                })}
+                                <div
+                                    onClick={() => setAreaSecundariaSeleccionada(null)}
+                                    style={{
+                                        backgroundColor: areaSecundariaSeleccionada === null ? 'rgba(156, 163, 175, 0.1)' : t.cardBg,
+                                        border: `1px solid ${areaSecundariaSeleccionada === null ? 'rgba(156, 163, 175, 0.5)' : t.cardBorder}`,
+                                        borderRadius: '12px',
+                                        padding: '14px',
+                                        textAlign: 'center',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        boxShadow: areaSecundariaSeleccionada === null ? '0 0 0 2px rgba(156, 163, 175, 0.3)' : t.cardShadow,
+                                        transform: areaSecundariaSeleccionada === null ? 'scale(1.02)' : 'scale(1)'
+                                    }}
+                                >
+                                    <p style={{ fontSize: '11px', color: t.bodyText, margin: 0 }}>Sin 2ª opción</p>
+                                    <p style={{ fontSize: '22px', fontWeight: 700, color: '#9CA3AF', margin: '4px 0' }}>
+                                        {postulantesSinSecundaria.length}
+                                    </p>
+                                    <p style={{ fontSize: '10px', color: t.bodyText, margin: 0, opacity: 0.6 }}>
+                                        postulantes
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {loading && (
+                            <div style={{ textAlign: 'center', padding: '40px', color: t.bodyText }}>
+                                Cargando postulantes...
+                            </div>
+                        )}
+
+                        {/* TABLA DE POSTULANTES POR ÁREA SECUNDARIA (cuando se selecciona un área) */}
+                        {!loading && areaSecundariaSeleccionada !== null && (
+                            <div style={{
+                                backgroundColor: t.cardBg,
+                                border: `1px solid ${t.cardBorder}`,
+                                boxShadow: t.cardShadow,
+                                borderRadius: '14px',
+                                overflow: 'hidden',
+                                marginBottom: '20px'
+                            }}>
+                                {(() => {
+                                    const area = areasSecundaria.find(a => a.area === areaSecundariaSeleccionada)
+                                    if (!area) return null
+
+                                    const postulantesFiltrados = area.postulantes.filter(p => {
+                                        if (!busquedaPostulante.trim()) return true
+                                        const busqueda = busquedaPostulante.trim().toLowerCase()
+                                        return (
+                                            p.codigoMatricula?.toLowerCase().includes(busqueda) ||
+                                            p.nombres?.toLowerCase().includes(busqueda) ||
+                                            p.apellidos?.toLowerCase().includes(busqueda) ||
+                                            `${p.apellidos} ${p.nombres}`.toLowerCase().includes(busqueda) ||
+                                            p.correoElectronico?.toLowerCase().includes(busqueda) ||
+                                            p.numeroCelular?.toLowerCase().includes(busqueda)
+                                        )
+                                    })
+
+                                    return (
+                                        <>
+                                            <div style={{
+                                                padding: '12px 16px',
+                                                borderBottom: `1px solid ${t.tableBorder}`,
+                                                backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#f8f5fa',
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                flexWrap: 'wrap',
+                                                gap: '8px'
+                                            }}>
+                                                <div>
+                                                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '15px', color: t.titleText, margin: 0 }}>
+                                                        {getAreaNombre(area.area)} <span style={{ fontWeight: 500, fontSize: '12px', color: t.bodyText }}>(2ª opción)</span>
+                                                    </p>
+                                                    <p style={{ fontSize: '12px', color: t.bodyText, margin: 0 }}>
+                                                        {postulantesFiltrados.length} postulante{postulantesFiltrados.length !== 1 ? 's' : ''}
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    onClick={() => setAreaSecundariaSeleccionada(null)}
+                                                    style={{
+                                                        padding: '4px 12px',
+                                                        borderRadius: '6px',
+                                                        border: `1px solid ${t.cardBorder}`,
+                                                        backgroundColor: 'transparent',
+                                                        color: t.bodyText,
+                                                        fontSize: '11px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    Cerrar
+                                                </button>
+                                            </div>
+                                            {postulantesFiltrados.length === 0 ? (
+                                                <div style={{ padding: '40px 20px', textAlign: 'center', color: t.bodyText }}>
+                                                    No hay postulantes en esta área como segunda opción
+                                                </div>
+                                            ) : (
+                                                <div style={{ overflowX: 'auto' }}>
+                                                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                                                        <thead>
+                                                            <tr style={{ backgroundColor: t.tableHead }}>
+                                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Código</th>
+                                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Postulante</th>
+                                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Área Principal</th>
+                                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Correo</th>
+                                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Fecha Elección</th>
+                                                                <th style={{ padding: '10px 14px', textAlign: 'center', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Acción</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {postulantesFiltrados.map((p, i) => {
+                                                                const isEven = i % 2 === 1
+                                                                const colorsPrincipal = getAreaColors(p.areaPrincipal)
+                                                                return (
+                                                                    <tr
+                                                                        key={p.codigoMatricula}
+                                                                        style={{
+                                                                            backgroundColor: isEven ? t.tableRowAlt : t.tableRow,
+                                                                            borderBottom: i < postulantesFiltrados.length - 1 ? `1px solid ${t.tableBorder}` : 'none'
+                                                                        }}
+                                                                        onMouseEnter={e => e.currentTarget.style.backgroundColor = t.tableRowHover}
+                                                                        onMouseLeave={e => e.currentTarget.style.backgroundColor = isEven ? t.tableRowAlt : t.tableRow}
+                                                                    >
+                                                                        <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: '12px', fontWeight: 600, color: t.bodyText }}>
+                                                                            {p.codigoMatricula}
+                                                                        </td>
+                                                                        <td style={{ padding: '10px 14px', fontWeight: 500, color: t.bodyText }}>
+                                                                            {p.apellidos} {p.nombres}
+                                                                        </td>
+                                                                        <td style={{ padding: '10px 14px' }}>
+                                                                            <span style={{
+                                                                                padding: '2px 10px',
+                                                                                borderRadius: '12px',
+                                                                                fontSize: '11px',
+                                                                                fontWeight: 600,
+                                                                                color: t.bodyText
+                                                                            }}>
+                                                                                {p.nombreAreaPrincipal}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
+                                                                            {p.correoElectronico || '—'}
+                                                                        </td>
+                                                                        <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
+                                                                            {p.fechaEleccion ? new Date(p.fechaEleccion).toLocaleString('es-PE') : '—'}
+                                                                        </td>
+                                                                        <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                                                                            <button
+                                                                                onClick={() => handleQuitarAreaSecundaria(p.codigoMatricula, `${p.apellidos} ${p.nombres}`)}
+                                                                                disabled={loadingAction}
+                                                                                style={{
+                                                                                    padding: '4px 12px',
+                                                                                    borderRadius: '6px',
+                                                                                    border: 'none',
+                                                                                    backgroundColor: loadingAction ? '#9CA3AF' : '#EF4444',
+                                                                                    color: '#fff',
+                                                                                    fontSize: '11px',
+                                                                                    fontWeight: 600,
+                                                                                    cursor: loadingAction ? 'not-allowed' : 'pointer',
+                                                                                    transition: 'all 0.2s',
+                                                                                    opacity: loadingAction ? 0.6 : 1
+                                                                                }}
+                                                                                onMouseEnter={e => {
+                                                                                    if (!loadingAction) e.currentTarget.style.backgroundColor = '#DC2626'
+                                                                                }}
+                                                                                onMouseLeave={e => {
+                                                                                    if (!loadingAction) e.currentTarget.style.backgroundColor = '#EF4444'
+                                                                                }}
+                                                                            >
+                                                                                {loadingAction ? '...' : 'Quitar 2ª opción'}
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                )
+                                                            })}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            )}
+                                        </>
+                                    )
+                                })()}
+                            </div>
+                        )}
+
+                        {/* TABLA DE POSTULANTES SIN SEGUNDA OPCIÓN (siempre visible al final) */}
+                        {!loading && (
+                            <div style={{
+                                backgroundColor: t.cardBg,
+                                border: `1px solid ${t.cardBorder}`,
+                                boxShadow: t.cardShadow,
+                                borderRadius: '14px',
+                                overflow: 'hidden',
+                            }}>
+                                <div style={{
+                                    padding: '12px 16px',
+                                    borderBottom: `1px solid ${t.tableBorder}`,
+                                    backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#f8f5fa',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    flexWrap: 'wrap',
+                                    gap: '10px'
+                                }}>
+                                    <div>
+                                        <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '15px', color: t.titleText, margin: 0 }}>
+                                            Postulantes sin segunda opción
+                                        </p>
+                                        <p style={{ fontSize: '12px', color: t.bodyText, margin: 0 }}>
+                                            {postulantesSinSecundaria.length} postulante{postulantesSinSecundaria.length !== 1 ? 's' : ''} con área principal que aún no eligieron segunda opción
+                                        </p>
+                                    </div>
+                                    <div style={{ position: 'relative', minWidth: '200px' }}>
+                                        <span style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: t.dividerText, pointerEvents: 'none' }}>
+                                            <Ico.Search />
+                                        </span>
+                                        <input
+                                            value={busquedaPostulante}
+                                            onChange={e => setBusquedaPostulante(e.target.value)}
+                                            placeholder="Buscar postulante..."
+                                            style={{
+                                                width: '100%',
+                                                padding: '6px 12px 6px 32px',
+                                                borderRadius: '8px',
+                                                border: `1px solid ${t.inputBorder}`,
+                                                backgroundColor: dark ? '#2d2b3e' : '#fff',
+                                                color: t.inputText,
+                                                fontSize: '12px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                outline: 'none',
+                                            }}
+                                            onFocus={e => { e.target.style.borderColor = '#672577' }}
+                                            onBlur={e => { e.target.style.borderColor = t.inputBorder }}
+                                        />
+                                    </div>
+                                </div>
+
+                                {postulantesSinSecundariaFiltrados.length === 0 ? (
+                                    <div style={{ padding: '56px 20px', textAlign: 'center', color: t.dividerText }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                                            <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: t.emptyIcon, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <Ico.Users />
+                                            </div>
+                                            <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '14px', margin: 0 }}>
+                                                {busquedaPostulante ? 'No hay postulantes que coincidan con la búsqueda' : 'Todos los postulantes con área principal ya eligieron su segunda opción'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div style={{ overflowX: 'auto' }}>
+                                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                                            <thead>
+                                                <tr style={{ backgroundColor: t.tableHead }}>
+                                                    <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Código</th>
+                                                    <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Postulante</th>
+                                                    <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Área Principal</th>
+                                                    <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Correo</th>
+                                                    <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Celular</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {postulantesSinSecundariaFiltrados.map((p, i) => {
+                                                    const isEven = i % 2 === 1
+                                                    const colorsPrincipal = getAreaColors(p.areaPrincipal)
+                                                    return (
+                                                        <tr
+                                                            key={p.codigoMatricula}
+                                                            style={{
+                                                                backgroundColor: isEven ? t.tableRowAlt : t.tableRow,
+                                                                borderBottom: i < postulantesSinSecundariaFiltrados.length - 1 ? `1px solid ${t.tableBorder}` : 'none'
+                                                            }}
+                                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = t.tableRowHover}
+                                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = isEven ? t.tableRowAlt : t.tableRow}
+                                                        >
+                                                            <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: '12px', fontWeight: 600, color: t.bodyText }}>
+                                                                {p.codigoMatricula}
+                                                            </td>
+                                                            <td style={{ padding: '10px 14px', fontWeight: 500, color: t.bodyText }}>
+                                                                {p.apellidos} {p.nombres}
+                                                            </td>
+                                                            <td style={{ padding: '10px 14px' }}>
+                                                                <span style={{
+                                                                    padding: '2px 10px',
+                                                                    borderRadius: '12px',
+                                                                    fontSize: '11px',
+                                                                    fontWeight: 600,
+                                                                    color: t.bodyText
+                                                                }}>
+                                                                    {p.nombreAreaPrincipal}
+                                                                </span>
+                                                            </td>
+                                                            <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
+                                                                {p.correoElectronico || '—'}
+                                                            </td>
+                                                            <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
+                                                                {p.numeroCelular || '—'}
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                                {postulantesSinSecundariaFiltrados.length > 0 && (
+                                    <div style={{ padding: '10px 16px', borderTop: `1px solid ${t.tableBorder}` }}>
+                                        <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: t.bodyText, margin: 0 }}>
+                                            {postulantesSinSecundariaFiltrados.length} postulante{postulantesSinSecundariaFiltrados.length !== 1 ? 's' : ''} sin segunda opción
+                                            {postulantesSinSecundariaFiltrados.length !== postulantesSinSecundaria.length &&
+                                                ` (${postulantesSinSecundaria.length - postulantesSinSecundariaFiltrados.length} ocultos por búsqueda)`}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </>
                     )}
                 </>
             )}

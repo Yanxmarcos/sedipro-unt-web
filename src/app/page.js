@@ -439,7 +439,7 @@ export default function Home() {
                     <button 
                     onClick={openModal}
                     className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-full font-label-md text-label-md font-bold active:scale-105 hover:scale-105 transform transition-transform duration-200 shadow-lg">
-                        Resultados Fase 2
+                        Elegir Área
                     </button>
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -493,7 +493,7 @@ export default function Home() {
                             Áreas
                         </a>
                         <button onClick={openModal} className="mt-2 px-6 py-3 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-xl font-bold">
-                            Resultados Fase 2
+                            Elegir Área
                         </button>
                     </div>
                 </div>
@@ -524,7 +524,7 @@ export default function Home() {
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
                                 <button onClick={openModal} className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-                                    Resultados Fase 2
+                                    Elegir Área
                                 </button>
                                 <a href="#fases" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
                                     Fase Actual
@@ -808,7 +808,7 @@ export default function Home() {
                         </p>
                         <div className="pt-4 relative z-10">
                             <button onClick={openModal} className="px-8 py-4 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-                                Resultados Fase 2
+                                Elegir Área
                             </button>
                         </div>
                     </div>
