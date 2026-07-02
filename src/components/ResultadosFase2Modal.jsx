@@ -233,18 +233,18 @@ const ResultadoExitoso = ({ estudiante, areaSeleccionada, areaSecundaria, onEleg
 
     return (
         <div className="space-y-6 text-center animate-fadeIn">
-            <div className="flex justify-center">
+            {/* <div className="flex justify-center">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-500/30 to-emerald-500/30 border-2 border-green-500/50 flex items-center justify-center animate-pulse">
                     <Sparkles size={36} className="text-green-400" />
                 </div>
-            </div>
+            </div> */}
 
             <div className="space-y-3">
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-                    ¡Felicidades!
+                <h3 className="text-2xl font-bold text-[#d0bcff]">
+                    Área de Postulación
                 </h3>
                 <p className="text-[#d0bcff] text-sm">
-                    Has superado exitosamente la Fase 2 del proceso de selección.
+                    El área de postulación que seleccionaste es la siguiente.
                 </p>
 
                 <div className="bg-[#3b0191]/30 border border-[#6b46c1]/30 rounded-lg p-4 space-y-2">
@@ -278,24 +278,23 @@ const ResultadoExitoso = ({ estudiante, areaSeleccionada, areaSecundaria, onEleg
             </div>
 
             {/* Botón de área secundaria: solo si ya tiene principal y aún no eligió la segunda */}
-            {areaSeleccionada && !areaSecundaria && onElegirSecundaria && (
+            {/* {areaSeleccionada && !areaSecundaria && onElegirSecundaria && (
                 <button
                     onClick={onElegirSecundaria}
                     className="w-full px-6 py-3 border-2 border-[#6b46c1]/50 text-[#d0bcff] rounded-lg font-semibold hover:bg-[#6b46c1]/10 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2"
                 >
-                    {/* <Sparkles size={16} /> */}
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart-plus-icon lucide-heart-plus"><path d="m14.479 19.374-.971.939a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5a5.2 5.2 0 0 1-.219 1.49"/><path d="M15 15h6"/><path d="M18 12v6"/></svg>
                     Elegir Área de Segunda Opción
                 </button>
-            )}
+            )} */}
 
-            <button
+            {/* <button
                 onClick={handleJoinWhatsApp}
                 className="w-full px-6 py-3 bg-[#25D366] hover:bg-[#1DA851] text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
             >
                 <FaWhatsapp size={25} />
                 Unirme Comunidad de Fase 3
-            </button>
+            </button> */}
 
             <button
                 onClick={onExit}
@@ -634,7 +633,7 @@ export default function ResultadosFase2Modal({ isOpen, onClose }) {
                             SEDInvita 2026
                         </h2>
                         <p className="text-xs text-[#d0bcff]/50">
-                            Resultados de Segunda Fase
+                            FASE 3
                         </p>
 
                         {(step === 0 || step === 1) && (
@@ -651,7 +650,7 @@ export default function ResultadosFase2Modal({ isOpen, onClose }) {
                         <div className="space-y-6 animate-fadeIn">
                             <div>
                                 <p className="text-[#d0bcff] text-sm mb-4">
-                                    Ingresa tu código de matrícula UNT para conocer tu resultado y elegir tu área de postulación:
+                                    Ingresa tu código de matrícula UNT para conocer tu área de postulación:
                                 </p>
                                 <CodigoInput
                                     value={codigo}
@@ -673,7 +672,7 @@ export default function ResultadosFase2Modal({ isOpen, onClose }) {
                                     </div>
                                 ) : (
                                     <div className="flex items-center justify-center gap-2">
-                                        <span>Elegir Área</span>
+                                        <span>Ver Área Seleccionada</span>
                                         <ChevronRight size={18} />
                                     </div>
                                 )}
