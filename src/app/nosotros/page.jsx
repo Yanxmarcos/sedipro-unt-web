@@ -1,0 +1,102 @@
+// src/app/about/page.jsx
+
+import { Education } from "@/components/about/education";
+import { Experience } from "@/components/about/experience";
+import { Skills } from "@/components/about/skills";
+import { Stack } from "@/components/about/stack";
+import { ContactCard } from "@/components/contact/contact-card";
+import { FadeIn } from "@/components/ui/motion-primitives";
+import { VideoSection } from "@/components/about/video-section"; 
+import { Mail, Heart, Sparkles, ArrowRight } from "lucide-react";
+import Image from "next/image";
+
+export const metadata = {
+    title: "Nosotros | SEDIPRO UNT",
+    description: "Nuestra esencia, propósito e impacto.",
+};
+
+export default function AboutPage() {
+    return (
+        <main id="main-content" className="flex flex-1 flex-col gap-20 sm:gap-10">
+            <section className="mx-auto w-full max-w-275 px-6 pt-44 pb-16 sm:px-10 sm:pt-56 sm:pb-20">
+                <FadeIn className="flex flex-col items-center gap-5 text-center pb-20 sm:pb-20">
+                    <div className="flex items-center gap-5 text-center">
+                        <Image
+                            src="/favicon-96x96.png"
+                            alt="SEDIPRO UNT Logo"
+                            width={70}
+                            height={70}
+                            className="h-18 w-18 object-contain"
+                        />
+                        {/* <p className="select-none text-[20px] leading-tight tracking-tight font-medium text-foreground">
+                            SEDIPRO UNT
+                        </p> */}
+                    </div>
+                </FadeIn>
+                <FadeIn className="flex flex-col items-center gap-5 text-center">
+                    <h1 className="text-[2.75rem] font-medium leading-[1.05] tracking-tight text-foreground md:text-[3.25rem] lg:text-[3.75rem]">
+                        Nosotros
+                    </h1>
+                    <p className="max-w-[33ch] text-[20px] leading-[1.4] tracking-tight text-foreground/65 sm:text-[22px]">
+                        Impulsando el liderazgo en dirección de proyectos.
+                    </p>
+                </FadeIn>
+            </section>
+
+            <section className="mx-auto w-full max-w-160 px-6 pt-0 pb-0 sm:px-10 sm:pt-0 sm:pb-5">
+                <FadeIn delay={0.5}>
+                    <div className="rounded-4xl border border-foreground/5 bg-foreground/1.5 p-8 sm:p-12 dark:bg-foreground/3">
+                        <h1 className="text-[1.75rem] font-medium tracking-tight text-foreground sm:text-[2.5rem]">
+                            Conoce <span className="border-primary border-b-2 text-primary pb-0.5">SEDIPRO UNT</span>
+                        </h1>
+
+                        <div className="mt-8 space-y-6 text-[17px] leading-[1.7] tracking-tight text-foreground/75 sm:text-[18px]">
+                            <p>
+                                Somos la <strong className="font-semibold text-foreground">Sección Estudiantil de Dirección de Proyectos de la Universidad Nacional de Trujillo</strong>, un equipo multidisciplinario comprometido con la formación de estudiantes mediante la difusión de las <strong className="font-semibold text-foreground">buenas prácticas en gestión de proyectos</strong>, utilizando la metodología PMI y herramientas ágiles bajo un enfoque <strong className="font-semibold text-foreground">académico, social y ambiental</strong>.
+                            </p>
+
+                            <p>
+                                Nuestra misión es <strong className="font-semibold text-foreground">formar a los futuros líderes en las buenas prácticas de dirección de proyectos</strong> mediante un enfoque integral e innovador. Nuestra visión es <strong className="font-semibold text-foreground">ser la mejor SEDIPRO a nivel nacional</strong>, impulsando el desarrollo de gestores comprometidos con la excelencia y el impacto positivo.
+                            </p>
+
+                            {/* <p>
+                                Organizamos <strong className="font-semibold text-foreground">talleres, conferencias, webinars, proyectos colaborativos y eventos de networking</strong>, brindando a los estudiantes oportunidades para fortalecer sus conocimientos, desarrollar experiencia práctica y participar en iniciativas con impacto real en la comunidad.
+                            </p> */}
+                        </div>
+                    </div>
+                </FadeIn>
+            </section>
+
+            <section className="mx-auto w-full max-w-[40rem] px-6 pb-20 sm:px-10 sm:pb-10">
+                <FadeIn delay={0.1}>
+                    <div className="flex flex-col gap-10">
+                        <Education />
+                        <Stack />
+                        <Experience />
+                        <Skills />
+                        <VideoSection />
+                    </div>
+                </FadeIn>
+            </section>
+
+            <ContactCard />
+            <div className="h-12 sm:h-16">
+                <div className="flex items-center justify-center gap-1.5 text-xs text-foreground">
+                    <span>Hecho con</span>
+                    <Heart className="h-3 w-3 text-orange-500 fill-orange-500 animate-pulse" />
+                    <span>por</span>
+                    <span className="font-semibold text-orange-400">Área de TI</span>
+                    <div className="relative h-5 w-5 overflow-hidden">
+                        <Image
+                            alt="Logo Área de TI SEDIPRO"
+                            width={20}
+                            height={20}
+                            className="object-cover"
+                            src="/img/area-ti.png"
+                        />
+                    </div>
+                </div>
+            </div>
+        </main>
+    );
+}

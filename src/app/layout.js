@@ -1,4 +1,7 @@
+// src/app/layout.js
 import { Montserrat, Poppins } from "next/font/google";
+import { Providers } from "@/components/layout/providers";
+import { LandingOnly } from "@/components/layout/landing-only";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -21,7 +24,7 @@ export const metadata = {
 	authors: [{ name: "SEDIPRO UNT" }],
 	creator: "SEDIPRO UNT",
 	robots: "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
-	
+
 	icons: {
 		icon: [
 			{ url: '/favicon.svg', type: 'image/svg+xml' },
@@ -32,14 +35,14 @@ export const metadata = {
 		apple: '/apple-touch-icon.png',
 		shortcut: '/favicon.ico',
 	},
-	
+
 	manifest: '/site.webmanifest',
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: 'black-translucent',
 		title: 'SEDIPRO UNT',
 	},
-	
+
 	openGraph: {
 		title: 'SEDIPRO UNT',
 		description: 'Sección Estudiantil de Dirección de Proyectos de la Universidad Nacional de Trujillo',
@@ -57,7 +60,7 @@ export const metadata = {
 		type: 'website',
 		locale: 'es_PE',
 	},
-	
+
 	twitter: {
 		card: 'summary_large_image',
 		title: 'SEDIPRO UNT',
@@ -66,9 +69,9 @@ export const metadata = {
 		creator: '@SediproUNT',
 		site: '@SediproUNT',
 	},
-	
+
 	metadataBase: new URL('https://sediprount.org'),
-	
+
 	alternates: {
 		canonical: 'https://sediprount.org',
 		languages: {
@@ -84,7 +87,11 @@ export default function RootLayout({ children }) {
 			className={`${montserrat.variable} ${poppins.variable} h-full antialiased`}
 		>
 			<body className="min-h-full flex flex-col font-poppins">
-				{children}
+				<Providers>
+					<LandingOnly>
+						{children}
+					</LandingOnly>
+				</Providers>
 			</body>
 		</html>
 	);
