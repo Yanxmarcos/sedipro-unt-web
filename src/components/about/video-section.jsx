@@ -21,7 +21,7 @@ export function VideoSection() {
     return (
         <div className="flex flex-col gap-3">
             <h3 className="text-foreground text-[15px] font-semibold tracking-tight">
-                SEDIPRO UNT
+                Un poco de nosotros
             </h3>
             <div className="border-foreground/5 bg-foreground/2 dark:bg-foreground/5 relative h-64 overflow-hidden rounded-4xl border sm:h-94">
                 <video

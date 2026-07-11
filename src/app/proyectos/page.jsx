@@ -8,21 +8,21 @@ import Image from "next/image";
 
 export const metadata = {
     title: "Proyectos | SEDIPRO UNT",
-    description: "Una pequeña muestra de nuestro compromiso y trabajo.",
+    description: "Sección Estudiantil de Dirección de Proyectos de la Universidad Nacional de Trujillo",
 };
 
 export default function ProjectsPage() {
     return (
         <main id="main-content" className="flex flex-1 flex-col gap-20 sm:gap-10">
             <section className="mx-auto w-full max-w-275 px-6 pt-44 pb-16 sm:px-10 sm:pt-56 sm:pb-20">
-                <FadeIn className="flex flex-col items-center gap-5 text-center pb-20 sm:pb-20">
+                <FadeIn className="flex flex-col items-center gap-5 text-center pb-40 sm:pb-40">
                     <div className="flex items-center gap-5 text-center">
                         <Image
-                            src="/favicon-96x96.png"
+                            src="/logo_blanco.png"
                             alt="SEDIPRO UNT Logo"
-                            width={70}
-                            height={70}
-                            className="h-18 w-18 object-contain"
+                            width={100}
+                            height={100}
+                            className="h-full w-40 object-contain"
                         />
                         {/* <p className="select-none text-[20px] leading-tight tracking-tight font-medium text-foreground">
                             SEDIPRO UNT

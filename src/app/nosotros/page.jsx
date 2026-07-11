@@ -12,21 +12,21 @@ import Image from "next/image";
 
 export const metadata = {
     title: "Nosotros | SEDIPRO UNT",
-    description: "Nuestra esencia, propósito e impacto.",
+    description: "Sección Estudiantil de Dirección de Proyectos de la Universidad Nacional de Trujillo",
 };
 
 export default function AboutPage() {
     return (
         <main id="main-content" className="flex flex-1 flex-col">
-            <section className="mx-auto w-full max-w-275 px-6 pt-44 pb-16 sm:px-10 sm:pt-56 sm:pb-20">
-                <FadeIn className="flex flex-col items-center gap-5 text-center pb-20 sm:pb-20">
+            <section className="mx-auto w-full max-w-275 px-6 pt-44 pb-35 sm:px-10 sm:pt-56 sm:pb-20">
+                <FadeIn className="flex flex-col items-center gap-5 text-center pb-40 sm:pb-40">
                     <div className="flex items-center gap-5 text-center">
                         <Image
-                            src="/favicon-96x96.png"
+                            src="/logo_blanco.png"
                             alt="SEDIPRO UNT Logo"
-                            width={70}
-                            height={70}
-                            className="h-18 w-18 object-contain"
+                            width={100}
+                            height={100}
+                            className="h-full w-40 object-contain"
                         />
                     </div>
                 </FadeIn>
@@ -44,7 +44,7 @@ export default function AboutPage() {
                 <FadeIn delay={0.5}>
                     <div className="rounded-4xl border border-foreground/5 bg-foreground/1.5 p-8 sm:p-12 dark:bg-foreground/3">
                         <h1 className="text-[1.75rem] font-medium tracking-tight text-foreground sm:text-[2.5rem]">
-                            Conoce <span className="border-primary border-b-2 text-primary pb-0.5">SEDIPRO UNT</span>
+                            Quiénes <span className="border-primary border-b-2 text-primary">somos</span>
                         </h1>
 
                         <div className="mt-8 space-y-6 text-[17px] leading-[1.7] tracking-tight text-foreground/75 sm:text-[18px]">
@@ -65,12 +65,12 @@ export default function AboutPage() {
                     <div className="flex flex-col gap-10 overflow-visible">
                         <Education />
                         <Stack />
+                        <Skills />
+                        <VideoSection />
                         {/* Experience SOLO en desktop (md:block) */}
                         <div className="hidden md:block">
                             <Experience />
                         </div>
-                        <Skills />
-                        <VideoSection />
                     </div>
                 </FadeIn>
             </section>

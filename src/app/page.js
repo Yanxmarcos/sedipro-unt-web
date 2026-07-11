@@ -7,8 +7,8 @@ import { Mail, Heart, Sparkles, ArrowRight } from "lucide-react";
 import Image from "next/image";
 
 export const metadata = {
-    title: "Inicio | SEDIPRO UNT",
-    description: "Bienvenido a la Sección Estudiantil de Dirección de Proyectos de la UNT",
+    title: "SEDIPRO UNT | Sección Estudiantil de Dirección de Proyectos de la UNT",
+    description: "Sección Estudiantil de Dirección de Proyectos de la Universidad Nacional de Trujillo",
 };
 
 export default function HomePage() {

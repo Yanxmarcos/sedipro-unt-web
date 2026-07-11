@@ -23,6 +23,21 @@ export function Nav() {
     const itemRefs = useRef([]);
     const [pillRect, setPillRect] = useState(null);
     const [hasMeasured, setHasMeasured] = useState(false);
+    const [useLiquidGlassFilter, setUseLiquidGlassFilter] = useState(false);
+
+    // Mismo principio que en LiquidEther: el filtro SVG arranca DESACTIVADO
+    // por defecto y solo se activa cuando se confirma que es desktop, en vez
+    // de activarlo por defecto y corregirlo después.
+    useEffect(() => {
+        const checkCapability = () => {
+            const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            const isDesktopSize = window.innerWidth >= 768;
+            setUseLiquidGlassFilter(!isTouch && isDesktopSize);
+        };
+        checkCapability();
+        window.addEventListener('resize', checkCapability);
+        return () => window.removeEventListener('resize', checkCapability);
+    }, []);
 
     const activeIndex = NAV_ITEMS.findIndex((item) =>
         item.href === "/"
@@ -91,8 +106,9 @@ export function Nav() {
                 className="liquid-glass-nav relative flex items-center gap-1 rounded-full p-1.5 border overflow-hidden"
                 style={{
                     background: "rgba(11, 19, 38, 0.35)",
-                    backdropFilter:
-                        "url(#liquid-glass-nav) blur(14px) saturate(1.6)",
+                    backdropFilter: useLiquidGlassFilter
+                        ? "url(#liquid-glass-nav) blur(14px) saturate(1.6)"
+                        : "blur(14px) saturate(1.6)",
                     WebkitBackdropFilter: "blur(20px) saturate(1.6)",
                     borderColor: "rgba(255, 255, 255, 0.18)",
                     boxShadow: `

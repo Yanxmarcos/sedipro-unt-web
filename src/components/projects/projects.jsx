@@ -108,17 +108,17 @@ function ProjectCard({ project, index }) {
                 href={project.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group focus-ring flex flex-col gap-4 rounded-3xl border border-foreground/8 bg-background p-3 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_20px_45px_-18px_rgba(103,37,119,0.35)] sm:p-3.5"
+                className="group focus-ring flex flex-col gap-4 rounded-3xl border border-foreground/10 bg-foreground/2 p-3 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_10px_24px_-16px_rgba(0,0,0,0.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-background hover:shadow-[0_20px_45px_-18px_rgba(103,37,119,0.35)] dark:bg-foreground/3 sm:p-3.5"
             >
                 <header className="flex items-center justify-between gap-2.5 px-1 pt-2">
                     <div className="flex items-center gap-2.5">
-                        <span className="border-foreground/10 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border bg-background transition-colors duration-300 group-hover:border-primary/40 group-hover:bg-primary/10">
+                        {/* <span className="border-foreground/10 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border bg-background transition-colors duration-300 group-hover:border-primary/40 group-hover:bg-primary/10">
                             <Icon
                                 className="h-3.5 w-3.5 text-foreground transition-colors duration-300 group-hover:text-primary"
                                 aria-hidden="true"
                             />
-                        </span>
-                        <span className="text-sm font-medium tracking-tight text-foreground">
+                        </span> */}
+                        <span className="text-sm font-medium tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary">
                             {project.iconLabel}
                         </span>
                     </div>
@@ -138,7 +138,7 @@ function ProjectCard({ project, index }) {
                         alt={project.imageAlt}
                         fill
                         sizes="(min-width: 1024px) 540px, (min-width: 768px) 45vw, 100vw"
-                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.1]"
                         priority={index < 2}
                     />
                 </div>

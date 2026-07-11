@@ -353,7 +353,13 @@ export default function Home() {
                 });
             },
             {
-                threshold: 0.5,
+                // Línea de detección fina (~45% desde arriba) en vez de exigir
+                // que el 50% del ÁREA TOTAL de la sección esté visible.
+                // Con threshold: 0.5, una sección más alta que el viewport
+                // (como "beneficios" ahora que tiene el iframe) nunca llega
+                // a ese 50%, así que el observer la salta por completo.
+                rootMargin: '-45% 0px -50% 0px',
+                threshold: 0,
             }
         );
 
@@ -650,7 +656,7 @@ export default function Home() {
                 </section> */}
 
                 {/* Video Section */}
-                <section className="py-stack-lg bg-surface" id="video">
+                {/* <section className="py-stack-lg bg-surface" id="video">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
                         <div className="flex justify-center">
                             <iframe
@@ -669,10 +675,26 @@ export default function Home() {
                             />
                         </div>
                     </div>
-                </section>
+                </section> */}
 
                 {/* Benefits Section */}
                 <section className="py-stack-lg bg-surface relative overflow-hidden" id="beneficios">
+                    <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-10">
+                        <div className="flex justify-center">
+                            <iframe
+                                src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1865576567446700%2F&show_text=false&width=560&t=0"
+                                className="w-full max-w-6xl rounded-2xl shadow-xl"
+                                style={{
+                                    border: "none",
+                                    overflow: "hidden",
+                                    aspectRatio: "16 / 9",
+                                    height: "auto",
+                                }}
+                                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                                allowFullScreen
+                            />
+                        </div>
+                    </div>
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-stack-lg items-center">
                         <div className="lg:col-span-5 space-y-stack-md">
                             <h2 className="font-display-lg text-headline-lg md:text-display-lg text-on-surface leading-tight">
@@ -828,7 +850,7 @@ export default function Home() {
                             Cuarta Fase <br />de Selección.
                         </h2>
                         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto relative z-10">
-                            Es momento del proceso final de SEDInvita.
+                            Se desarrolla la evaluación final mediante entrevistas personales para seleccionar a los nuevos integrantes, quienes serán anunciados oficialmente y recibirán la bienvenida.
                         </p>
                         <div className="pt-4 relative z-10">
                             <button onClick={openModal} className="px-8 py-4 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
@@ -842,7 +864,6 @@ export default function Home() {
             <ScrollToTopButton />
             {/* Footer */}
             <footer className="bg-surface-container-lowest border-t border-outline-variant/30 py-12">
-                {/* ... contenido del footer sin cambios ... */}
                 <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-stack-md">
                         <div className="flex flex-col gap-2 items-center md:items-start">

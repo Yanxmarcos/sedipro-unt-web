@@ -80,19 +80,22 @@ const Modal = ({ isOpen, onClose, image, glowColor }) => {
             scrollPositionRef.current = window.scrollY;
             document.body.style.overflow = 'hidden';
             // document.body.style.touchAction = 'none'; // Previene scroll táctil
-            document.body.style.height = '100vh'; // Mantener altura
+            // OJO: NO forzar document.body.style.height = '100vh' aquí.
+            // Eso colapsa la altura real del body al alto del viewport, y el
+            // navegador clampea el scrollY a 0 en el mismo reflow (ya no hay
+            // "de más" que scrollear), lo que provoca el flash del inicio de
+            // la página detrás del modal. overflow: hidden ya es suficiente
+            // para bloquear el scroll sin tocar la altura del documento.
             document.body.style.width = '100%';
         } else {
             document.body.style.overflow = '';
             document.body.style.touchAction = '';
-            document.body.style.height = '';
             document.body.style.width = '';
             window.scrollTo(0, scrollPositionRef.current);
         }
         return () => {
             document.body.style.overflow = '';
             document.body.style.touchAction = '';
-            document.body.style.height = '';
             document.body.style.width = '';
         };
     }, [isOpen]);
