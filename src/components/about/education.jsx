@@ -51,7 +51,7 @@ const ROW_HEIGHT = 64;
 
 export function Education() {
     return (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 mt-10 sm:mt-10">
             <h3 className="text-foreground text-[15px] font-semibold tracking-tight">
                 Directiva
             </h3>
