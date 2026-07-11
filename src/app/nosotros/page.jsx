@@ -17,7 +17,7 @@ export const metadata = {
 
 export default function AboutPage() {
     return (
-        <main id="main-content" className="flex flex-1 flex-col gap-20 sm:gap-10">
+        <main id="main-content" className="flex flex-1 flex-col">
             <section className="mx-auto w-full max-w-275 px-6 pt-44 pb-16 sm:px-10 sm:pt-56 sm:pb-20">
                 <FadeIn className="flex flex-col items-center gap-5 text-center pb-20 sm:pb-20">
                     <div className="flex items-center gap-5 text-center">
@@ -28,9 +28,6 @@ export default function AboutPage() {
                             height={70}
                             className="h-18 w-18 object-contain"
                         />
-                        {/* <p className="select-none text-[20px] leading-tight tracking-tight font-medium text-foreground">
-                            SEDIPRO UNT
-                        </p> */}
                     </div>
                 </FadeIn>
                 <FadeIn className="flex flex-col items-center gap-5 text-center">
@@ -58,21 +55,20 @@ export default function AboutPage() {
                             <p>
                                 Nuestra misión es <strong className="font-semibold text-foreground">formar a los futuros líderes en las buenas prácticas de dirección de proyectos</strong> mediante un enfoque integral e innovador. Nuestra visión es <strong className="font-semibold text-foreground">ser la mejor SEDIPRO a nivel nacional</strong>, impulsando el desarrollo de gestores comprometidos con la excelencia y el impacto positivo.
                             </p>
-
-                            {/* <p>
-                                Organizamos <strong className="font-semibold text-foreground">talleres, conferencias, webinars, proyectos colaborativos y eventos de networking</strong>, brindando a los estudiantes oportunidades para fortalecer sus conocimientos, desarrollar experiencia práctica y participar en iniciativas con impacto real en la comunidad.
-                            </p> */}
                         </div>
                     </div>
                 </FadeIn>
             </section>
 
-            <section className="mx-auto w-full max-w-[40rem] px-6 pb-20 sm:px-10 sm:pb-10">
+            <section className="mx-auto w-full max-w-[40rem] px-6 pb-20 sm:px-10 sm:pb-10 overflow-visible">
                 <FadeIn delay={0.1}>
-                    <div className="flex flex-col gap-10">
+                    <div className="flex flex-col gap-10 overflow-visible">
                         <Education />
                         <Stack />
-                        <Experience />
+                        {/* Experience SOLO en desktop (md:block) */}
+                        <div className="hidden md:block">
+                            <Experience />
+                        </div>
                         <Skills />
                         <VideoSection />
                     </div>

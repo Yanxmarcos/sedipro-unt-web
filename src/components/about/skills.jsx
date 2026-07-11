@@ -7,9 +7,9 @@ const SKILLS = [
     "5 áreas funcionales",
     "+20 carreras representadas",
     "Alianzas estratégicas",
-    "+100 eventos realizados",
-    "Networking profesional",
-    "+13 años proyectando vidas"
+    "+100 eventos",
+    "Networking",
+    "+13 años proyectando vidas",
 ];
 
 export function Skills() {
