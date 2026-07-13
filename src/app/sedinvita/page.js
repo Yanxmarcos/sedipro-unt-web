@@ -8,7 +8,8 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTiktok } from 'rea
 
 // import TurnoModal from "@/components/TurnoModal";
 // import TurnoTemporalModal from "@/components/TurnoTemporalModalProps";
-import ResultadoFase2Modal from "@/components/ResultadosFase2Modal";
+// import ResultadoFase2Modal from "@/components/ResultadosFase2Modal";
+import ResultadosFase3Modal from '@/components/ResultadosFase3Modal';
 
 import MagicBento from "@/components/MagicBento";
 
@@ -282,7 +283,7 @@ export default function Home() {
     const [activeSection, setActiveSection] = useState('inicio');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const titulo_boton_cta = "Ver Área";
+    const titulo_boton_cta = "Resultados Fase 3";
 
     //Borrar luego
     // const [showTemporalModal, setShowTemporalModal] = useState(false);
@@ -850,7 +851,7 @@ export default function Home() {
                             Cuarta Fase <br />de Selección.
                         </h2>
                         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto relative z-10">
-                            Se desarrolla la evaluación final mediante entrevistas personales para seleccionar a los nuevos integrantes, quienes serán anunciados oficialmente y recibirán la bienvenida.
+                            Evaluación final mediante entrevistas personales para seleccionar a los nuevos integrantes, quienes serán anunciados oficialmente y recibirán una calurosa bienvenida.
                         </p>
                         <div className="pt-4 relative z-10">
                             <button onClick={openModal} className="px-8 py-4 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
@@ -978,7 +979,7 @@ export default function Home() {
                 isOpen={showTemporalModal}
                 onClose={() => setShowTemporalModal(false)}
             /> */}
-            <ResultadoFase2Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+            <ResultadosFase3Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </>
     );
 }

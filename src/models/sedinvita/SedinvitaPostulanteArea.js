@@ -60,6 +60,24 @@ const sedinvitaPostulanteAreaSchema = new mongoose.Schema({
         trim: true,
         default: 'postulante'
     },
+    // ── NUEVO: Asignación final para Fase 4 ──
+    // Área que la directiva asigna definitivamente al postulante
+    areaFinal: {
+        type: String,
+        enum: ['gth', 'pmo', 'ti', 'mkt', 'ltkyfnz'],
+        default: null,
+    },
+    // Fecha en que se asignó el área final
+    fechaAsignacionFinal: {
+        type: Date,
+        default: null,
+    },
+    // Quién asignó (admin/directiva)
+    asignadoPor: {
+        type: String,
+        trim: true,
+        default: null,
+    },
 }, {
     collection: 'sedinvita_postulantes_area',
     timestamps: true,

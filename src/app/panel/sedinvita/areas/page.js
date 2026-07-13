@@ -31,6 +31,15 @@ export default function Page() {
     const [areaSeleccionada, setAreaSeleccionada] = useState(null)
     const [mensajeConfirmacion, setMensajeConfirmacion] = useState(null)
 
+    // NUEVO: Filtro de fase
+    const [faseFilter, setFaseFilter] = useState('fase4')
+    const fases = ['fase3', 'fase4']
+
+    // NUEVO: datos de Fase 4
+    const [postulantesFase4, setPostulantesFase4] = useState([])
+    const [areasFase4, setAreasFase4] = useState([])
+    const [postulantesFase4SinArea, setPostulantesFase4SinArea] = useState([])
+
     // NUEVO: pestaña activa — 'principal' | 'secundaria'
     const [vista, setVista] = useState('principal')
     // NUEVO: data de segunda opción (viene en la misma respuesta de por-area)
@@ -55,6 +64,24 @@ export default function Page() {
         }
     }, [])
 
+    // Cargar datos de Fase 4
+    const cargarDatosFase4 = useCallback(async (edicionId) => {
+        try {
+            const res = await fetch(`/api/sedinvita/postulantes/fase4?edicionId=${edicionId}`, {
+                credentials: 'include'
+            })
+            const json = await res.json()
+            if (!res.ok) throw new Error(json.error || 'Error al cargar Fase 4')
+            
+            setPostulantesFase4(json.postulantes || [])
+            setAreasFase4(json.areas || [])
+            setPostulantesFase4SinArea(json.sinArea || [])
+        } catch (err) {
+            console.error(err)
+            setError(err.message)
+        }
+    }, [])
+
     // Cargar todas las áreas y postulantes
     const cargarDatos = useCallback(async () => {
         const activa = await fetchEdicionActiva()
@@ -67,6 +94,7 @@ export default function Page() {
         setError(null)
 
         try {
+            // Cargar datos de Fase 3 (siempre)
             const [areasRes, sinAreaRes] = await Promise.all([
                 fetch('/api/sedinvita/postulantes/por-area', {
                     credentials: 'include'
@@ -88,13 +116,17 @@ export default function Page() {
             setAreasSecundaria(areasJson.areasSecundaria || [])
             setTotalSecundaria(areasJson.totalSecundaria || 0)
             setPostulantesSinSecundaria(areasJson.postulantesSinSecundaria || [])
+
+            // Cargar datos de Fase 4
+            await cargarDatosFase4(activa._id)
+
         } catch (err) {
             console.error(err)
             setError(err.message)
         } finally {
             setLoading(false)
         }
-    }, [fetchEdicionActiva])
+    }, [fetchEdicionActiva, cargarDatosFase4])
 
     useEffect(() => {
         cargarDatos()
@@ -125,6 +157,44 @@ export default function Page() {
             setTimeout(() => setMensajeConfirmacion(null), 4000)
 
             // Recargar datos
+            await cargarDatos()
+
+        } catch (err) {
+            console.error(err)
+            setError(err.message)
+        } finally {
+            setLoadingAction(false)
+        }
+    }
+
+    // NUEVO: Asignar área final a un postulante de Fase 4
+    const handleAsignarAreaFinal = async (codigoMatricula, areaFinal, nombreCompleto) => {
+        if (!areaFinal) {
+            setError('Debes seleccionar un área')
+            return
+        }
+
+        if (!confirm(`¿Asignar el área "${getAreaNombre(areaFinal)}" a ${nombreCompleto} (${codigoMatricula})?`)) {
+            return
+        }
+
+        setLoadingAction(true)
+        setError(null)
+
+        try {
+            const res = await fetch('/api/sedinvita/admin/asignar-area-final', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codigoMatricula, areaFinal }),
+                credentials: 'include'
+            })
+
+            const json = await res.json()
+            if (!res.ok) throw new Error(json.error || 'Error al asignar área final')
+
+            setMensajeConfirmacion(`Área final "${getAreaNombre(areaFinal)}" asignada a ${nombreCompleto}`)
+            setTimeout(() => setMensajeConfirmacion(null), 4000)
+
             await cargarDatos()
 
         } catch (err) {
@@ -226,7 +296,25 @@ export default function Page() {
         return resultado
     }, [postulantesSinSecundaria, busquedaPostulante])
 
+    // NUEVO: Postulantes de Fase 4 filtrados por búsqueda
+    const postulantesFase4Filtrados = useMemo(() => {
+        let resultado = postulantesFase4
+        if (busquedaPostulante.trim()) {
+            const busqueda = busquedaPostulante.trim().toLowerCase()
+            resultado = resultado.filter(p =>
+                p.codigoMatricula?.toLowerCase().includes(busqueda) ||
+                p.nombres?.toLowerCase().includes(busqueda) ||
+                p.apellidos?.toLowerCase().includes(busqueda) ||
+                `${p.apellidos} ${p.nombres}`.toLowerCase().includes(busqueda) ||
+                p.correoElectronico?.toLowerCase().includes(busqueda) ||
+                p.numeroCelular?.toLowerCase().includes(busqueda)
+            )
+        }
+        return resultado
+    }, [postulantesFase4, busquedaPostulante])
+
     const totalConArea = areas.reduce((acc, area) => acc + area.postulantes.length, 0)
+    const totalFase4ConArea = areasFase4.reduce((acc, area) => acc + area.postulantes.length, 0)
 
     return (
         <div style={{
@@ -240,67 +328,48 @@ export default function Page() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '11px', marginBottom: '4px' }}>
                     <div>
                         <h1 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '22px', color: t.titleText, margin: 0, lineHeight: 1.2 }}>
-                            Áreas - Fase 3
+                            Áreas
                         </h1>
                         <p style={{ fontSize: '13px', color: t.bodyText, marginTop: '4px', marginBottom: 0 }}>
-                            Postulantes agrupados por área seleccionada
+                            {faseFilter === 'fase3' 
+                                ? `Postulantes agrupados por área seleccionada • ${totalConArea} con área • ${postulantesSinArea.length} sin área`
+                                : `Postulantes en Fase 4 • ${totalFase4ConArea} con área final • ${postulantesFase4SinArea.length} sin asignar`
+                            }
                             {edicionActiva && ` • ${edicionActiva.nombre} (${edicionActiva.anio})`}
-                            {!loading && ` • ${totalConArea} con área • ${postulantesSinArea.length} sin área`}
-                            {!loading && ` • ${totalSecundaria} con 2ª opción`}
                         </p>
                     </div>
                 </div>
             </div>
 
-            {/* NUEVO: Selector de pestañas Primera Opción / Segunda Opción */}
-            {edicionActiva && !loading && (
-                <div style={{
-                    display: 'inline-flex',
-                    gap: '4px',
-                    padding: '4px',
-                    backgroundColor: t.tabBg,
-                    border: `1px solid ${t.tabBorder}`,
-                    borderRadius: '10px',
-                    marginBottom: '20px',
-                }}>
-                    <button
-                        onClick={() => { setVista('principal'); setAreaSeleccionada(null) }}
-                        style={{
-                            padding: '7px 16px',
-                            borderRadius: '7px',
-                            border: 'none',
-                            backgroundColor: vista === 'principal' ? t.tabActive : 'transparent',
-                            color: vista === 'principal' ? t.titleText : t.bodyText,
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: '13px',
-                            fontWeight: vista === 'principal' ? 600 : 500,
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                            boxShadow: vista === 'principal' ? t.cardShadow : 'none',
-                        }}
-                    >
-                        Primera Opción
-                    </button>
-                    <button
-                        onClick={() => { setVista('secundaria'); setAreaSecundariaSeleccionada(null) }}
-                        style={{
-                            padding: '7px 16px',
-                            borderRadius: '7px',
-                            border: 'none',
-                            backgroundColor: vista === 'secundaria' ? t.tabActive : 'transparent',
-                            color: vista === 'secundaria' ? t.titleText : t.bodyText,
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: '13px',
-                            fontWeight: vista === 'secundaria' ? 600 : 500,
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                            boxShadow: vista === 'secundaria' ? t.cardShadow : 'none',
-                        }}
-                    >
-                        Segunda Opción
-                    </button>
-                </div>
-            )}
+            {/* Filtro de Fase */}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 600, color: t.labelText }}>
+                    Fase:
+                </label>
+                <select
+                    value={faseFilter}
+                    onChange={e => {
+                        setFaseFilter(e.target.value)
+                        setAreaSeleccionada(null)
+                        setAreaSecundariaSeleccionada(null)
+                    }}
+                    style={{
+                        padding: '6px 24px 6px 12px',
+                        borderRadius: '8px',
+                        border: `1px solid ${t.inputBorder}`,
+                        backgroundColor: dark ? '#2d2b3e' : '#fff',
+                        color: t.inputText,
+                        fontSize: '13px',
+                        fontFamily: 'Poppins, sans-serif',
+                        cursor: 'pointer',
+                        minWidth: '110px'
+                    }}
+                >
+                    {fases.map(f => (
+                        <option key={f} value={f}>{f.charAt(0).toUpperCase() + f.slice(1)}</option>
+                    ))}
+                </select>
+            </div>
 
             {mensajeConfirmacion && (
                 <div style={{ 
@@ -352,8 +421,60 @@ export default function Page() {
                 </div>
             )}
 
-            {edicionActiva && (
+            {edicionActiva && faseFilter === 'fase3' && (
                 <>
+                    {/* ============================================================ */}
+                    {/* SELECTOR DE PESTAÑAS - SOLO PARA FASE 3 */}
+                    {/* ============================================================ */}
+                    {!loading && (
+                        <div style={{
+                            display: 'inline-flex',
+                            gap: '4px',
+                            padding: '4px',
+                            backgroundColor: t.tabBg,
+                            border: `1px solid ${t.tabBorder}`,
+                            borderRadius: '10px',
+                            marginBottom: '20px',
+                        }}>
+                            <button
+                                onClick={() => { setVista('principal'); setAreaSeleccionada(null) }}
+                                style={{
+                                    padding: '7px 16px',
+                                    borderRadius: '7px',
+                                    border: 'none',
+                                    backgroundColor: vista === 'principal' ? t.tabActive : 'transparent',
+                                    color: vista === 'principal' ? t.titleText : t.bodyText,
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontSize: '13px',
+                                    fontWeight: vista === 'principal' ? 600 : 500,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    boxShadow: vista === 'principal' ? t.cardShadow : 'none',
+                                }}
+                            >
+                                Primera Opción
+                            </button>
+                            <button
+                                onClick={() => { setVista('secundaria'); setAreaSecundariaSeleccionada(null) }}
+                                style={{
+                                    padding: '7px 16px',
+                                    borderRadius: '7px',
+                                    border: 'none',
+                                    backgroundColor: vista === 'secundaria' ? t.tabActive : 'transparent',
+                                    color: vista === 'secundaria' ? t.titleText : t.bodyText,
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontSize: '13px',
+                                    fontWeight: vista === 'secundaria' ? 600 : 500,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    boxShadow: vista === 'secundaria' ? t.cardShadow : 'none',
+                                }}
+                            >
+                                Segunda Opción
+                            </button>
+                        </div>
+                    )}
+
                     {vista === 'principal' && (
                     <>
                     {/* Tarjetas de resumen */}
@@ -467,20 +588,6 @@ export default function Page() {
                                             gap: '8px'
                                         }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                {/* <div style={{
-                                                    width: '28px',
-                                                    height: '28px',
-                                                    borderRadius: '50%',
-                                                    backgroundColor: colors.bg,
-                                                    border: `2px solid ${colors.border}`,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}>
-                                                    <span style={{ fontSize: '12px', fontWeight: 700, color: colors.text }}>
-                                                        {getAreaNombre(area.area).charAt(0)}
-                                                    </span>
-                                                </div> */}
                                                 <div>
                                                     <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '15px', color: t.titleText, margin: 0 }}>
                                                         {getAreaNombre(area.area)}
@@ -880,7 +987,6 @@ export default function Page() {
                                                         <tbody>
                                                             {postulantesFiltrados.map((p, i) => {
                                                                 const isEven = i % 2 === 1
-                                                                const colorsPrincipal = getAreaColors(p.areaPrincipal)
                                                                 return (
                                                                     <tr
                                                                         key={p.codigoMatricula}
@@ -1031,7 +1137,6 @@ export default function Page() {
                                             <tbody>
                                                 {postulantesSinSecundariaFiltrados.map((p, i) => {
                                                     const isEven = i % 2 === 1
-                                                    const colorsPrincipal = getAreaColors(p.areaPrincipal)
                                                     return (
                                                         <tr
                                                             key={p.codigoMatricula}
@@ -1085,6 +1190,302 @@ export default function Page() {
                         )}
                     </>
                     )}
+                </>
+            )}
+
+            {/* ============================================================ */}
+            {/* VISTA FASE 4 */}
+            {/* ============================================================ */}
+            {edicionActiva && faseFilter === 'fase4' && (
+                <>
+                {/* Tarjetas de resumen Fase 4 */}
+                {!loading && areasFase4.length > 0 && (
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                        gap: '12px',
+                        marginBottom: '20px'
+                    }}>
+                        {areasFase4.map(area => {
+                            const colors = getAreaColors(area.area)
+                            const count = area.postulantes.length
+                            const isSelected = areaSeleccionada === area.area
+                            return (
+                                <div
+                                    key={area.area}
+                                    onClick={() => setAreaSeleccionada(isSelected ? null : area.area)}
+                                    style={{
+                                        backgroundColor: isSelected ? colors.bg : t.cardBg,
+                                        border: `1px solid ${isSelected ? colors.border : t.cardBorder}`,
+                                        borderRadius: '12px',
+                                        padding: '14px',
+                                        textAlign: 'center',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        boxShadow: isSelected ? `0 0 0 2px ${colors.border}` : t.cardShadow,
+                                        transform: isSelected ? 'scale(1.02)' : 'scale(1)'
+                                    }}
+                                >
+                                    <p style={{ fontSize: '11px', color: t.bodyText, margin: 0 }}>{getAreaNombre(area.area)}</p>
+                                    <p style={{ fontSize: '22px', fontWeight: 700, color: t.bodyText, margin: '4px 0' }}>
+                                        {count}
+                                    </p>
+                                    <p style={{ fontSize: '10px', color: t.bodyText, margin: 0, opacity: 0.6 }}>
+                                        postulantes
+                                    </p>
+                                </div>
+                            )
+                        })}
+                        <div
+                            onClick={() => setAreaSeleccionada(null)}
+                            style={{
+                                backgroundColor: areaSeleccionada === null ? 'rgba(156, 163, 175, 0.1)' : t.cardBg,
+                                border: `1px solid ${areaSeleccionada === null ? 'rgba(156, 163, 175, 0.5)' : t.cardBorder}`,
+                                borderRadius: '12px',
+                                padding: '14px',
+                                textAlign: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                boxShadow: areaSeleccionada === null ? '0 0 0 2px rgba(156, 163, 175, 0.3)' : t.cardShadow,
+                                transform: areaSeleccionada === null ? 'scale(1.02)' : 'scale(1)'
+                            }}
+                        >
+                            <p style={{ fontSize: '11px', color: t.bodyText, margin: 0 }}>Sin asignar</p>
+                            <p style={{ fontSize: '22px', fontWeight: 700, color: '#9CA3AF', margin: '4px 0' }}>
+                                {postulantesFase4SinArea.length}
+                            </p>
+                            <p style={{ fontSize: '10px', color: t.bodyText, margin: 0, opacity: 0.6 }}>
+                                postulantes
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {loading && (
+                    <div style={{ textAlign: 'center', padding: '40px', color: t.bodyText }}>
+                        Cargando postulantes...
+                    </div>
+                )}
+
+                {/* TABLA DE POSTULANTES DE FASE 4 */}
+                {!loading && (
+                    <div style={{
+                        backgroundColor: t.cardBg,
+                        border: `1px solid ${t.cardBorder}`,
+                        boxShadow: t.cardShadow,
+                        borderRadius: '14px',
+                        overflow: 'hidden',
+                    }}>
+                        <div style={{ 
+                            padding: '12px 16px', 
+                            borderBottom: `1px solid ${t.tableBorder}`,
+                            backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#f8f5fa',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: '10px'
+                        }}>
+                            <div>
+                                <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '15px', color: t.titleText, margin: 0 }}>
+                                    Postulantes en Fase 4
+                                </p>
+                                <p style={{ fontSize: '12px', color: t.bodyText, margin: 0 }}>
+                                    {postulantesFase4.length} postulante{postulantesFase4.length !== 1 ? 's' : ''} en Fase 4
+                                    {postulantesFase4SinArea.length > 0 && ` • ${postulantesFase4SinArea.length} sin asignar`}
+                                </p>
+                            </div>
+                            <div style={{ position: 'relative', minWidth: '200px' }}>
+                                <span style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: t.dividerText, pointerEvents: 'none' }}>
+                                    <Ico.Search />
+                                </span>
+                                <input
+                                    value={busquedaPostulante}
+                                    onChange={e => setBusquedaPostulante(e.target.value)}
+                                    placeholder="Buscar postulante..."
+                                    style={{
+                                        width: '100%',
+                                        padding: '6px 12px 6px 32px',
+                                        borderRadius: '8px',
+                                        border: `1px solid ${t.inputBorder}`,
+                                        backgroundColor: dark ? '#2d2b3e' : '#fff',
+                                        color: t.inputText,
+                                        fontSize: '12px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        outline: 'none',
+                                    }}
+                                    onFocus={e => { e.target.style.borderColor = '#672577' }}
+                                    onBlur={e => { e.target.style.borderColor = t.inputBorder }}
+                                />
+                            </div>
+                        </div>
+
+                        {postulantesFase4Filtrados.length === 0 ? (
+                            <div style={{ padding: '56px 20px', textAlign: 'center', color: t.dividerText }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: t.emptyIcon, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Ico.Users />
+                                    </div>
+                                    <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '14px', margin: 0 }}>
+                                        {busquedaPostulante ? 'No hay postulantes que coincidan con la búsqueda' : 'No hay postulantes en Fase 4'}
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div style={{ overflowX: 'auto' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                                    <thead>
+                                        <tr style={{ backgroundColor: t.tableHead }}>
+                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Código</th>
+                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Postulante</th>
+                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Área Principal</th>
+                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Área Secundaria</th>
+                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Área Final</th>
+                                            <th style={{ padding: '10px 14px', textAlign: 'center', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Asignar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {postulantesFase4Filtrados.map((p, i) => {
+                                            const isEven = i % 2 === 1
+                                            const areaPrincipal = p.areaPrincipal || '—'
+                                            const areaSecundaria = p.areaSecundaria || null
+                                            const areaFinal = p.areaFinal || null
+
+                                            // Opciones para el selector
+                                            const opciones = []
+                                            if (areaPrincipal) opciones.push({ value: areaPrincipal, label: `${getAreaNombre(areaPrincipal)} (Principal)` })
+                                            if (areaSecundaria) opciones.push({ value: areaSecundaria, label: `${getAreaNombre(areaSecundaria)} (Secundaria)` })
+
+                                            // Si tiene área final asignada, mostrarla seleccionada
+                                            const valorActual = areaFinal || ''
+
+                                            return (
+                                                <tr
+                                                    key={p.codigoMatricula}
+                                                    style={{
+                                                        backgroundColor: isEven ? t.tableRowAlt : t.tableRow,
+                                                        borderBottom: i < postulantesFase4Filtrados.length - 1 ? `1px solid ${t.tableBorder}` : 'none'
+                                                    }}
+                                                    onMouseEnter={e => e.currentTarget.style.backgroundColor = t.tableRowHover}
+                                                    onMouseLeave={e => e.currentTarget.style.backgroundColor = isEven ? t.tableRowAlt : t.tableRow}
+                                                >
+                                                    <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: '12px', fontWeight: 600, color: t.bodyText }}>
+                                                        {p.codigoMatricula}
+                                                    </td>
+                                                    <td style={{ padding: '10px 14px', fontWeight: 500, color: t.bodyText }}>
+                                                        {p.apellidos} {p.nombres}
+                                                    </td>
+                                                    <td style={{ padding: '10px 14px' }}>
+                                                        {areaPrincipal !== '—' ? (
+                                                            <span style={{
+                                                                padding: '2px 10px',
+                                                                borderRadius: '12px',
+                                                                fontSize: '11px',
+                                                                fontWeight: 600,
+                                                                backgroundColor: getAreaColors(areaPrincipal).bg,
+                                                                color: t.bodyText,
+                                                                border: `1px solid ${getAreaColors(areaPrincipal).border}`
+                                                            }}>
+                                                                {getAreaNombre(areaPrincipal)}
+                                                            </span>
+                                                        ) : '—'}
+                                                    </td>
+                                                    <td style={{ padding: '10px 14px' }}>
+                                                        {areaSecundaria ? (
+                                                            <span style={{
+                                                                padding: '2px 10px',
+                                                                borderRadius: '12px',
+                                                                fontSize: '11px',
+                                                                fontWeight: 600,
+                                                                backgroundColor: getAreaColors(areaSecundaria).bg,
+                                                                color: t.bodyText,
+                                                                border: `1px solid ${getAreaColors(areaSecundaria).border}`
+                                                            }}>
+                                                                {getAreaNombre(areaSecundaria)}
+                                                            </span>
+                                                        ) : '—'}
+                                                    </td>
+                                                    <td style={{ padding: '10px 14px' }}>
+                                                        {areaFinal ? (
+                                                            <span style={{
+                                                                padding: '2px 10px',
+                                                                borderRadius: '12px',
+                                                                fontSize: '11px',
+                                                                fontWeight: 700,
+                                                                backgroundColor: getAreaColors(areaFinal).bg,
+                                                                color: getAreaColors(areaFinal).text,
+                                                                border: `2px solid ${getAreaColors(areaFinal).border}`
+                                                            }}>
+                                                                ✓ {getAreaNombre(areaFinal)}
+                                                            </span>
+                                                        ) : (
+                                                            <span style={{
+                                                                padding: '2px 10px',
+                                                                borderRadius: '12px',
+                                                                fontSize: '11px',
+                                                                fontWeight: 600,
+                                                                backgroundColor: '#FEF3C7',
+                                                                color: '#92400E'
+                                                            }}>
+                                                                Sin asignar
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                                                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                                            <select
+                                                                value={valorActual}
+                                                                onChange={(e) => {
+                                                                    const selected = e.target.value
+                                                                    if (selected && selected !== areaFinal) {
+                                                                        handleAsignarAreaFinal(
+                                                                            p.codigoMatricula, 
+                                                                            selected, 
+                                                                            `${p.apellidos} ${p.nombres}`
+                                                                        )
+                                                                    }
+                                                                }}
+                                                                disabled={loadingAction}
+                                                                style={{
+                                                                    padding: '4px 8px',
+                                                                    borderRadius: '6px',
+                                                                    border: `1px solid ${t.inputBorder}`,
+                                                                    backgroundColor: dark ? '#2d2b3e' : '#fff',
+                                                                    color: t.inputText,
+                                                                    fontSize: '11px',
+                                                                    fontFamily: 'Poppins, sans-serif',
+                                                                    cursor: loadingAction ? 'not-allowed' : 'pointer',
+                                                                    minWidth: '120px',
+                                                                    opacity: loadingAction ? 0.6 : 1
+                                                                }}
+                                                            >
+                                                                <option value="">Seleccionar...</option>
+                                                                {opciones.map(opt => (
+                                                                    <option key={opt.value} value={opt.value}>
+                                                                        {opt.label}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                        {postulantesFase4Filtrados.length > 0 && (
+                            <div style={{ padding: '10px 16px', borderTop: `1px solid ${t.tableBorder}` }}>
+                                <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: t.bodyText, margin: 0 }}>
+                                    {postulantesFase4Filtrados.length} postulante{postulantesFase4Filtrados.length !== 1 ? 's' : ''} en Fase 4
+                                    {postulantesFase4Filtrados.length !== postulantesFase4.length && 
+                                        ` (${postulantesFase4.length - postulantesFase4Filtrados.length} ocultos por búsqueda)`}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                )}
                 </>
             )}
 

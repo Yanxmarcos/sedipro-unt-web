@@ -37,17 +37,43 @@ const PROJECTS = [
         imageAlt: "Imagen de Sedinvita",
     },
     {
-        id: "atlas",
+        id: "proyectando3",
         icon: Compass,
         iconLabel: "PROYECTANDO VOCACIONES",
         title: "PROYECTANDO VOCACIONES 3.0",
         description:
-            "Proyectando Vocaciones 3.0 es un espacio que orienta, inspira y acompaña a los jóvenes a descubrir su verdadera vocación y elegir su futuro con confianza.",
+            "Proyectando Vocaciones 3.0 fue un espacio que orientó, inspiró y acompañó a los jóvenes a descubrir su verdadera vocación y elegir su futuro con confianza.",
         meta: "Sábado 28 de febrero, 2026",
-        href: "https://proyectando-vocaciones.vercel.app/galeria",
+        href: "https://proyectando-vocaciones.vercel.app/galeria/pv3/",
         imageRatio: 912 / 1136,
         image: "/proyectos/proyectando_v.webp",
         imageAlt: "Imagen de Proyectando Vocaciones 3.0",
+    },
+    {
+        id: "proyectando2",
+        icon: Compass,
+        iconLabel: "PROYECTANDO VOCACIONES",
+        title: "PROYECTANDO VOCACIONES 2.0",
+        description:
+            "Proyectando Vocaciones 2.0 consolidó el proyecto como un espacio de orientación universitaria, fortaleciendo su impacto en la comunidad estudiantil.",
+        meta: "Sábado 22 de febrero, 2025",
+        href: "https://proyectando-vocaciones.vercel.app/galeria/pv2/",
+        imageRatio: 1024 / 1024,
+        image: "/proyectos/proyectando2.webp",
+        imageAlt: "Imagen de Proyectando Vocaciones 2.0",
+    },
+    {
+        id: "proyectando1",
+        icon: Compass,
+        iconLabel: "PROYECTANDO VOCACIONES",
+        title: "PROYECTANDO VOCACIONES 1.0",
+        description:
+            "Proyectando Vocaciones 1.0 fue el inicio de una idea que nació para conectar a los estudiantes con su vocación universitaria, brindándoles orientación e inspiración para dar sus primeros pasos hacia la elección de su futuro profesional.",
+        meta: "Viernes 16 de diciembre, 2022",
+        href: "https://proyectando-vocaciones.vercel.app/galeria/pv1/",
+        imageRatio: 1024 / 1024,
+        image: "/proyectos/proyectando.webp",
+        imageAlt: "Imagen de Proyectando Vocaciones 1.0",
     },
     
 ];

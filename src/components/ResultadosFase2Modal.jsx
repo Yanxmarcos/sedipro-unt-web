@@ -633,7 +633,7 @@ export default function ResultadosFase2Modal({ isOpen, onClose }) {
                             SEDInvita 2026
                         </h2>
                         <p className="text-xs text-[#d0bcff]/50">
-                            FASE 3
+                            RESULTADOS FASE 3
                         </p>
 
                         {(step === 0 || step === 1) && (

@@ -24,7 +24,7 @@ export default function Page() {
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
     const [error, setError] = useState(null)
-    const [faseSeleccionada, setFaseSeleccionada] = useState('fase3')
+    const [faseSeleccionada, setFaseSeleccionada] = useState('fase4')
 
     const fetchData = useCallback(async () => {
         setLoading(true)
