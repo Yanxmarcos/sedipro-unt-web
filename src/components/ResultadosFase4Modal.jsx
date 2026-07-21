@@ -13,6 +13,7 @@ import {
     Truck,
     Megaphone,
     ClipboardList,
+    Heart,
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -56,6 +57,78 @@ const PADRON_FASE4 = [
     { codigo: '1022700525', nombres: 'JEFFRAN ALBERTO', apellidos: 'SILVESTRE FERRER', area: 'TI' },
     { codigo: '1023300523', nombres: 'RICARDO BERNARDO', apellidos: 'VELÁSQUEZ GARCÍA', area: 'TI' },
     { codigo: '1010101625', nombres: 'JEFFERSON MOISES ', apellidos: 'SALAZAR LEON', area: 'PMO' },
+];
+
+// ─────────────────────────────────────────────────────────
+// LISTA DE NO INGRESANTES (con mensaje de motivación)
+// ─────────────────────────────────────────────────────────
+const LISTA_NO_INGRESANTES = [
+    { 
+        codigo: '1012400325', 
+        nombres: 'PIERO SEBASTIAN', 
+        apellidos: 'ARMAS REYES',
+        correo: 'psarmasr@unitru.edu.pe'
+    },
+    { 
+        codigo: '1514000324', 
+        nombres: 'JHEISON VALENTINO', 
+        apellidos: 'ARAUJO RUIZ',
+        correo: 'jvaraujor@unitru.edu.pe'
+    },
+    { 
+        codigo: '1100602325', 
+        nombres: 'JHUNIOR DENILSON', 
+        apellidos: 'AVALOS IBAÑEZ',
+        correo: 'jdavalosi@unitru.edu.pe'
+    },
+    { 
+        codigo: '1011300726', 
+        nombres: 'MANUEL', 
+        apellidos: 'UGAS BARRIGA',
+        correo: 'manuelub2007@gmail.com'
+    },
+    { 
+        codigo: '1090601225', 
+        nombres: 'CLAUDIA SABINA MAYUMI', 
+        apellidos: 'CHAVEZ COCHAYALLE',
+        correo: 'cschavezc@unitru.edu.pe'
+    },
+    { 
+        codigo: '1021500424', 
+        nombres: 'GIANFRANCO GABRIEL', 
+        apellidos: 'OSORIO PÉREZ',
+        correo: 'ggosoriop@unitru.edu.pe'
+    },
+    { 
+        codigo: '1012800325', 
+        nombres: 'TRAESY CAROLINA', 
+        apellidos: 'CHAVEZ GERONIMO',
+        correo: 'tcchavezg@unitru.edu.pe'
+    },
+    { 
+        codigo: '1023700225', 
+        nombres: 'DAYANA VALERIA', 
+        apellidos: 'CASTILLO RODRIGUEZ',
+        correo: 'Dvcastillor@unitru.edu.pe'
+    },
+    { 
+        codigo: '1091800625', 
+        nombres: 'RENZO ANIBAL', 
+        apellidos: 'ESCOBEDO ZAVALETA',
+        correo: 'raescobedoz@unitru.edu.pe'
+    },
+    { 
+        codigo: '1511301424', 
+        nombres: 'JUAN CARLOS', 
+        apellidos: 'RODRIGUEZ HERMENEGILDO',
+        correo: 'jcrodriguezh@unitru.edu.pe'
+    },
+    { 
+        codigo: '1022700324', 
+        nombres: 'ANGEL EDUARDO', 
+        apellidos: 'GUTIERREZ NAVARRO',
+        correo: 'aegutierrezn@unitru.edu.pe'
+    },
 ];
 
 // ─────────────────────────────────────────────────────────
@@ -198,7 +271,6 @@ const ResultadoAceptado = ({ postulante, onExit }) => {
             {/* Área asignada, temática */}
             <div className={`rounded-lg p-4 border ${config.badgeBg} ${config.badgeBorder}`}>
                 <p className="text-xs text-[#d0bcff]/60 mb-2 flex items-center justify-center gap-2">
-                    {/* <Icono size={14} className={config.iconColor} /> */}
                     Tu área en SEDIPRO UNT
                 </p>
                 <p className={`text-xl font-bold ${config.badgeText}`}>
@@ -209,23 +281,69 @@ const ResultadoAceptado = ({ postulante, onExit }) => {
                 </p>
             </div>
 
-            {/* Próximo paso */}
-            {/* <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 space-y-2">
-                <p className="text-xs text-amber-400 font-semibold justify-center flex items-center gap-2">
-                    <Calendar size={14} />
-                    Próximo paso
-                </p>
-                <p className="text-sm text-[#d0bcff] font-semibold">
-                    Nos pondremos en contacto contigo
-                </p>
-                <p className="text-xs text-[#d0bcff]/70 leading-relaxed">
-                    En los próximos días, un representante de <strong>{config.nombreCompleto}</strong> se estará comunicando contigo al número de celular que brindaste durante el proceso de postulación, para coordinar los siguientes pasos de tu incorporación.
-                </p>
-            </div> */}
-
             <button
                 onClick={onExit}
                 className="w-full mt-2 px-6 py-3 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-lg font-semibold hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+                Finalizar
+            </button>
+        </div>
+    );
+};
+
+// Componente de resultado - No ingresante (con mensaje de motivación)
+const ResultadoNoIngresante = ({ postulante, onReintentar }) => {
+    return (
+        <div className="space-y-6 text-center animate-fadeIn">
+            <div className="flex justify-center">
+                <div className="w-20 h-20 rounded-full bg-blue-500/20 border-2 border-blue-500/50 flex items-center justify-center animate-pulse">
+                    <Heart size={36} className="text-blue-400" />
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                    ¡No te desanimes!
+                </h3>
+
+                {/* Datos del estudiante */}
+                <div className="bg-[#3b0191]/30 border border-[#6b46c1]/30 rounded-lg p-4 space-y-2">
+                    <p className="text-sm font-mono text-[#d0bcff] break-all">
+                        <strong>Código:</strong> {postulante?.codigo || '---'}
+                    </p>
+                    <p className="text-sm font-mono text-[#d0bcff] break-all">
+                        <strong>Estudiante:</strong> {postulante?.nombres || ''} {postulante?.apellidos || ''}
+                    </p>
+                </div>
+
+                {/* Mensaje informativo del resultado */}
+                <div className="bg-[#3b0191]/30 border border-[#6b46c1]/30 rounded-lg p-4 space-y-3">
+                    <p className="text-sm text-[#d0bcff] leading-relaxed">
+                        Lamentamos informarte que no has superado la <strong>Fase 4</strong> del proceso de selección de <strong>SEDInvita 2026</strong>.
+                    </p>
+                    <p className="text-sm text-[#d0bcff] leading-relaxed">
+                        Queremos que sepas que <strong className="text-amber-400">tu esfuerzo y dedicación son valiosos</strong>. Cada paso que das te acerca más a tus metas.
+                    </p>
+                </div>
+
+                {/* Invitación a futuras convocatorias */}
+                <div className="bg-amber-500/20 border border-amber-500/30 rounded-lg p-4 space-y-2">
+                    <p className="text-sm text-amber-200 leading-relaxed">
+                        Te invitamos a seguir preparándote y a participar en futuras convocatorias.
+                    </p>
+                </div>
+
+                {/* Agradecimiento final */}
+                <div className="bg-[#3b0191]/30 border border-[#6b46c1]/30 rounded-lg p-4">
+                    <p className="text-sm text-[#d0bcff]/80">
+                        Gracias por formar parte de este proceso y por confiar en <strong className="text-[#d0bcff]">SEDIPRO UNT</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <button
+                onClick={onReintentar}
+                className="w-full px-6 py-3 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-lg font-semibold hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl"
             >
                 Finalizar
             </button>
@@ -266,7 +384,7 @@ const ResultadoNoEncontrado = ({ onReintentar }) => {
 
 // Componente principal
 export default function ResultadosFase4Modal({ isOpen, onClose }) {
-    const [step, setStep] = useState(0); // 0: Input código, 1: Aceptado, 2: No encontrado
+    const [step, setStep] = useState(0); // 0: Input código, 1: Aceptado, 2: No encontrado, 3: No ingresante (motivación)
     const [codigo, setCodigo] = useState('');
     const [postulante, setPostulante] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -303,13 +421,22 @@ export default function ResultadosFase4Modal({ isOpen, onClose }) {
 
         // Búsqueda local en el padrón (sin consumo de API)
         setTimeout(() => {
+            // Primero buscar en el padrón de aceptados
             const encontrado = PADRON_FASE4.find((p) => p.codigo === codigo);
-
+            
             if (encontrado) {
                 setPostulante(encontrado);
                 setStep(1);
             } else {
-                setStep(2);
+                // Si no está en el padrón, buscar en la lista de no ingresantes
+                const noIngresante = LISTA_NO_INGRESANTES.find((p) => p.codigo === codigo);
+                
+                if (noIngresante) {
+                    setPostulante(noIngresante);
+                    setStep(3); // Paso especial para no ingresantes
+                } else {
+                    setStep(2); // Código no encontrado en ninguna lista
+                }
             }
 
             setIsLoading(false);
@@ -431,6 +558,10 @@ export default function ResultadosFase4Modal({ isOpen, onClose }) {
 
                     {step === 2 && (
                         <ResultadoNoEncontrado onReintentar={handleReintentar} />
+                    )}
+
+                    {step === 3 && (
+                        <ResultadoNoIngresante postulante={postulante} onReintentar={handleReintentar} />
                     )}
 
                     {/* Footer - Solo en paso 0 */}
