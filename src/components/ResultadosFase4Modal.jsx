@@ -55,6 +55,7 @@ const PADRON_FASE4 = [
     { codigo: '1103300225', nombres: 'DIEGO STEFANO', apellidos: 'REYMUNDO VILCA', area: 'TI' },
     { codigo: '1022700525', nombres: 'JEFFRAN ALBERTO', apellidos: 'SILVESTRE FERRER', area: 'TI' },
     { codigo: '1023300523', nombres: 'RICARDO BERNARDO', apellidos: 'VELÁSQUEZ GARCÍA', area: 'TI' },
+    { codigo: '1010101625', nombres: 'JEFFERSON MOISES ', apellidos: 'SALAZAR LEON', area: 'PMO' },
 ];
 
 // ─────────────────────────────────────────────────────────
