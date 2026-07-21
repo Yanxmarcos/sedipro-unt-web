@@ -9,7 +9,8 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTiktok } from 'rea
 // import TurnoModal from "@/components/TurnoModal";
 // import TurnoTemporalModal from "@/components/TurnoTemporalModalProps";
 // import ResultadoFase2Modal from "@/components/ResultadosFase2Modal";
-import ResultadosFase3Modal from '@/components/ResultadosFase3Modal';
+// import ResultadosFase3Modal from '@/components/ResultadosFase3Modal';
+import ResultadosFase4Modal from '@/components/ResultadosFase4Modal';
 
 import MagicBento from "@/components/MagicBento";
 
@@ -283,15 +284,15 @@ export default function Home() {
     const [activeSection, setActiveSection] = useState('inicio');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const titulo_boton_cta = "Resultados Fase 3";
+    const titulo_boton_cta = "Resultados Fase 4";
 
     //Borrar luego
     // const [showTemporalModal, setShowTemporalModal] = useState(false);
 
     const CONFIG_FASES = {
-        1: { clase: 'glass-card' },
-        2: { clase: 'glass-card' },
-        3: { clase: 'glass-card' },
+        1: { clase: 'glass-card-selected-glow' },
+        2: { clase: 'glass-card-selected-glow' },
+        3: { clase: 'glass-card-selected-glow' },
         4: { clase: 'glass-card-selected-glow' }
     }
 
@@ -563,7 +564,7 @@ export default function Home() {
                         <div className="text-center mb-stack-lg space-y-4">
                             <h2 className="font-headline-lg text-headline-lg text-on-surface">Fases de SEDInvita</h2>
                             <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
-                                Diseñamos un camino estructurado para identificar el talento de cada estudiante. Nos encontramos en la <strong>Fase 4</strong> del proceso.
+                                Diseñamos un camino estructurado para identificar el talento de cada estudiante.
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-stack-md">
@@ -848,10 +849,10 @@ export default function Home() {
                     <div className="max-w-container-max mx-auto glass-card-extra-light rounded-[32px] p-stack-lg md:p-24 text-center space-y-stack-md relative z-10 border-white/5 backdrop-blur-sm">
                         <div className="absolute inset-0 bg-gradient-to-tr from-[#3b0191]/10 via-transparent to-[#6b46c1]/10 pointer-events-none rounded-[32px]"></div>
                         <h2 className="font-display-lg text-headline-lg md:text-[56px] text-on-surface leading-tight relative z-10">
-                            Cuarta Fase <br />de Selección.
+                            ¡Proceso de <br />Selección Finalizado!
                         </h2>
                         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto relative z-10">
-                            Evaluación final mediante entrevistas personales para seleccionar a los nuevos integrantes, quienes serán anunciados oficialmente y recibirán una calurosa bienvenida.
+                            Agradecemos a todos los postulantes por su participación y felicitamos a quienes forman parte de la nueva generación de SEDIPRO UNT. ¡Les damos la bienvenida!
                         </p>
                         <div className="pt-4 relative z-10">
                             <button onClick={openModal} className="px-8 py-4 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
@@ -979,7 +980,7 @@ export default function Home() {
                 isOpen={showTemporalModal}
                 onClose={() => setShowTemporalModal(false)}
             /> */}
-            <ResultadosFase3Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+            <ResultadosFase4Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </>
     );
 }
