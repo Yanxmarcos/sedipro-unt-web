@@ -19,7 +19,7 @@ export async function GET() {
         await connectToDatabase();
 
         const sedipranos = await Sediprano.find({})
-            .select('area nombres apellidos dni')
+            .select('area nombres apellidos dni createdAt updatedAt') // ← Agregar createdAt y updatedAt
             .sort({ area: 1, apellidos: 1 })
             .lean();
 

@@ -1,3 +1,4 @@
+// src/app/api/sedipranos/[id]/route.js
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import Sediprano from '@/models/Sediprano';
@@ -11,6 +12,7 @@ async function authenticate() {
     return verifyToken(token);
 }
 
+// src/app/api/sedipranos/[id]/route.js
 export async function PUT(request, { params }) {
     try {
         const payload = await authenticate();
@@ -44,7 +46,7 @@ export async function PUT(request, { params }) {
                 dni: dni.trim(),
             },
             { new: true, runValidators: true }
-        ).select('area nombres apellidos dni');
+        ).select('area nombres apellidos dni createdAt updatedAt'); // ← Agregar createdAt y updatedAt
 
         if (!updated) {
             return NextResponse.json({ error: 'Sediprano no encontrado' }, { status: 404 });

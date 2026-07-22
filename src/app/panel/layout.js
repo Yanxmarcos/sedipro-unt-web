@@ -63,7 +63,7 @@ function SideNavGroup({ item, pathname, hideLabel, theme, open, onToggle, onLink
         <div className="sdp-navgroup" style={{ marginBottom: '2px', position: 'relative' }}>
             {hideLabel ? (
                 <Link
-                    href={item.children[0].href}
+                    href={item.children?.[0]?.href || '/'} 
                     onClick={onLinkClick}
                     title={item.label}
                     style={{

@@ -178,10 +178,11 @@ const COLUMNS = [
     { key: 'apellidos', label: 'Apellidos', sortable: true,  width: 'auto'                   },
     { key: 'dni',       label: 'DNI',       sortable: true,  width: '120px', align: 'center' },
     { key: 'area',      label: 'Área',      sortable: true,  width: '150px', align: 'center' },
+    { key: 'fechas',    label: 'Fechas',    sortable: false, width: '200px', align: 'center' },
     { key: 'acciones',  label: 'Acciones',  sortable: false, width: '96px',  align: 'center' },
 ]
 
-const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
+const PAGE_SIZE_OPTIONS = [50, 100, 200]
 
 function Toast({ toast }) {
     if (!toast) return null
@@ -547,13 +548,15 @@ export default function SedipranosTable() {
     const [search, setSearch]       = useState('')
     const [sort, setSort]           = useState({ key: 'apellidos', dir: 'asc' })
     const [page, setPage]           = useState(1)
-    const [pageSize, setPageSize]   = useState(10)
+    const [pageSize, setPageSize]   = useState(200)
 
     // CRUD state
     const [modal,      setModal]      = useState(null)  // null | { mode: 'create'|'edit', row: null|{} }
     const [confirmDel, setConfirmDel] = useState(null)  // null | row
     const [deleting,   setDeleting]   = useState(false)
     const [toast,      setToast]      = useState(null)  // null | { type, msg }
+
+    const [areaFilter, setAreaFilter] = useState('')
 
     // ── Dark mode (misma lógica del proyecto) ──
     useEffect(() => {
@@ -634,15 +637,24 @@ export default function SedipranosTable() {
     // ── Filtrado + orden ──
     const filtered = useMemo(() => {
         const q = search.trim().toLowerCase()
-        let rows = q
-            ? data.filter(r =>
+        let rows = data
+        
+        // Filtro por búsqueda
+        if (q) {
+            rows = rows.filter(r =>
                 r.nombres.toLowerCase().includes(q)   ||
                 r.apellidos.toLowerCase().includes(q) ||
                 r.dni.includes(q)                     ||
                 r.area.toLowerCase().includes(q)
-              )
-            : data
+            )
+        }
+        
+        // Filtro por área
+        if (areaFilter) {
+            rows = rows.filter(r => r.area === areaFilter)
+        }
 
+        // Ordenamiento
         if (sort.key && sort.key !== 'index' && sort.key !== 'acciones') {
             rows = [...rows].sort((a, b) => {
                 const av = (a[sort.key] ?? '').toLowerCase()
@@ -653,7 +665,7 @@ export default function SedipranosTable() {
             })
         }
         return rows
-    }, [data, search, sort])
+    }, [data, search, areaFilter, sort])
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
     const safePage   = Math.min(page, totalPages)
@@ -743,14 +755,14 @@ export default function SedipranosTable() {
 
             {/* ── Tarjeta resumen ── */}
             <div style={{ ...card, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{
+                {/* <div style={{
                     width: '52px', height: '52px', borderRadius: '14px', flexShrink: 0,
                     background: 'linear-gradient(135deg, #672577, #3454A1)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     color: '#fff', boxShadow: '0 4px 14px rgba(103,37,119,0.35)',
                 }}>
                     <Ico.Users />
-                </div>
+                </div> */}
                 <div>
                     <p style={{ fontFamily: 'Poppins, sans-serif', fontSize: '12px', color: t.bodyText, margin: 0 }}>
                         Total de Sedipranos
@@ -777,8 +789,8 @@ export default function SedipranosTable() {
                                 fontFamily: 'Poppins, sans-serif', fontSize: '11px', fontWeight: 600,
                                 color: c.text, whiteSpace: 'nowrap',
                             }}>
-                                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: c.text, flexShrink: 0 }} />
-                                {area} · {count}
+                                {/* <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: c.text, flexShrink: 0 }} /> */}
+                                {area}: {count}
                             </span>
                         )
                     })}
@@ -818,6 +830,7 @@ export default function SedipranosTable() {
 
                     {/* Buscador + botón Agregar */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                        {/* Buscador */}
                         <div style={{ position: 'relative' }}>
                             <span style={{
                                 position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)',
@@ -833,7 +846,7 @@ export default function SedipranosTable() {
                                 style={{
                                     paddingLeft: '34px', paddingRight: '12px',
                                     paddingTop: '7px', paddingBottom: '7px',
-                                    width: '220px', maxWidth: '100%',
+                                    width: '200px', maxWidth: '100%',
                                     fontSize: '13px', fontFamily: 'Poppins, sans-serif',
                                     borderRadius: '10px', border: `1px solid ${t.inputBorder}`,
                                     backgroundColor: t.inputBg, color: t.inputText,
@@ -844,6 +857,44 @@ export default function SedipranosTable() {
                             />
                         </div>
 
+                        {/* Selector de filtro por área */}
+                        <select
+                            value={areaFilter}
+                            onChange={e => {
+                                setAreaFilter(e.target.value)
+                                setPage(1) // Resetear a página 1 al cambiar filtro
+                            }}
+                            style={{
+                                padding: '7px 32px 7px 12px',
+                                fontSize: '13px', fontFamily: 'Poppins, sans-serif',
+                                borderRadius: '10px', border: `1px solid ${t.inputBorder}`,
+                                backgroundColor: t.inputBg, color: t.inputText,
+                                outline: 'none', cursor: 'pointer', appearance: 'none',
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23672577' strokeWidth='2.5' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'right 10px center',
+                                minWidth: '150px',
+                                transition: 'border-color 0.15s, box-shadow 0.15s',
+                            }}
+                            onFocus={e => { e.currentTarget.style.borderColor = '#672577'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(103,37,119,0.13)' }}
+                            onBlur={e => { e.currentTarget.style.borderColor = t.inputBorder; e.currentTarget.style.boxShadow = 'none' }}
+                        >
+                            <option value="">Todas las áreas</option>
+                            {AREAS.map(area => {
+                                const color = getAreaColor(area)
+                                return (
+                                    <option key={area} value={area} style={{ 
+                                        backgroundColor: color.bg,
+                                        color: color.text,
+                                        fontWeight: 600
+                                    }}>
+                                        {area}
+                                    </option>
+                                )
+                            })}
+                        </select>
+
+                        {/* Botón Agregar */}
                         <button
                             onClick={() => setModal({ mode: 'create', row: null })}
                             style={{
@@ -931,11 +982,11 @@ export default function SedipranosTable() {
                                         </td>
                                         {/* Nombres */}
                                         <td style={{ padding: '12px 16px', fontFamily: 'Poppins, sans-serif', fontSize: '13px', color: dark ? '#EAD8F5' : '#111827', fontWeight: 500 }}>
-                                            {row.nombres}
+                                            {row.nombres.toUpperCase()}
                                         </td>
                                         {/* Apellidos */}
                                         <td style={{ padding: '12px 16px', fontFamily: 'Poppins, sans-serif', fontSize: '13px', color: dark ? '#EAD8F5' : '#111827' }}>
-                                            {row.apellidos}
+                                            {row.apellidos.toUpperCase()}
                                         </td>
                                         {/* DNI */}
                                         <td style={{ textAlign: 'center', padding: '12px 16px' }}>
@@ -959,6 +1010,32 @@ export default function SedipranosTable() {
                                             }}>
                                                 {row.area}
                                             </span>
+                                        </td>
+                                        {/* Fechas - Nueva columna */}
+                                        <td style={{ 
+                                            padding: '8px 12px', 
+                                            textAlign: 'center',
+                                            fontSize: '11px',
+                                            fontFamily: 'Poppins, sans-serif',
+                                        }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                                <div style={{ 
+                                                    color: dark ? '#9880B0' : '#6B7280',
+                                                    fontSize: '10px',
+                                                    fontWeight: 400,
+                                                }}>
+                                                    <span style={{ opacity: 0.6 }}>Creado: </span>
+                                                    {formatDate(row.createdAt)}
+                                                </div>
+                                                <div style={{ 
+                                                    color: dark ? '#9880B0' : '#6B7280',
+                                                    fontSize: '10px',
+                                                    fontWeight: 400,
+                                                }}>
+                                                    <span style={{ opacity: 0.6 }}>Actualizado: </span>
+                                                    {formatDate(row.updatedAt)}
+                                                </div>
+                                            </div>
                                         </td>
                                         {/* Acciones */}
                                         <td style={{ textAlign: 'center', padding: '8px 16px' }}>
@@ -1067,4 +1144,16 @@ export default function SedipranosTable() {
             `}</style>
         </div>
     )
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'No registrado'
+    const date = new Date(dateString)
+    return date.toLocaleDateString('es-PE', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    })
 }
