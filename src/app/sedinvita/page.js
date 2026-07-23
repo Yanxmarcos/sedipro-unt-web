@@ -2,15 +2,16 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
-import { Check, Heart, Menu, X, Lock , ArrowUp} from 'lucide-react';
+import { Check, Heart, Menu, X, Lock, ArrowUp, ExternalLink } from 'lucide-react';
 import Link from 'next/link'
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTiktok } from 'react-icons/fa';
+import { createPortal } from 'react-dom';
 
 // import TurnoModal from "@/components/TurnoModal";
 // import TurnoTemporalModal from "@/components/TurnoTemporalModalProps";
 // import ResultadoFase2Modal from "@/components/ResultadosFase2Modal";
 // import ResultadosFase3Modal from '@/components/ResultadosFase3Modal';
-import ResultadosFase4Modal from '@/components/ResultadosFase4Modal';
+// import ResultadosFase4Modal from '@/components/ResultadosFase4Modal';
 
 import MagicBento from "@/components/MagicBento";
 
@@ -256,17 +257,42 @@ const ScrollToTopButton = () => {
     return (
         <button
             onClick={scrollToTop}
-            className={`fixed bottom-8 right-8 z-50 p-4 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-full shadow-2xl shadow-primary/30 hover:scale-110 transition-all duration-500 ${
-                isFooterVisible 
-                    ? 'opacity-100 translate-y-0 pointer-events-auto' 
+            className={`fixed bottom-8 right-8 z-50 p-4 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-full shadow-2xl shadow-primary/30 hover:scale-110 transition-all duration-500 ${isFooterVisible
+                    ? 'opacity-100 translate-y-0 pointer-events-auto'
                     : 'opacity-0 translate-y-10 pointer-events-none'
-            }`}
+                }`}
             aria-label="Volver arriba"
         >
             <ArrowUp size={24} strokeWidth={2.5} />
         </button>
     );
 };
+
+const posters = [
+    { id: 1, src: '/sedinvita-2026-nuevos/gth-1.webp', alt: 'Poster Nuevos Talentos 1', area: 'GTH' },
+    { id: 2, src: '/sedinvita-2026-nuevos/gth-2.webp', alt: 'Poster Nuevos Talentos 2', area: 'GTH' },
+    { id: 3, src: '/sedinvita-2026-nuevos/ltk-1.webp', alt: 'Poster Nuevos Talentos 3', area: 'LTK & FNZ' },
+    { id: 4, src: '/sedinvita-2026-nuevos/ltk-2.webp', alt: 'Poster Nuevos Talentos 4', area: 'LTK & FNZ' },
+    { id: 5, src: '/sedinvita-2026-nuevos/pmo-1.webp', alt: 'Poster Nuevos Talentos 5', area: 'PMO' },
+    { id: 6, src: '/sedinvita-2026-nuevos/pmo-2.webp', alt: 'Poster Nuevos Talentos 6', area: 'PMO' },
+    { id: 7, src: '/sedinvita-2026-nuevos/mkt-1.webp', alt: 'Poster Nuevos Talentos 7', area: 'MKT' },
+    { id: 8, src: '/sedinvita-2026-nuevos/mkt-2.webp', alt: 'Poster Nuevos Talentos 8', area: 'MKT' },
+    { id: 9, src: '/sedinvita-2026-nuevos/ti-1.webp', alt: 'Poster Nuevos Talentos 9', area: 'TI' },
+    { id: 10, src: '/sedinvita-2026-nuevos/ti-2.webp', alt: 'Poster Nuevos Talentos 10', area: 'TI' },
+];
+
+const getAreaColor = (area) => {
+    const colors = {
+        'GTH': 'bg-emerald-500/90 border-emerald-400',
+        'MKT': 'bg-red-500/90 border-red-400',
+        'TI': 'bg-orange-500/90 border-orange-400',
+        'LTK & FNZ': 'bg-cyan-500/90 border-cyan-400',
+        'PMO': 'bg-yellow-500/90 border-yellow-400',
+    };
+    return colors[area] || 'bg-purple-500/90 border-purple-400';
+};
+
+const POSTER_FACEBOOK_URL = "https://www.facebook.com/SediproUNT/posts/pfbid01BJrDZekyKLtRutoqR4XEcqeJNYmb4HTQeSqeJ7qPWr4Dz9wrC8QyBnaUFsTQ9R3l?rdid=HCAEmQtRYaAz5rPy#";
 
 const images = [
     { src: '/img/hito1.webp', alt: 'Hito 1' },
@@ -283,8 +309,10 @@ export default function Home() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('inicio');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedPoster, setSelectedPoster] = useState(null);
+    const [isPosterModalOpen, setIsPosterModalOpen] = useState(false);
 
-    const titulo_boton_cta = "Resultados Fase 4";
+    const titulo_boton_cta = "Nuevos Talentos";
 
     //Borrar luego
     // const [showTemporalModal, setShowTemporalModal] = useState(false);
@@ -386,6 +414,30 @@ export default function Home() {
         setIsModalOpen(true); // Cambiar por setShowTemporalModal cuando tovia no este activo o setIsModalOpen
     };
 
+    // Función para abrir el modal del poster
+    const openPosterModal = (poster) => {
+        setSelectedPoster(poster);
+        setIsPosterModalOpen(true);
+    };
+
+    // Función para cerrar el modal del poster
+    const closePosterModal = () => {
+        setIsPosterModalOpen(false);
+        setTimeout(() => setSelectedPoster(null), 300);
+    };
+
+    const scrollToNuevosTalentos = (e) => {
+        e.preventDefault();
+        const section = document.getElementById('nuevos-talentos');
+        if (section) {
+            section.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            });
+        }
+        setMobileMenuOpen(false);
+    };
+
     return (
         <>
             {/* TopNavBar - Actualizado con gradiente hero */}
@@ -414,7 +466,15 @@ export default function Home() {
                     >
                         Inicio
                     </a>
-
+                    <a
+                        href="#nuevos-talentos"
+                        className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'nuevos-talentos'
+                            ? 'text-on-surface-variant font-bold hover:text-primary border-b-2'
+                            : 'text-on-surface-variant/60 border-on-surface-variant/60 font-medium'
+                            }`}
+                    >
+                        Nuevos Talentos
+                    </a>
                     <a
                         href="#fases"
                         className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'fases'
@@ -433,7 +493,6 @@ export default function Home() {
                     >
                         Beneficios
                     </a>
-
                     <a
                         href="#areas"
                         className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'areas'
@@ -443,14 +502,15 @@ export default function Home() {
                     >
                         Áreas
                     </a>
-
                 </div>
                 <div className="flex items-center gap-4">
-                    <button 
-                    onClick={openModal}
-                    className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-full font-label-md text-label-md font-bold active:scale-105 hover:scale-105 transform transition-transform duration-200 shadow-lg">
+                    <a
+                        href="#nuevos-talentos"
+                        onClick={scrollToNuevosTalentos}
+                        className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-full font-label-md text-label-md font-bold active:scale-105 hover:scale-105 transform transition-transform duration-200 shadow-lg"
+                    >
                         {titulo_boton_cta}
-                    </button>
+                    </a>
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className="md:hidden text-on-surface"
@@ -475,19 +535,24 @@ export default function Home() {
                             Inicio
                         </a>
                         <a
+                            href="#nuevos-talentos"
+                            onClick={() => {
+                                setMobileMenuOpen(false);
+                                setTimeout(() => {
+                                    document.getElementById('nuevos-talentos')?.scrollIntoView({ behavior: 'smooth' });
+                                }, 100);
+                            }}
+                            className="font-semibold text-on-surface"
+                        >
+                            Nuevos Talentos
+                        </a>
+                        <a
                             href="#fases"
                             onClick={() => setMobileMenuOpen(false)}
                             className="font-semibold text-on-surface"
                         >
                             Fases
                         </a>
-                        {/* <a
-                            href="#resultados"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="font-semibold text-on-surface"
-                        >
-                            Resultados
-                        </a> */}
                         <a
                             href="#beneficios"
                             onClick={() => setMobileMenuOpen(false)}
@@ -502,9 +567,19 @@ export default function Home() {
                         >
                             Áreas
                         </a>
-                        <button onClick={openModal} className="mt-2 px-6 py-3 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-xl font-bold">
+                        <a
+                            href="#nuevos-talentos"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setMobileMenuOpen(false);
+                                setTimeout(() => {
+                                    document.getElementById('nuevos-talentos')?.scrollIntoView({ behavior: 'smooth' });
+                                }, 100);
+                            }}
+                            className="mt-2 px-6 py-3 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-xl font-bold text-center"
+                        >
                             {titulo_boton_cta}
-                        </button>
+                        </a>
                     </div>
                 </div>
             )}
@@ -514,14 +589,14 @@ export default function Home() {
                 <section className="relative min-h-screen flex items-center pt-24 overflow-hidden hero-gradient" id="inicio">
                     {/* Fondo de respaldo inmediato (se ve mientras carga el shader) */}
                     <div className="absolute inset-0 z-[-1] hero-gradient"></div>
-                    
+
                     {/* ShaderBackground como fondo principal */}
                     <div className="absolute inset-0 z-0">
                         <ShaderBackground />
                     </div>
-                    
+
                     {/* Overlay con gradiente hero */}
-                    <div className="absolute inset-0 z-[1]" style={{ 
+                    <div className="absolute inset-0 z-[1]" style={{
                         background: "linear-gradient(135deg, rgba(11, 19, 38, 0.7) 0%, rgba(59, 1, 145, 0.6) 50%, rgba(107, 70, 193, 0.5) 100%)"
                     }}></div>
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop w-full grid grid-cols-1 md:grid-cols-2 gap-stack-lg items-center relative z-10">
@@ -530,14 +605,14 @@ export default function Home() {
                                 Conecta, lidera y <br /><span className="text-primary-container">transforma</span> tu futuro académico.
                             </h1>
                             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-lg mx-auto md:mx-0">
-                                Únete a la comunidad de líderes más influyente de la UNT. <strong>SEDInvita 2026</strong> es el punto de partida para tu crecimiento profesional y personal.
+                                Únete a la comunidad de líderes más influyente de la UNT. <strong>SEDInvita</strong> es el punto de partida para tu crecimiento profesional y personal.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                                <button onClick={openModal} className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
+                                <button onClick={scrollToNuevosTalentos} className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
                                     {titulo_boton_cta}
                                 </button>
-                                <a href="#fases" className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
-                                    Fase Actual
+                                <a href="https://sediprount.org" target='_blank' className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
+                                    SEDIPRO UNT
                                 </a>
                             </div>
                         </div>
@@ -554,6 +629,89 @@ export default function Home() {
                                     src={images[currentImageIndex].src}
                                 />
                             </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Sección Nuevos Talentos */}
+                <section className="py-stack-lg bg-gradient-to-b from-[#0b1326] via-[#1a0a3a] to-[#0b1326] relative overflow-hidden" id="nuevos-talentos">
+                    {/* Fondo con efecto de estrellas sutil */}
+                    <div className="absolute inset-0 opacity-30">
+                        <div className="absolute inset-0" style={{
+                            backgroundImage: `radial-gradient(2px 2px at 20px 30px, #6b46c1, transparent),
+                                             radial-gradient(2px 2px at 40px 70px, #3b0191, transparent),
+                                             radial-gradient(2px 2px at 50px 160px, #6b46c1, transparent),
+                                             radial-gradient(2px 2px at 90px 40px, #3b0191, transparent),
+                                             radial-gradient(2px 2px at 130px 80px, #6b46c1, transparent)`,
+                            backgroundSize: '200px 200px',
+                            backgroundRepeat: 'repeat',
+                        }} />
+                    </div>
+
+                    <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop relative z-10">
+                        <div className="text-center mb-stack-lg space-y-4">
+                            <h2 className="font-headline-lg text-headline-lg md:text-display-lg text-on-surface leading-tight">
+                                Conoce nuestros <span className="text-primary">Nuevos Talentos</span>
+                            </h2>
+                            <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+                                Descubre a los estudiantes que destacaron en el proceso de selección y que hoy forman parte de la Generación 2026 de <strong>SEDIPRO UNT.</strong>
+                            </p>
+                        </div>
+
+                        {/* Grid de Posters - Responsive */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 auto-rows-fr">
+                            {posters.map((poster) => (
+                                <div
+                                    key={poster.id}
+                                    onClick={() => openPosterModal(poster)}
+                                    className="group relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#1a0a3a] to-[#0b1326] border border-[#6b46c1]/20 hover:border-[#6b46c1]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-2 cursor-pointer"
+                                >
+                                    <div className="aspect-[1080/1355] relative">
+                                        <Image
+                                            src={poster.src}
+                                            alt={poster.alt}
+                                            fill
+                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+                                            loading="lazy"
+                                        />
+
+                                        {/* Overlay con icono de ampliar */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-4">
+                                            <div className="flex items-center gap-2 bg-[#3b0191]/90 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 border border-[#6b46c1]/40">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                    <circle cx="11" cy="11" r="8"></circle>
+                                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                                    <line x1="11" y1="8" x2="11" y2="14"></line>
+                                                    <line x1="8" y1="11" x2="14" y2="11"></line>
+                                                </svg>
+                                            </div>
+                                        </div>
+
+                                        {/* Borde brillante en hover */}
+                                        <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#6b46c1]/40 rounded-2xl transition-all duration-500 pointer-events-none"></div>
+
+                                        {/* Badge del Área con color personalizado */}
+                                        <div className={`absolute top-2 right-2 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full border shadow-lg ${getAreaColor(poster.area)}`}>
+                                            {poster.area}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Botón de ver en Facebook */}
+                        <div className="text-center mt-12">
+                            <a
+                                href={POSTER_FACEBOOK_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#1877f2] to-[#0d65d9] text-white rounded-2xl font-bold shadow-xl shadow-[#1877f2]/20 hover:scale-105 transition-all duration-300"
+                            >
+                                <FaFacebookF size={20} />
+                                Ver en Facebook
+                                <ExternalLink size={18} />
+                            </a>
                         </div>
                     </div>
                 </section>
@@ -643,7 +801,7 @@ export default function Home() {
                         </div>
                     </div>
                 </section>
-                
+
                 {/* PUBLICACION DE RESULTADOS */}
                 {/* <section className="py-stack-lg bg-surface-container-lowest relative overflow-hidden" id="resultados">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
@@ -657,46 +815,72 @@ export default function Home() {
                     </div>
                 </section> */}
 
-                {/* Video Section */}
-                {/* <section className="py-stack-lg bg-surface" id="video">
-                    <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-                        <div className="flex justify-center">
-                            <iframe
-                                src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1865576567446700%2F&show_text=false&width=560&t=0"
-                                className="w-full max-w-6xl rounded-2xl shadow-xl"
-                                style={{
-                                    border: "none",
-                                    overflow: "hidden",
-                                    aspectRatio: "16 / 9",
-                                    height: "auto",
-                                }}
-                                scrolling="no"
-                                frameBorder="0"
-                                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                                allowFullScreen
-                            />
-                        </div>
-                    </div>
-                </section> */}
-
                 {/* Benefits Section */}
                 <section className="py-stack-lg bg-surface relative overflow-hidden" id="beneficios">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-10">
-                        <div className="flex justify-center">
-                            <iframe
-                                src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1865576567446700%2F&show_text=false&width=560&t=0"
-                                className="w-full max-w-6xl rounded-2xl shadow-xl"
-                                style={{
-                                    border: "none",
-                                    overflow: "hidden",
-                                    aspectRatio: "16 / 9",
-                                    height: "auto",
-                                }}
-                                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                                allowFullScreen
-                            />
-                        </div>
-                    </div>
+    <div className="text-center mb-12 mt-6">
+        <h3 className="font-headline-lg text-headline-lg font-bold text-on-surface">
+            SEDInvita 2026
+        </h3>
+        <p className="mt-2 font-body-md text-body-md text-on-surface-variant">
+            Conoce más sobre SEDIPRO UNT y descubre lo que significa formar parte de nuestra comunidad.
+        </p>
+    </div>
+
+    {/* Reels */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 max-w-6xl mx-auto">
+        <iframe
+            src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1799701534555046%2F&show_text=false&width=267&t=0"
+            className="w-full rounded-2xl shadow-xl"
+            style={{
+                border: "none",
+                overflow: "hidden",
+                aspectRatio: "9 / 16",
+            }}
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            allowFullScreen
+        />
+
+        <iframe
+            src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F2077073693192449%2F&show_text=false&width=267&t=0"
+            className="w-full rounded-2xl shadow-xl"
+            style={{
+                border: "none",
+                overflow: "hidden",
+                aspectRatio: "9 / 16",
+            }}
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            allowFullScreen
+        />
+
+        <iframe
+            src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F2807551126258579%2F&show_text=false&width=267&t=0"
+            className="w-full rounded-2xl shadow-xl"
+            style={{
+                border: "none",
+                overflow: "hidden",
+                aspectRatio: "9 / 16",
+            }}
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            allowFullScreen
+        />
+    </div>
+
+    {/* Video principal */}
+    <div className="max-w-6xl mx-auto">
+        <iframe
+            src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1865576567446700%2F&show_text=false&width=560&t=0"
+            className="w-full rounded-2xl shadow-xl"
+            style={{
+                border: "none",
+                overflow: "hidden",
+                aspectRatio: "16 / 9",
+            }}
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            allowFullScreen
+        />
+    </div>
+</div>
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-stack-lg items-center">
                         <div className="lg:col-span-5 space-y-stack-md">
                             <h2 className="font-display-lg text-headline-lg md:text-display-lg text-on-surface leading-tight">
@@ -743,8 +927,8 @@ export default function Home() {
                         </div>
                         <div className="lg:col-span-7 grid grid-cols-2 gap-4">
                             <div className="space-y-4 pt-12">
-                                <a 
-                                    href="https://www.facebook.com/SediproUNT/posts/pfbid02PjWsMHJDriaFfzskH2fn9TSmxpFtC1gJ8TG7HDKeGfsY2Q55u6f6MSGXpzPBgUwvl" 
+                                <a
+                                    href="https://www.facebook.com/SediproUNT/posts/pfbid02PjWsMHJDriaFfzskH2fn9TSmxpFtC1gJ8TG7HDKeGfsY2Q55u6f6MSGXpzPBgUwvl"
                                     className="aspect-square rounded-2xl bg-surface-variant overflow-hidden relative block hover:opacity-90 transition-opacity"
                                     target="_blank" // Opcional: abre en nueva pestaña
                                     rel="noopener noreferrer" // Seguridad para target="_blank"
@@ -757,8 +941,8 @@ export default function Home() {
                                         sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
                                 </a>
-                                <a 
-                                    href="https://www.facebook.com/photo.php?fbid=1276527767972830&set=pb.100068468572320.-2207520000&type=3" 
+                                <a
+                                    href="https://www.facebook.com/photo.php?fbid=1276527767972830&set=pb.100068468572320.-2207520000&type=3"
                                     className="aspect-[4/3] rounded-2xl overflow-hidden relative block hover:opacity-90 transition-opacity"
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -773,8 +957,8 @@ export default function Home() {
                                 </a>
                             </div>
                             <div className="space-y-4">
-                                <a 
-                                    href="https://www.facebook.com/photo.php?fbid=1276582514634022&set=pb.100068468572320.-2207520000&type=3" 
+                                <a
+                                    href="https://www.facebook.com/photo.php?fbid=1276582514634022&set=pb.100068468572320.-2207520000&type=3"
                                     className="aspect-[4/3] rounded-2xl overflow-hidden relative block hover:opacity-90 transition-opacity"
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -787,8 +971,8 @@ export default function Home() {
                                         sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
                                 </a>
-                                <a 
-                                    href="https://www.facebook.com/photo.php?fbid=1243271171298490&set=pb.100068468572320.-2207520000&type=3" 
+                                <a
+                                    href="https://www.facebook.com/photo.php?fbid=1243271171298490&set=pb.100068468572320.-2207520000&type=3"
                                     className="aspect-square rounded-2xl bg-surface-variant overflow-hidden relative block hover:opacity-90 transition-opacity"
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -815,7 +999,7 @@ export default function Home() {
                                 Conoce nuestras áreas y atrévete a ser el próximo fichaje de SEDIPRO UNT. Tu próxima gran oportunidad comienza aquí.
                             </p>
                         </div>
-                        <MagicBento 
+                        <MagicBento
                             textAutoHide={true}
                             enableStars
                             enableSpotlight
@@ -854,21 +1038,26 @@ export default function Home() {
                         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto relative z-10">
                             Agradecemos a todos los postulantes por su participación y felicitamos a quienes forman parte de la nueva generación de SEDIPRO UNT. ¡Les damos la bienvenida!
                         </p>
-                        <div className="pt-4 relative z-10">
+                        {/* <div className="pt-4 relative z-10">
                             <button onClick={openModal} className="px-8 py-4 bg-gradient-to-r from-[#3b0191] to-[#6b46c1] text-white rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
                                 {titulo_boton_cta}
                             </button>
-                        </div>
+                        </div> */}
                     </div>
                 </section>
             </main>
-            
+
             <ScrollToTopButton />
             {/* Footer */}
             <footer className="bg-surface-container-lowest border-t border-outline-variant/30 py-12">
                 <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-stack-md">
-                        <div className="flex flex-col gap-2 items-center md:items-start">
+                        <a
+                            href="https://sediprount.org"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex flex-col gap-2 items-center md:items-start hover:opacity-90 transition-opacity"
+                        >
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 relative">
                                     <Image
@@ -879,16 +1068,19 @@ export default function Home() {
                                         className="w-auto h-auto object-contain"
                                     />
                                 </div>
-                                <span className="text-label-md font-headline-md font-bold text-on-surface">SEDIPRO UNT</span>
+                                <span className="text-label-md font-headline-md font-bold text-on-surface">
+                                    SEDIPRO UNT
+                                </span>
                             </div>
+
                             <p className="font-body-md text-body-md text-on-surface-variant font-label-sm text-label-sm">
                                 Sección Estudiantil de Dirección de
                             </p>
+
                             <p className="font-body-md text-body-md text-on-surface-variant font-label-sm text-label-sm">
                                 Proyectos de la UNT.
                             </p>
-                        </div>
-
+                        </a>
                         <div className="flex gap-4">
                             <a
                                 href="https://www.facebook.com/SediproUNT"
@@ -980,7 +1172,311 @@ export default function Home() {
                 isOpen={showTemporalModal}
                 onClose={() => setShowTemporalModal(false)}
             /> */}
-            <ResultadosFase4Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+            {/* <ResultadosFase4Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} /> */}
+            {/* Poster Modal */}
+            <PosterModal
+                isOpen={isPosterModalOpen}
+                onClose={closePosterModal}
+                image={selectedPoster?.src}
+                area={selectedPoster?.area}
+            />
         </>
     );
 }
+
+// Componente Modal Mejorado con soporte táctil
+const PosterModal = ({ isOpen, onClose, image, area }) => {
+    const overlayRef = useRef(null);
+    const contentRef = useRef(null);
+    const startYRef = useRef(0);
+    const startXRef = useRef(0);
+    const scrollPositionRef = useRef(0);
+
+    // Color del área para el glow
+    const getGlowColor = (area) => {
+        const colors = {
+            'GTH': '16, 185, 129',    // Emerald
+            'MKT': '239, 68, 68',     // Red
+            'TI': '249, 115, 22',     // Orange
+            'LTK & FNZ': '6, 182, 212', // Cyan
+            'PMO': '234, 179, 8',     // Yellow
+        };
+        return colors[area] || '107, 70, 193';
+    };
+
+    const glowColor = getGlowColor(area);
+
+    useEffect(() => {
+        if (isOpen) {
+            scrollPositionRef.current = window.scrollY;
+            document.body.style.overflow = 'hidden';
+            document.body.style.width = '100%';
+        } else {
+            document.body.style.overflow = '';
+            document.body.style.touchAction = '';
+            document.body.style.width = '';
+            window.scrollTo(0, scrollPositionRef.current);
+        }
+        return () => {
+            document.body.style.overflow = '';
+            document.body.style.touchAction = '';
+            document.body.style.width = '';
+        };
+    }, [isOpen]);
+
+    // Manejar gestos táctiles para cerrar
+    useEffect(() => {
+        if (!isOpen || !overlayRef.current) return;
+
+        const handleTouchStart = (e) => {
+            startYRef.current = e.touches[0].clientY;
+            startXRef.current = e.touches[0].clientX;
+        };
+
+        const handleTouchEnd = (e) => {
+            const endY = e.changedTouches[0].clientY;
+            const endX = e.changedTouches[0].clientX;
+            const diffY = endY - startYRef.current;
+            const diffX = endX - startXRef.current;
+
+            if (Math.abs(diffY) > 80 && Math.abs(diffY) > Math.abs(diffX)) {
+                onClose();
+            }
+        };
+
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        const overlay = overlayRef.current;
+        overlay.addEventListener('touchstart', handleTouchStart, { passive: true });
+        overlay.addEventListener('touchend', handleTouchEnd, { passive: true });
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            overlay.removeEventListener('touchstart', handleTouchStart);
+            overlay.removeEventListener('touchend', handleTouchEnd);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isOpen, onClose]);
+
+    if (!isOpen) return null;
+
+    return createPortal(
+        <div
+            ref={overlayRef}
+            className="modal-overlay"
+            onClick={onClose}
+            style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'linear-gradient(135deg, rgba(11,19,38,0.92) 0%, rgba(59,1,145,0.85) 50%, rgba(107,70,193,0.8) 100%)',
+                backdropFilter: 'blur(1px)',
+                WebkitBackdropFilter: 'blur(1px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 99999,
+                padding: '16px',
+                WebkitOverflowScrolling: 'touch',
+                animation: 'fadeIn 0.3s ease',
+                touchAction: 'manipulation',
+                cursor: 'pointer',
+            }}
+        >
+            <div
+                ref={contentRef}
+                className="modal-content"
+                onClick={e => e.stopPropagation()}
+                style={{
+                    backgroundColor: 'rgba(26, 26, 46, 0.95)',
+                    borderRadius: '24px',
+                    maxWidth: '95vw',
+                    maxHeight: '92vh',
+                    width: 'auto',
+                    height: 'auto',
+                    position: 'relative',
+                    animation: 'scaleIn 0.35s ease',
+                    boxShadow: `0 30px 80px rgba(${glowColor}, 0.3), 0 0 120px rgba(${glowColor}, 0.15)`,
+                    border: `2px solid rgba(${glowColor}, 0.3)`,
+                    overflow: 'hidden',
+                    touchAction: 'manipulation',
+                    WebkitTransform: 'translateZ(0)',
+                    transform: 'translateZ(0)',
+                    cursor: 'default',
+                }}
+            >
+                {/* Indicador de arrastre para móvil */}
+                <div
+                    style={{
+                        display: 'none',
+                        width: '40px',
+                        height: '4px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                        borderRadius: '2px',
+                        margin: '12px auto 0',
+                    }}
+                    className="modal-drag-indicator"
+                />
+
+                {/* Botón cerrar mejorado */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onClose();
+                    }}
+                    aria-label="Cerrar modal"
+                    style={{
+                        position: 'absolute',
+                        top: '16px',
+                        right: '16px',
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '50%',
+                        border: 'none',
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        color: 'white',
+                        fontSize: '24px',
+                        cursor: 'pointer',
+                        zIndex: 10,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        touchAction: 'manipulation',
+                        padding: '12px',
+                        WebkitTapHighlightColor: 'transparent',
+                        transition: 'all 0.3s ease',
+                        backdropFilter: 'blur(8px)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                    }}
+                    onMouseEnter={e => {
+                        e.currentTarget.style.backgroundColor = `rgba(${glowColor}, 0.4)`;
+                        e.currentTarget.style.transform = 'scale(1.1)';
+                    }}
+                    onMouseLeave={e => {
+                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                        e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                    onTouchStart={e => {
+                        e.currentTarget.style.backgroundColor = `rgba(${glowColor}, 0.4)`;
+                        e.currentTarget.style.transform = 'scale(1.1)';
+                    }}
+                    onTouchEnd={e => {
+                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                        e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+
+                {/* Imagen con mejor manejo */}
+                {image && (
+                    <img
+                        src={image}
+                        alt="Poster Nuevos Talentos"
+                        loading="lazy"
+                        style={{
+                            display: 'block',
+                            maxWidth: '100%',
+                            maxHeight: '82vh',
+                            width: 'auto',
+                            height: 'auto',
+                            objectFit: 'contain',
+                            borderRadius: '20px',
+                            touchAction: 'manipulation',
+                            WebkitUserSelect: 'none',
+                            userSelect: 'none',
+                            WebkitTransform: 'translateZ(0)',
+                            pointerEvents: 'none',
+                        }}
+                        draggable={false}
+                    />
+                )}
+
+                {/* Badge del área en el modal */}
+                {/* {area && (
+                    <div style={{
+                        position: 'absolute',
+                        bottom: '24px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        padding: '10px 24px',
+                        borderRadius: '50px',
+                        backgroundColor: `rgba(${glowColor}, 0.4)`,
+                        backdropFilter: 'blur(12px)',
+                        border: `2px solid rgba(${glowColor}, 0.4)`,
+                        color: 'white',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        letterSpacing: '0.5px',
+                        boxShadow: `0 4px 20px rgba(${glowColor}, 0.2)`,
+                        pointerEvents: 'none',
+                    }}>
+                        {area}
+                    </div>
+                )} */}
+            </div>
+
+            <style>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes scaleIn {
+                    from { 
+                        opacity: 0;
+                        transform: scale(0.92) translateY(20px);
+                    }
+                    to { 
+                        opacity: 1;
+                        transform: scale(1) translateY(0);
+                    }
+                }
+                .modal-overlay {
+                    -webkit-overflow-scrolling: touch;
+                    overscroll-behavior: contain;
+                }
+                
+                @media (max-width: 768px) {
+                    .modal-overlay {
+                        padding: 12px;
+                        align-items: flex-end;
+                    }
+                    .modal-content {
+                        max-width: 100vw;
+                        max-height: 88vh;
+                        border-radius: 24px 24px 0 0;
+                        margin-bottom: 0;
+                    }
+                    .modal-drag-indicator {
+                        display: block !important;
+                    }
+                    .modal-content button {
+                        top: 12px !important;
+                        right: 12px !important;
+                        width: 40px !important;
+                        height: 40px !important;
+                        font-size: 18px !important;
+                        padding: 8px !important;
+                    }
+                }
+                
+                @media (max-width: 480px) {
+                    .modal-overlay {
+                        padding: 8px;
+                    }
+                    .modal-content {
+                        max-height: 82vh;
+                        border-radius: 20px 20px 0 0;
+                    }
+                }
+            `}</style>
+        </div>,
+        document.body
+    );
+};
