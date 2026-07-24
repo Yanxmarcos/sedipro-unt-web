@@ -23,6 +23,20 @@ import { FadeIn } from "@/components/ui/motion-primitives";
 
 const PROJECTS = [
     {
+        id: "crown-night",
+        icon: Sparkles,
+        iconLabel: "CROWN NIGHT",
+        title:
+            "CROWN NIGHT 2026",
+        description:
+            "Crown Night es el certamen oficial que reúne el talento, liderazgo e identidad de las áreas funcionales de SEDIPRO UNT en una noche inolvidable.",
+        meta: "Sábado 29 de agosto, 2026.",
+        href: "/crown-night",
+        imageRatio: 3375 / 4219,
+        image: "/proyectos/crown-night.webp",
+        imageAlt: "Imagen de CROWN NIGHT",
+    },
+    {
         id: "sedinvita",
         icon: Sparkles,
         iconLabel: "SEDINVITA",

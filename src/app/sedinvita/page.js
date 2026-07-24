@@ -818,69 +818,69 @@ export default function Home() {
                 {/* Benefits Section */}
                 <section className="py-stack-lg bg-surface relative overflow-hidden" id="beneficios">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-10">
-    <div className="text-center mb-12 mt-6">
-        <h3 className="font-headline-lg text-headline-lg font-bold text-on-surface">
-            SEDInvita 2026
-        </h3>
-        <p className="mt-2 font-body-md text-body-md text-on-surface-variant">
-            Conoce más sobre SEDIPRO UNT y descubre lo que significa formar parte de nuestra comunidad.
-        </p>
-    </div>
+                        <div className="text-center mb-12 mt-6">
+                            <h3 className="font-headline-lg text-headline-lg font-bold text-on-surface">
+                                SEDInvita 2026
+                            </h3>
+                            <p className="mt-2 font-body-md text-body-md text-on-surface-variant">
+                                Conoce más sobre SEDIPRO UNT y descubre lo que significa formar parte de nuestra comunidad.
+                            </p>
+                        </div>
 
-    {/* Reels */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 max-w-6xl mx-auto">
-        <iframe
-            src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1799701534555046%2F&show_text=false&width=267&t=0"
-            className="w-full rounded-2xl shadow-xl"
-            style={{
-                border: "none",
-                overflow: "hidden",
-                aspectRatio: "9 / 16",
-            }}
-            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            allowFullScreen
-        />
+                        {/* Reels */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 max-w-6xl mx-auto">
+                            <iframe
+                                src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1799701534555046%2F&show_text=false&width=267&t=0"
+                                className="w-full rounded-2xl shadow-xl"
+                                style={{
+                                    border: "none",
+                                    overflow: "hidden",
+                                    aspectRatio: "9 / 16",
+                                }}
+                                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                                allowFullScreen
+                            />
 
-        <iframe
-            src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F2077073693192449%2F&show_text=false&width=267&t=0"
-            className="w-full rounded-2xl shadow-xl"
-            style={{
-                border: "none",
-                overflow: "hidden",
-                aspectRatio: "9 / 16",
-            }}
-            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            allowFullScreen
-        />
+                            <iframe
+                                src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F2077073693192449%2F&show_text=false&width=267&t=0"
+                                className="w-full rounded-2xl shadow-xl"
+                                style={{
+                                    border: "none",
+                                    overflow: "hidden",
+                                    aspectRatio: "9 / 16",
+                                }}
+                                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                                allowFullScreen
+                            />
 
-        <iframe
-            src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F2807551126258579%2F&show_text=false&width=267&t=0"
-            className="w-full rounded-2xl shadow-xl"
-            style={{
-                border: "none",
-                overflow: "hidden",
-                aspectRatio: "9 / 16",
-            }}
-            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            allowFullScreen
-        />
-    </div>
+                            <iframe
+                                src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F2807551126258579%2F&show_text=false&width=267&t=0"
+                                className="w-full rounded-2xl shadow-xl"
+                                style={{
+                                    border: "none",
+                                    overflow: "hidden",
+                                    aspectRatio: "9 / 16",
+                                }}
+                                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                                allowFullScreen
+                            />
+                        </div>
 
-    {/* Video principal */}
-    <div className="max-w-6xl mx-auto">
-        <iframe
-            src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1865576567446700%2F&show_text=false&width=560&t=0"
-            className="w-full rounded-2xl shadow-xl"
-            style={{
-                border: "none",
-                overflow: "hidden",
-                aspectRatio: "16 / 9",
-            }}
-            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            allowFullScreen
-        />
-    </div>
-</div>
+                        {/* Video principal */}
+                        <div className="max-w-6xl mx-auto">
+                            <iframe
+                                src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1865576567446700%2F&show_text=false&width=560&t=0"
+                                className="w-full rounded-2xl shadow-xl"
+                                style={{
+                                    border: "none",
+                                    overflow: "hidden",
+                                    aspectRatio: "16 / 9",
+                                }}
+                                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                                allowFullScreen
+                            />
+                        </div>
+                    </div>
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-stack-lg items-center">
                         <div className="lg:col-span-5 space-y-stack-md">
                             <h2 className="font-display-lg text-headline-lg md:text-display-lg text-on-surface leading-tight">
