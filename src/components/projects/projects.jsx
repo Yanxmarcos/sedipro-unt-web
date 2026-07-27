@@ -25,9 +25,9 @@ const PROJECTS = [
     {
         id: "sedichampions",
         icon: Sparkles,
-        iconLabel: "SEDICHAMPIONS LEAGUE 2026",
+        iconLabel: "SEDICHAMPIONS LEAGUE",
         title:
-            "SEDICHAMPIONS LEAGUE",
+            "SEDICHAMPIONS LEAGUE 2026",
         description:
             "Es el campeonato deportivo que busca fortalecer la integración, el trabajo en equipo y el compañerismo entre estudiantes a través de actividades recreativas y competitivas.",
         meta: "Sábado 8 de agosto, 2026.",
