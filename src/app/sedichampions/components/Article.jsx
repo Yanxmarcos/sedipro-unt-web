@@ -135,8 +135,7 @@ function LugarArticle() {
       {/* Descripción del lugar */}
       <div className="text-white/80 text-center">
         <p className="mb-4 leading-relaxed">
-          El evento se realizará en el <strong>Club Campestre Golden Club</strong>, un espacio ideal para 
-          disfrutar de un día maravilloso. Hora de apertura: 8:00 a.m
+          El evento se realizará el <strong>sábado 8 de agosto de 2026</strong> en el <strong>Club Campestre Golden Club</strong>, un espacio ideal para compartir, disfrutar de un ambiente agradable y vivir una jornada llena de deporte, integración y sana competencia. <strong>Hora de apertura:</strong> 8:00 a.m.
         </p>
         <p className="leading-relaxed">
           📍 Av. Metropolitana I, Trujillo
