@@ -23,6 +23,20 @@ import { FadeIn } from "@/components/ui/motion-primitives";
 
 const PROJECTS = [
     {
+        id: "sedichampions",
+        icon: Sparkles,
+        iconLabel: "SEDICHAMPIONS LEAGUE 2026",
+        title:
+            "SEDICHAMPIONS LEAGUE",
+        description:
+            "Es el campeonato deportivo que busca fortalecer la integración, el trabajo en equipo y el compañerismo entre estudiantes a través de actividades recreativas y competitivas.",
+        meta: "Sábado 8 de agosto, 2026.",
+        href: "/sedichampions",
+        imageRatio: 2482 / 3510,
+        image: "/proyectos/sedichampions.webp",
+        imageAlt: "Imagen de SEDICHAMPIONS",
+    },
+    {
         id: "crown-night",
         icon: Sparkles,
         iconLabel: "CROWN NIGHT",
