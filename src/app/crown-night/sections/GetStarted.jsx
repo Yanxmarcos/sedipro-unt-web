@@ -8,7 +8,7 @@ import { StartSteps, TitleText, TypingText } from '../components'
 import { startingFeatures } from '../constants'
 
 const GetStarted = () => (
-    <section className="py-20 px-4 relative z-10">
+    <section className="py-20 px-4 relative z-10" id="objetivos">
         <motion.div
             variants={staggerContainer}
             initial="hidden"

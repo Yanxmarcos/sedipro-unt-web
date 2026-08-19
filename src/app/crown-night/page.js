@@ -10,9 +10,10 @@ import {
     WhatsNew,
     World,
     Insights,
-    Feedback
+    Feedback,
+    Todos
 } from './sections'
-import { Navbar, Footer } from './components'
+import { Navbar, Footer, BackToTop } from './components'
 import PixelSnow from './components/PixelSnow'
 
 export default function CrownNightPage() {
@@ -21,7 +22,7 @@ export default function CrownNightPage() {
             {/* Fondo PixelSnow */}
             <div className="fixed inset-0 w-full h-full -z-10">
                 <PixelSnow 
-                    color="#ffffff" // color="#E0D534"
+                    color="#ffffff"
                     flakeSize={0.01}
                     minFlakeSize={1.25}
                     pixelResolution={500}
@@ -43,12 +44,14 @@ export default function CrownNightPage() {
                 <Hero />
                 <About />
                 <Miss />         
-                <Mister />        
+                <Mister />     
+                <Todos />      
                 <GetStarted />
                 <WhatsNew />
                 <World />
                 <Insights />
                 <Feedback />
+                <BackToTop />
                 <Footer />
             </div>
         </div>

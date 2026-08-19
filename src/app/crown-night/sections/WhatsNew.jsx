@@ -8,7 +8,7 @@ import { planetVariants, staggerContainer, fadeIn } from '../utils/motion'
 import { newFeatures } from '../constants'
 
 const WhatsNew = () => (
-    <section className="py-20 px-4 relative">
+    <section className="py-20 px-4 relative" id="requisitos">
         <motion.div
             variants={staggerContainer}
             initial="hidden"

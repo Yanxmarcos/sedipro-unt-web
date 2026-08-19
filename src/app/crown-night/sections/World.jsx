@@ -68,7 +68,7 @@ const World = () => {
     const positions = areas.map((_, i) => getPosition(i, areas.length))
 
     return (
-        <section className="py-20 px-4 relative z-10">
+        <section className="py-20 px-4 relative z-10" id="areas">
             <motion.div
                 variants={staggerContainer}
                 initial="hidden"

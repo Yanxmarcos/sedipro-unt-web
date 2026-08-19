@@ -7,7 +7,7 @@ import { textVariant } from '../utils/motion'
 
 const Hero = () => {
     return (
-        <section className="relative min-h-[calc(100vh-104px)] w-full flex flex-col items-center justify-center px-4 pt-0 py-12">
+        <section className="relative min-h-[calc(100vh-104px)] w-full flex flex-col items-center justify-center px-4 pt-0 py-12" id="inicio">
             <motion.div
                 initial="hidden"
                 animate="show"
@@ -28,7 +28,7 @@ const Hero = () => {
                     className="relative w-[220px] sm:w-[300px] md:w-[380px] lg:w-[400px] aspect-[773/1080] mb-6"
                 >
                     <Image
-                        src="/crown-night/logo.webp"
+                        src="/crown-night/logo2.webp"
                         alt="Crown Night Logo"
                         fill
                         priority
