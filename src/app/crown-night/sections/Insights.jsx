@@ -7,7 +7,7 @@ import { staggerContainer } from '../utils/motion'
 import { insights } from '../constants'
 
 const Insights = () => (
-    <section className="py-20 px-4 relative">
+    <section className="py-20 px-4 relative" id="cronograma">
         <motion.div
             variants={staggerContainer}
             initial="hidden"

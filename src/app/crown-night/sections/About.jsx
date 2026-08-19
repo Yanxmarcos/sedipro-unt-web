@@ -6,7 +6,7 @@ import { TypingText } from '../components/UI/CustomTexts'
 import { fadeIn, staggerContainer } from '../utils/motion'
 
 const About = () => (
-    <section className="py-20 px-4 relative z-10">
+    <section className="py-20 px-4 relative z-10" id="about">
         <div className="absolute inset-0" />
 
         <motion.div

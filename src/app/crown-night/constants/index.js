@@ -29,65 +29,55 @@ export const newFeatures = [
 ]
 
 // src/app/crown-night/constants/index.js
+
 export const insights = [
     {
         id: 1,
         date: '25 jul',
         activity: 'Sesión de fotos + entrega de sistema de votos',
-        evaluation: 'Puntualidad, asistencia y vestimenta'
+        evaluation: 'Puntualidad, asistencia y vestimenta',
+        status: 'completed' // Ya pasó
     },
-    // {
-    //     id: 2,
-    //     date: 'Post-sesión',
-    //     activity: 'Guerra de likes en Facebook',
-    //     evaluation: 'Conteo de reacciones y control anti-bots'
-    // },
-    // {
-    //     id: 3,
-    //     date: 'Post-sesión',
-    //     activity: 'Guerra de comentarios / encuesta en Instagram y TikTok',
-    //     evaluation: 'Conteo + control anti-bots'
-    // },
     {
         id: 4,
         date: '07 ago',
         activity: 'Ponencia e inauguración',
-        evaluation: 'Asistencia'
+        evaluation: 'Asistencia',
+        status: 'completed' // Ya pasó
     },
     {
         id: 5,
         date: '08 ago',
         activity: 'Gymkana',
-        evaluation: 'Participación y presentación'
+        evaluation: 'Participación y presentación',
+        status: 'completed' // Ya pasó
     },
     {
         id: 6,
         date: '19 ago',
         activity: 'Conectando SEDIPRO — Show de talentos',
-        evaluation: 'Participación'
+        evaluation: 'Participación',
+        status: 'current' // Hoy/actual
     },
     {
         id: 7,
         date: '22 ago',
         activity: 'Ensayo general',
-        evaluation: 'Asistencia'
+        evaluation: 'Asistencia',
+        status: 'upcoming' // Próximo
     },
     {
         id: 8,
         date: '26 ago',
         activity: 'Backup Sediprano (modalidad virtual)',
-        evaluation: 'Asistencia de inicio a fin'
+        evaluation: 'Asistencia de inicio a fin',
+        status: 'upcoming' // Próximo
     },
     {
         id: 9,
         date: '29 ago',
         activity: 'Día Central: desfile y ronda de preguntas',
-        evaluation: 'Desfile y criterio en las preguntas según rúbrica'
-    },
-    // {
-    //     id: 10,
-    //     date: 'Transversal',
-    //     activity: 'Puntualidad en todas las actividades',
-    //     evaluation: 'Suma puntos acumulables'
-    // }
+        evaluation: 'Desfile y criterio en las preguntas según rúbrica',
+        status: 'upcoming' // Próximo
+    }
 ]

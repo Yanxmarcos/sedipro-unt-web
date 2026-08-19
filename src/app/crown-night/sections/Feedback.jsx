@@ -14,7 +14,6 @@ const Feedback = () => (
             viewport={{ once: false, amount: 0.25 }}
             className="max-w-7xl mx-auto flex lg:flex-row flex-col gap-8"
         >
-            {/* Card 1 - Testimonio */}
             <motion.div
                 variants={fadeIn('right', 'tween', 0.2, 1)}
                 className="lg:w-1/2 w-full flex flex-col glass-card p-8 rounded-[32px] border border-border/10 relative group hover:border-primary/30 transition-all duration-300"
@@ -33,9 +32,16 @@ const Feedback = () => (
                             />
                         </div>
                         <div>
-                            <h4 className="font-bold text-xl sm:text-2xl md:text-3xl text-foreground">
-                                Marycielo Roca Mendoza
-                            </h4>
+                            <a
+                                href="https://linkedin.com/in/marycielo-roca-mendoza-administracion"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group/link inline-block"
+                            >
+                                <h4 className="font-bold text-xl sm:text-2xl md:text-3xl text-foreground transition-all duration-300 group-hover/link:text-primary group-hover/link:scale-105">
+                                    Marycielo Roca Mendoza
+                                </h4>
+                            </a>
                             <p className="font-normal text-sm sm:text-base text-foreground/60">
                                 Directora de Proyecto
                             </p>
