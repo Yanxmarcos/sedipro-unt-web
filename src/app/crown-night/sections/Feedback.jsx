@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { fadeIn, staggerContainer, zoomIn } from '../utils/motion'
 
 const Feedback = () => (
-    <section className="py-20 px-4 relative z-10">
+    <section className="py-20 px-4 relative z-10" id="dp">
         <motion.div
             variants={staggerContainer}
             initial="hidden"

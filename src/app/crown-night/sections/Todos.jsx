@@ -17,9 +17,9 @@ const Todos = () => {
                 viewport={{ once: false, amount: 0.25 }}
                 className="max-w-7xl mx-auto flex flex-col"
             >
-                <TypingText title="| Haz que tu candidato destaque" textStyles="text-center" />
+                <TypingText title="| Haz que tu candidat@ destaque" textStyles="text-center" />
                 <TitleText
-                    title={<>Apoya a tu candidato</>}
+                    title={<>Apoya a tu <span className='text-primary'>representante</span></>}
                     textStyles="text-center"
                 />
                 <p className="text-center text-foreground/60 text-base sm:text-lg font-light mt-2 mb-8">
@@ -44,14 +44,25 @@ const Todos = () => {
                                     <span className="text-primary font-bold text-lg">1</span>
                                     <div>
                                         <p className="font-semibold text-foreground">Realiza el pago</p>
-                                        <p className="text-foreground/60 text-sm">S/ 1.00 al candidato que deseas apoyar</p>
+                                        <p className="text-foreground/60 text-sm">S/ 1.00 al candidat@ que deseas apoyar</p>
                                     </div>
                                 </li>
                                 <li className="flex gap-3 items-start">
                                     <span className="text-primary font-bold text-lg">2</span>
-                                    <div>
-                                        <p className="font-semibold text-foreground">Completa el formulario</p>
-                                        <p className="text-foreground/60 text-sm">Con tus datos personales</p>
+                                    <div className="w-full">
+                                        <p className="font-semibold text-foreground mb-3">
+                                            Completa el formulario con los siguientes datos:
+                                        </p>
+
+                                        <div className="bg-primary/10 rounded-xl p-4">
+                                            <ul className="space-y-2 text-sm text-foreground/80">
+                                                <li>Nombres y apellidos</li>
+                                                <li>Correo electrónico</li>
+                                                <li>Número de WhatsApp</li>
+                                                <li>Área a la que apoyas</li>
+                                                <li>Elección de voto: ¿Miss o Mister?</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </li>
                             </ol>
@@ -66,20 +77,27 @@ const Todos = () => {
                                 <FaGift className="text-primary" />
                                 Gran rifa
                             </h4>
-                            <p className="text-foreground/70 mb-4">
-                                Al realizar tu compra, entras automáticamente a la rifa y podrás llevarte uno de nuestros increíbles premios.
+
+                            <p className="text-foreground/70 mb-5">
+                                Al realizar tu compra, entras automáticamente a la rifa y podrás llevarte uno de los siguientes premios.
                             </p>
+
                             <div className="bg-primary/10 rounded-xl p-4">
-                                <p className="text-sm text-foreground/80 font-medium">
-                                    🎁 ¡Participa y gana!
-                                </p>
+                                <ul className="space-y-2 text-sm text-foreground/80">
+                                    <li><strong>1er premio: </strong> Licuadora</li>
+                                    <li><strong>2do premio: </strong> Box de postres</li>
+                                    <li><strong>3er premio: </strong> Botella de vino</li>
+                                    <li><strong>4to premio: </strong> Canasta especial</li>
+                                    <li><strong>5to premio: </strong> Premio sorpresa</li>
+                                    <li><strong>6to premio: </strong> Premio sorpresa</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </motion.div>
 
                 {/* Datos del formulario */}
-                <motion.div
+                {/* <motion.div
                     variants={fadeIn('up', 'tween', 0.4, 1)}
                     className="glass-card p-6 sm:p-8 rounded-[32px] border border-border/10 relative group hover:border-primary/30 transition-all duration-300 mt-6"
                 >
@@ -108,7 +126,7 @@ const Todos = () => {
                             </div>
                         </div>
                     </div>
-                </motion.div>
+                </motion.div> */}
 
                 {/* Foto de todos + Botón - 2 columnas */}
                 <motion.div

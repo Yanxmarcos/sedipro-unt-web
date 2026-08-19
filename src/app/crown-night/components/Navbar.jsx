@@ -44,11 +44,12 @@ const Navbar = () => {
         { id: 'about', label: 'Sobre Crown Night' },
         { id: 'miss', label: 'Miss' },
         { id: 'mister', label: 'Mister' },
-        { id: 'todos', label: 'Apoya tu candidato' },
-        { id: 'objetivos', label: 'Objetivos' },
-        { id: 'requisitos', label: 'Requisitos' },
-        { id: 'areas', label: 'Áreas de Sedipro UNT' },
+        { id: 'todos', label: 'Apoya tu candidat@' },
+        { id: 'resultados', label: 'Resultados' },
         { id: 'cronograma', label: 'Cronograma' },
+        { id: 'areas', label: 'Áreas de Sedipro UNT' },
+        { id: 'objetivos', label: 'Objetivos' },
+        { id: 'dp', label: 'DP' },
     ]
 
     return (

@@ -55,7 +55,7 @@ export const insights = [
     {
         id: 6,
         date: '19 ago',
-        activity: 'Conectando SEDIPRO — Show de talentos',
+        activity: 'SEDICONECTA — Show de talentos',
         evaluation: 'Participación',
         status: 'current' // Hoy/actual
     },

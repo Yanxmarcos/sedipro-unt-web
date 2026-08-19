@@ -21,7 +21,7 @@ const Miss = () => {
             >
                 <TypingText title="| Miss Crown Night" textStyles="text-center" />
                 <TitleText
-                    title={<>Conoce a las candidatas <br className="md:block hidden" /></>}
+                    title={<>Conoce a las candidatas <br className="md:block hidden" />de <span className='text-primary'>Miss</span> Crown Night</>}
                     textStyles="text-center"
                 />
 

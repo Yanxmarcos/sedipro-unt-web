@@ -25,7 +25,7 @@ const Hero = () => {
             >
                 <motion.div
                     variants={textVariant(0.5)}
-                    className="relative w-[220px] sm:w-[300px] md:w-[380px] lg:w-[400px] aspect-[773/1080] mb-6"
+                    className="relative w-[320px] sm:w-[300px] md:w-[380px] lg:w-[400px] aspect-[773/1080] mb-6"
                 >
                     <Image
                         src="/crown-night/logo2.webp"
