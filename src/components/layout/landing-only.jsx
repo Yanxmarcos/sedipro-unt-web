@@ -6,9 +6,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Nav } from "./nav";
 import { PageBackdrop } from "./page-backdrop";
-import { SkipToContent } from "./skip-to-content";
 import LiquidEther from '@/components/shaders/LiquidEther';
-
 const LANDING_PATHS = ['/', '/nosotros', '/proyectos'];
 const MOBILE_BREAKPOINT = 768;
 

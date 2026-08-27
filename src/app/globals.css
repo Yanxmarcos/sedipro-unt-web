@@ -216,27 +216,6 @@
 }
 
 /* ============================================
-   SKIP TO CONTENT - Accesibilidad
-   ============================================ */
-.skip-to-content {
-  position: fixed;
-  top: -9999px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--color-primary);
-  color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  z-index: 9999;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.skip-to-content:focus {
-  top: 20px;
-}
-
-/* ============================================
    ESTILOS BASE
    ============================================ */
 @layer base {
@@ -358,7 +337,7 @@
    ELIMINAR SCROLL HORIZONTAL COMPLETAMENTE
    ============================================ */
 html, body {
-    overflow-x: hidden !important;
+    /* overflow-x: hidden !important; */
     width: 100% !important;
     max-width: 100vw !important;
     margin: 0;
