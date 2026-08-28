@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import {AlarmClockCheck, AlarmClockMinus} from 'lucide-react'
 
 const Ico = {
     Check: () => (
@@ -86,6 +87,8 @@ export default function RegistroAsistenciaPage() {
     const [registrados,    setRegistrados]    = useState([])
     const [showLogout,     setShowLogout]     = useState(false)
 
+    const [loadingOverlay, setLoadingOverlay] = useState(false);
+
     // Paso 2: DNI encontrado, esperando que el encargado elija el estado
     const [awaitingEstado, setAwaitingEstado] = useState(null) // null | { dni: string }
 
@@ -154,13 +157,15 @@ export default function RegistroAsistenciaPage() {
     }
 
     /* ── Paso 2: el encargado elige el estado ── */
+    // Modifica la función handleRegistrar
     async function handleRegistrar(estado) {
         if (!awaitingEstado) return
         setSubmitting(true)
+        setLoadingOverlay(true) // Activa el overlay
         setFeedback(null)
 
         try {
-            const res  = await fetch(`/api/registro/${asistenciaId}`, {
+            const res = await fetch(`/api/registro/${asistenciaId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ dni: awaitingEstado.dni, estado }),
@@ -196,8 +201,8 @@ export default function RegistroAsistenciaPage() {
             setRegistrados(prev => [
                 {
                     nombre: `${data.sediprano.nombres} ${data.sediprano.apellidos}`,
-                    area:   data.sediprano.area,
-                    hora:   new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
+                    area: data.sediprano.area,
+                    hora: new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
                     estado,
                 },
                 ...prev,
@@ -208,6 +213,7 @@ export default function RegistroAsistenciaPage() {
             setAwaitingEstado(null)
         } finally {
             setSubmitting(false)
+            setLoadingOverlay(false) // Desactiva el overlay
             setAwaitingEstado(null)
             setDni('')
             setTimeout(() => inputRef.current?.focus(), 50)
@@ -293,6 +299,8 @@ export default function RegistroAsistenciaPage() {
         error:   { bg: 'rgba(239,68,68,0.10)',   border: 'rgba(239,68,68,0.30)',  text: '#991B1B', icon: '#EF4444' },
     }
 
+    const dniLength = dni.length;
+
     return (
         <div style={{ minHeight: '100vh', backgroundColor: '#f8f5fa', fontFamily: 'Poppins, sans-serif' }}>
 
@@ -320,6 +328,42 @@ export default function RegistroAsistenciaPage() {
                             </button>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* ── Overlay de carga ── */}
+            {loadingOverlay && (
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    zIndex: 9999,
+                    backgroundColor: 'rgba(0,0,0,0.50)',
+                    backdropFilter: 'blur(1px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'column',
+                    gap: '20px',
+                    animation: 'fadeIn 0.2s ease'
+                }}>
+                    <div style={{
+                        width: '64px',
+                        height: '64px',
+                        borderRadius: '50%',
+                        border: '4px solid rgba(103,37,119,0.15)',
+                        borderTopColor: '#672577',
+                        animation: 'spin 0.8s linear infinite',
+                    }} />
+                    <p style={{
+                        fontFamily: 'Montserrat, sans-serif',
+                        fontWeight: 600,
+                        fontSize: '14px',
+                        color: '#fff',
+                        margin: 0,
+                        textShadow: '0 2px 8px rgba(0,0,0,0.30)',
+                    }}>
+                        Registrando asistencia...
+                    </p>
                 </div>
             )}
 
@@ -352,8 +396,23 @@ export default function RegistroAsistenciaPage() {
             <main style={{ maxWidth: '520px', margin: '0 auto', padding: '28px 16px' }}>
                 {encargado && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: '#fff', border: '1px solid rgba(214,182,223,0.55)', borderRadius: '14px', padding: '14px 16px', marginBottom: '24px', boxShadow: '0 2px 12px rgba(103,37,119,0.08)' }}>
-                        <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #672577, #3454A1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#fff' }}>
-                            <Ico.User />
+                        <div style={{ 
+                            width: '42px', 
+                            height: '42px', 
+                            borderRadius: '50%', 
+                            overflow: 'hidden', // Esto asegura que la imagen se recorte en círculo
+                            flexShrink: 0,
+                            border: '2px solid #672577' // Opcional: un borde para destacar
+                        }}>
+                            <img 
+                                src="/img/hito-cara.jpg" 
+                                alt="Foto de encargado"
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover', // Esto asegura que la imagen cubra todo el espacio sin deformarse
+                                }}
+                            />
                         </div>
                         <div>
                             <p style={{ fontSize: '11px', color: '#9880B0', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
@@ -408,35 +467,152 @@ export default function RegistroAsistenciaPage() {
                                     Ingresa el DNI del sediprano para elegir su estado.
                                 </p>
 
-                                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4A1A5E', marginBottom: '8px' }}>
+                                {/* <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4A1A5E', marginBottom: '8px' }}>
                                     DNI del sediprano
-                                </label>
+                                </label> */}
 
-                                <div style={{ position: 'relative', marginBottom: '16px' }}>
-                                    <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#9880B0', pointerEvents: 'none', display: 'flex' }}>
-                                        <Ico.IdCard />
-                                    </span>
-                                    <input
-                                        ref={inputRef}
-                                        type="text"
-                                        inputMode="numeric"
-                                        pattern="[0-9]*"
-                                        maxLength={8}
-                                        value={dni}
-                                        onChange={e => setDni(e.target.value.replace(/\D/g, ''))}
-                                        placeholder="Ej: 76543210"
-                                        disabled={submitting}
-                                        style={{
-                                            width: '100%', boxSizing: 'border-box',
-                                            padding: '13px 14px 13px 44px',
-                                            borderRadius: '12px', border: '2px solid #e5d9ef',
-                                            backgroundColor: '#f9f6fb', color: '#111827',
-                                            fontSize: '16px', fontWeight: 700, letterSpacing: '0.10em',
-                                            outline: 'none', transition: 'border-color 0.15s, box-shadow 0.15s',
-                                        }}
-                                        onFocus={e => { e.target.style.borderColor = '#672577'; e.target.style.boxShadow = '0 0 0 3px rgba(103,37,119,0.13)' }}
-                                        onBlur={e => { e.target.style.borderColor = '#e5d9ef'; e.target.style.boxShadow = 'none' }}
-                                    />
+                                <div style={{ marginBottom: '16px' }}>
+                                    {/* Header con label y contador */}
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', fontWeight: 600, color: '#4A1A5E' }}>
+                                            <Ico.IdCard /> DNI del Sediprano
+                                        </label>
+                                        <span style={{
+                                            fontSize: '12px',
+                                            fontWeight: 600,
+                                            color: dniLength === 8 ? '#10B981' : dniLength > 0 ? '#EF4444' : '#9CA3AF',
+                                            transition: 'color 0.2s ease'
+                                        }}>
+                                            {dniLength}/8
+                                        </span>
+                                    </div>
+
+                                    {/* Contenedor del input con diseño similar */}
+                                    <div style={{
+                                        position: 'relative',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        backgroundColor: '#fff',
+                                        borderRadius: '12px',
+                                        border: `2px solid ${
+                                            dniLength === 8 
+                                                ? '#10B981' 
+                                                : dniLength > 0 
+                                                    ? '#EF4444' 
+                                                    : '#e5d9ef'
+                                        }`,
+                                        transition: 'border-color 0.2s ease',
+                                        overflow: 'hidden',
+                                        padding: '0 8px'
+                                    }}>
+                                        {/* Icono a la izquierda */}
+                                        {/* <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            padding: '0 4px',
+                                            color: dniLength > 0 ? '#672577' : '#D1D5DB',
+                                            transition: 'color 0.2s ease'
+                                        }}>
+                                            <Ico.IdCard />
+                                        </div> */}
+
+                                        {/* Input visible con estilo similar a los recuadros del código */}
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '2px',
+                                            padding: '0 8px',
+                                            flex: 1,
+                                        }}>
+                                            {Array.from({ length: 8 }, (_, i) => {
+                                                const digit = dni[i] || ''
+                                                const isFilled = digit !== ''
+                                                return (
+                                                    <div
+                                                        key={i}
+                                                        style={{
+                                                            width: '36px',
+                                                            height: '48px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '20px',
+                                                            fontWeight: 700,
+                                                            fontFamily: 'monospace',
+                                                            color: isFilled ? '#1F1030' : '#D1D5DB',
+                                                            borderBottom: `2px solid ${
+                                                                isFilled 
+                                                                    ? dniLength === 8 
+                                                                        ? '#10B981' 
+                                                                        : '#EF4444'
+                                                                    : '#E5E7EB'
+                                                            }`,
+                                                            transition: 'all 0.15s ease',
+                                                            background: isFilled ? 'rgba(103,37,119,0.04)' : 'transparent'
+                                                        }}
+                                                    >
+                                                        {digit || '•'}
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+
+                                        {/* Input oculto para manejar el valor */}
+                                        <input
+                                            ref={inputRef}
+                                            type="text"
+                                            value={dni}
+                                            onChange={e => {
+                                                const value = e.target.value.replace(/\D/g, '').slice(0, 8)
+                                                setDni(value)
+                                            }}
+                                            placeholder=""
+                                            disabled={submitting}
+                                            maxLength={8}
+                                            inputMode="numeric"
+                                            pattern="[0-9]*"
+                                            style={{
+                                                position: 'absolute',
+                                                inset: 0,
+                                                opacity: 0,
+                                                width: '100%',
+                                                height: '100%',
+                                                cursor: 'pointer',
+                                                zIndex: 10,
+                                            }}
+                                            autoComplete="off"
+                                        />
+                                    </div>
+
+                                    {/* Barra de progreso */}
+                                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div style={{
+                                            flex: 1,
+                                            height: '4px',
+                                            borderRadius: '2px',
+                                            backgroundColor: '#F3F4F6',
+                                            overflow: 'hidden'
+                                        }}>
+                                            <div style={{
+                                                width: `${(dniLength / 8) * 100}%`,
+                                                height: '100%',
+                                                backgroundColor: dniLength === 8 ? '#10B981' : dniLength > 0 ? '#EF4444' : '#E5E7EB',
+                                                transition: 'width 0.2s ease, background-color 0.2s ease',
+                                                borderRadius: '2px'
+                                            }} />
+                                        </div>
+                                        <span style={{
+                                            fontSize: '11px',
+                                            fontWeight: 500,
+                                            color: dniLength === 8 ? '#10B981' : dniLength > 0 ? '#EF4444' : '#9CA3AF',
+                                            minWidth: '40px',
+                                            textAlign: 'right'
+                                        }}>
+                                            {dniLength === 8 ? 'Listo' : dniLength > 0 ? `${8 - dniLength} restante` : '—'}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <button
@@ -507,7 +683,7 @@ export default function RegistroAsistenciaPage() {
                                     >
                                         {submitting
                                             ? <Ico.Spinner />
-                                            : <span style={{ fontSize: '22px' }}>✓</span>
+                                            : <AlarmClockCheck />
                                         }
                                         <span>Presente</span>
                                     </button>
@@ -534,7 +710,7 @@ export default function RegistroAsistenciaPage() {
                                     >
                                         {submitting
                                             ? <Ico.Spinner />
-                                            : <span style={{ fontSize: '22px' }}>⏰</span>
+                                            : <AlarmClockMinus />
                                         }
                                         <span>Tardanza</span>
                                     </button>

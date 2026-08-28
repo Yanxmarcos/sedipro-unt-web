@@ -95,6 +95,10 @@ export async function POST(request, { params }) {
 
         // Marcar con el estado elegido y recalcular resumen
         asistencia.registro[idx].estado = estado
+        asistencia.registro[idx].hora = new Date()
+        const primerNombre = (decoded.nombres || '').split(' ')[0]
+        const primerApellido = (decoded.apellidos || '').split(' ')[0]
+        asistencia.registro[idx].registradoPor = `${primerNombre} ${primerApellido}`.trim() || decoded.dni
 
         asistencia.resumen = {
             presentes:    asistencia.registro.filter(r => r.estado === 'presente').length,

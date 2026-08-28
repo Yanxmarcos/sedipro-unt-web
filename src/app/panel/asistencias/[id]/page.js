@@ -111,14 +111,20 @@ function formatDate(iso) {
     return `${day} de ${meses[Number(month) - 1]} de ${year}`
 }
 
+function formatTime(iso) {
+    if (!iso) return '—'
+    const date = new Date(iso)
+    return date.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+}
+
 function SkeletonRows({ dark, count = 8 }) {
     const t = getTheme(dark)
     return Array.from({ length: count }).map((_, i) => (
         <tr key={i} style={{ borderBottom: `1px solid ${t.tableBorder}` }}>
-            {[1, 2, 3, 4].map(j => (
+            {[1, 2, 3, 4, 5, 6].map(j => (
                 <td key={j} style={{ padding: '14px 16px' }}>
                     <div style={{
-                        height: '13px', borderRadius: '6px', width: j === 1 ? '40px' : j === 2 ? '55%' : j === 3 ? '70px' : '160px',
+                        height: '13px', borderRadius: '6px', width: j === 1 ? '40px' : j === 2 ? '55%' : j === 3 ? '70px' : j === 4 ? '55px' : j === 5 ? '80px' : '160px',
                         backgroundColor: dark ? 'rgba(103,37,119,0.12)' : 'rgba(103,37,119,0.07)',
                         animation: 'pulse 1.5s ease-in-out infinite',
                     }} />
@@ -129,32 +135,89 @@ function SkeletonRows({ dark, count = 8 }) {
 }
 
 function exportToExcel(asistencia, registro) {
+    // Agrupar por área
+    const groupedByArea = registro.reduce((acc, r) => {
+        const area = r.sediprano?.area || 'Sin área'
+        if (!acc[area]) acc[area] = []
+        acc[area].push(r)
+        return acc
+    }, {})
+
+    // Calcular totales
+    const totalPresentes = registro.filter(r => r.estado === 'presente').length
+    const totalTardanzas = registro.filter(r => r.estado === 'tardanza').length
+    const totalJustificados = registro.filter(r => r.estado === 'justificado').length
+    const totalAusentes = registro.filter(r => r.estado === 'ausente').length
+    const totalGeneral = registro.length
+    const porcentajeAsistencia = totalGeneral > 0 ? Math.round((totalPresentes / totalGeneral) * 100) : 0
+
+    // Datos principales
     const excelData = [
-        [`Asistencia: ${asistencia.descripcion}`],
-        [`Fecha: ${formatDate(asistencia.fecha)}`],
+        [`ASISTENCIA: ${asistencia.descripcion?.toUpperCase() || 'SIN DESCRIPCIÓN'}`],
+        [`FECHA: ${formatDate(asistencia.fecha).toUpperCase()}`],
         [],
-        ['N°', 'Nombres', 'Apellidos', 'DNI', 'Área', 'Estado'],
-        ...registro.map((r, i) => [
-            i + 1,
-            r.sediprano?.nombres ?? '—',
-            r.sediprano?.apellidos ?? '—',
-            r.sediprano?.dni ?? '—',
-            r.sediprano?.area ?? '—',
-            ESTADOS[r.estado]?.label ?? r.estado,
-        ])
+        ['RESUMEN GENERAL'],
+        [`TOTAL: ${totalGeneral}`, `PRESENTES: ${totalPresentes}`, `TARDANZAS: ${totalTardanzas}`, `JUSTIFICADOS: ${totalJustificados}`, `AUSENTES: ${totalAusentes}`, `% ASISTENCIA: ${porcentajeAsistencia}%`],
+        [],
+        ['DETALLE POR ÁREA DE SEDIPRO UNT'],
+        [],
+        // Encabezados
+        ['N°', 'NOMBRES', 'APELLIDOS', 'ÁREA', 'ESTADO', 'HORA REGISTRO', 'REGISTRÓ'],
+        []
     ]
+
+    // Agregar datos agrupados por área
+    let counter = 0
+    const areas = Object.keys(groupedByArea).sort()
+    
+    areas.forEach((area, areaIndex) => {
+        const items = groupedByArea[area]
+        
+        // Subtítulo de área con resumen
+        const p = items.filter(r => r.estado === 'presente').length
+        const t = items.filter(r => r.estado === 'tardanza').length
+        const j = items.filter(r => r.estado === 'justificado').length
+        const a = items.filter(r => r.estado === 'ausente').length
+        
+        excelData.push([
+            `${area.toUpperCase()}`,
+            `TOTAL: ${items.length}`,
+            `Presentes: ${p}`,
+            `Tardanza: ${t}`,
+            `Justificados: ${j}`,
+            `Ausentes: ${a}`
+        ])
+        
+        items.forEach((r) => {
+            counter++
+            excelData.push([
+                counter,
+                r.sediprano?.nombres?.toUpperCase() || '—',
+                r.sediprano?.apellidos?.toUpperCase() || '—',
+                r.sediprano?.area?.toUpperCase() || '—',
+                ESTADOS[r.estado]?.label?.toUpperCase() || r.estado?.toUpperCase() || '—',
+                r.hora ? formatTime(r.hora) : '—',
+                r.registradoPor || '—'
+            ])
+        })
+        
+        if (areaIndex < areas.length - 1) {
+            excelData.push([])
+        }
+    })
 
     const ws = XLSX.utils.aoa_to_sheet(excelData)
     
     ws['!cols'] = [
-        {wch:6},   // N°
-        {wch:25},  // Nombres
-        {wch:25},  // Apellidos
-        {wch:15},  // DNI
-        {wch:20},  // Área
-        {wch:12}   // Estado
+        { wch: 15 },   // N°
+        { wch: 30 },  // NOMBRES
+        { wch: 30 },  // APELLIDOS
+        { wch: 25 },  // ÁREA
+        { wch: 18 },  // ESTADO
+        { wch: 20 },  // HORA REGISTRO
+        { wch: 20 },  // REGISTRÓ
     ]
-    
+
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Asistencia')
     XLSX.writeFile(wb, `asistencia_${asistencia.descripcion?.replace(/\s+/g, '_')}_${new Date(asistencia.fecha).toISOString().slice(0, 10)}.xlsx`)
@@ -408,18 +471,18 @@ export default function AsistenciaDetallePage() {
                 </div>
 
                 <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '680px' }}>
                         <thead>
                             <tr style={{ backgroundColor: t.tableHead }}>
-                                {['#', 'Nombre completo', 'DNI', 'Estado'].map((h, i) => (
+                                {['#', 'Nombre completo', 'DNI', 'Hora', 'Registrado por', 'Estado'].map((h, i) => (
                                     <th key={h} style={{
                                         padding: '11px 16px',
-                                        textAlign: i === 0 ? 'center' : i === 3 ? 'center' : 'left',
+                                        textAlign: i === 0 ? 'center' : i >= 3 ? 'center' : 'left',
                                         fontFamily: 'Poppins, sans-serif', fontSize: '11px',
                                         fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
                                         color: t.tableHeadText, borderBottom: `1px solid ${t.tableBorder}`,
                                         whiteSpace: 'nowrap',
-                                        width: i === 0 ? '52px' : i === 2 ? '110px' : 'auto',
+                                        width: i === 0 ? '52px' : i === 2 ? '110px' : i === 3 ? '90px' : i === 4 ? '120px' : 'auto',
                                     }}>
                                         {h}
                                     </th>
@@ -431,7 +494,7 @@ export default function AsistenciaDetallePage() {
                                 <SkeletonRows dark={dark} count={8} />
                             ) : filteredRegistro.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} style={{ padding: '48px 20px', textAlign: 'center', color: t.dividerText, fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
+                                    <td colSpan={6} style={{ padding: '48px 20px', textAlign: 'center', color: t.dividerText, fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
                                         {search ? 'Sin resultados para la búsqueda' : 'Sin registros'}
                                     </td>
                                 </tr>
@@ -472,6 +535,14 @@ export default function AsistenciaDetallePage() {
                                             }}>
                                                 {s?.dni ?? '—'}
                                             </span>
+                                        </td>
+                                        {/* Hora */}
+                                        <td style={{ padding: '12px 16px', textAlign: 'center', fontFamily: 'Poppins, sans-serif', fontSize: '12px', color: r.hora ? (dark ? '#C8A8D8' : '#4A1A5E') : t.dividerText }}>
+                                            {r.hora ? formatTime(r.hora) : '—'}
+                                        </td>
+                                        {/* Registrado por */}
+                                        <td style={{ padding: '12px 16px', textAlign: 'center', fontFamily: 'Poppins, sans-serif', fontSize: '12px', color: r.registradoPor ? (dark ? '#C8A8D8' : '#4A1A5E') : t.dividerText }}>
+                                            {r.registradoPor || '—'}
                                         </td>
                                         {/* Estado */}
                                         <td style={{ padding: '10px 16px' }}>

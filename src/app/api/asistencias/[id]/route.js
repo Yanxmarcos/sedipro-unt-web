@@ -22,6 +22,8 @@ export async function GET(request, { params }) {
         const registroCompleto = asistencia.registro.map(r => ({
             sedipranoId: r.sedipranoId,
             estado:      r.estado,
+            hora:        r.hora || null,
+            registradoPor: r.registradoPor || null,
             sediprano:   sedipranoMap[r.sedipranoId.toString()] || null,
         }))
 
@@ -52,10 +54,18 @@ export async function PUT(request, { params }) {
         if (descripcion) asistencia.descripcion = descripcion.trim()
 
         if (registro) {
-            asistencia.registro = registro.map(r => ({
-                sedipranoId: r.sedipranoId,
-                estado:      r.estado,
-            }))
+            const existentes = new Map(
+                asistencia.registro.map(r => [r.sedipranoId.toString(), { hora: r.hora, registradoPor: r.registradoPor }])
+            )
+            asistencia.registro = registro.map(r => {
+                const prev = existentes.get(r.sedipranoId?.toString())
+                return {
+                    sedipranoId: r.sedipranoId,
+                    estado:      r.estado,
+                    hora:        r.hora || prev?.hora || null,
+                    registradoPor: r.registradoPor || prev?.registradoPor || null,
+                }
+            })
 
             asistencia.resumen = {
                 presentes:    registro.filter(r => r.estado === 'presente').length,

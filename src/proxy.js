@@ -11,6 +11,7 @@ const protectedRoutes = [
     '/api/encargados',
     '/api/registro',
     '/api/sedipranos',
+    '/api/users',
     '/registro',
     '/api/dashboard',
 ];
@@ -72,6 +73,7 @@ export const config = {
         '/api/encargados/:path*',
         '/api/registro/:path*',
         '/api/sedipranos/:path*',
+        '/api/users/:path*',
         '/api/dashboard/:path*',
     ],
 };

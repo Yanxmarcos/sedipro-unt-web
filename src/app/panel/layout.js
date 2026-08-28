@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Icon } from '@/components/Icon'
 import Link from 'next/link'
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
     { href: '/panel/asistencias', label: 'Asistencias', iconKey: 'Attendance' },
     { href: '/panel/votaciones', label: 'Votaciones', iconKey: 'Vote' },
     { href: '/panel/sedipranos', label: 'Sedipranos', iconKey: 'Members' },
+    { href: '/panel/usuarios', label: 'Usuarios', iconKey: 'Members', adminOnly: true },
     {
         href: '/panel/sedinvita',
         label: 'SEDInvita',
@@ -40,8 +41,8 @@ function isChildActive(child, pathname) {
     return pathname === child.href || pathname.startsWith(child.href + '/')
 }
 
-function getActiveInfo(pathname) {
-    for (const item of NAV_ITEMS) {
+function getActiveInfo(pathname, items = NAV_ITEMS) {
+    for (const item of items) {
         if (item.children) {
             const child = item.children.find(c => c.href && isChildActive(c, pathname))
             if (child) return { item, label: item.label, sub: child.label === 'Resumen' ? null : child.label }
@@ -548,13 +549,18 @@ export default function PanelLayout({ children }) {
     const [isLoading, setIsLoading] = useState(true)
     const [openMenus, setOpenMenus] = useState({})
 
+    const visibleNavItems = useMemo(() => {
+        if (!userData) return NAV_ITEMS
+        return NAV_ITEMS.filter(item => !item.adminOnly || userData.rol === 'ADMIN')
+    }, [userData])
+
     useEffect(() => {
-        NAV_ITEMS.forEach(item => {
+        visibleNavItems.forEach(item => {
             if (item.children?.some(c => c.href && isChildActive(c, pathname))) {
                 setOpenMenus(prev => prev[item.href] ? prev : { ...prev, [item.href]: true })
             }
         })
-    }, [pathname])
+    }, [pathname, visibleNavItems])
 
     useEffect(() => {
         try {
@@ -623,7 +629,7 @@ export default function PanelLayout({ children }) {
         return item.exact ? pathname === item.href : pathname.startsWith(item.href)
     }
 
-    const activeInfo = getActiveInfo(pathname)
+    const activeInfo = getActiveInfo(pathname, visibleNavItems)
     const theme = getTheme(darkMode)
     const desktopCollapsed = !isMobile && collapsed
     const displayName = userData?.nombres && userData?.apellidos
@@ -717,7 +723,7 @@ export default function PanelLayout({ children }) {
                 </div>
 
                 <nav style={{ flex: 1, padding: '10px 8px', overflowY: 'auto', overflowX: 'hidden' }}>
-                    {NAV_ITEMS.map((item) => (
+                    {visibleNavItems.map((item) => (
                         item.children ? (
                             <SideNavGroup
                                 key={item.href}
