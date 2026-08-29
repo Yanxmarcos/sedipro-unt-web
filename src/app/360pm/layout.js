@@ -17,7 +17,7 @@ export const metadata = {
   openGraph: {
     title: '360° Project Mastery | Fórmate como un Project Manager',
     description:
-      'Programa experiencial para estudiantes y profesionales que buscan potenciar sus competencias y convertirse en referentes del Project Management en el Perú.',
+      'Programa experiencial holístico diseñado para estudiantes y profesionales apasionados por la gestión de proyectos',
     url: '/360pm',
     siteName: '360° Project Mastery',
     images: [
