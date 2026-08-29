@@ -36,28 +36,28 @@ export const insights = [
         date: '25 jul',
         activity: 'Sesión de fotos + entrega de sistema de votos',
         evaluation: 'Puntualidad, asistencia y vestimenta',
-        status: 'completed' // Ya pasó
+        status: 'upcoming' // Ya pasó
     },
     {
         id: 4,
         date: '07 ago',
         activity: 'Ponencia e inauguración',
         evaluation: 'Asistencia',
-        status: 'completed' // Ya pasó
+        status: 'upcoming' // Ya pasó
     },
     {
         id: 5,
         date: '08 ago',
         activity: 'Gymkana',
         evaluation: 'Participación y presentación',
-        status: 'completed' // Ya pasó
+        status: 'upcoming' // Ya pasó
     },
     {
         id: 6,
         date: '19 ago',
         activity: 'SEDICONECTA — Show de talentos',
         evaluation: 'Participación',
-        status: 'current' // Hoy/actual
+        status: 'upcoming' // Hoy/actual
     },
     {
         id: 7,
@@ -78,6 +78,6 @@ export const insights = [
         date: '29 ago',
         activity: 'Día Central: desfile y ronda de preguntas',
         evaluation: 'Desfile y criterio en las preguntas según rúbrica',
-        status: 'upcoming' // Próximo
+        status: 'current' // Próximo
     }
 ]

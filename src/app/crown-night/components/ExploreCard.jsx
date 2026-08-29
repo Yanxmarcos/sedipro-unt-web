@@ -46,7 +46,7 @@ const ExploreCard = ({ id, imgUrl, title, index, active, handleClick, area, care
                             >
                                 <FaFacebookF className="text-white text-[12px] sm:text-[14px] lg:text-[16px]" />
                             </a>
-                            <a
+                            {/* <a
                                 href={social.instagram}
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -55,7 +55,7 @@ const ExploreCard = ({ id, imgUrl, title, index, active, handleClick, area, care
                                 aria-label="Instagram"
                             >
                                 <FaInstagram className="text-white text-[12px] sm:text-[14px] lg:text-[16px]" />
-                            </a>
+                            </a> */}
                             <a
                                 href={social.tiktok}
                                 target="_blank"
@@ -75,7 +75,7 @@ const ExploreCard = ({ id, imgUrl, title, index, active, handleClick, area, care
 
                 <div className="absolute bottom-0 p-4 sm:p-6 lg:p-8 justify-start w-full flex-col bg-gradient-to-t from-background/90 to-transparent rounded-b-[24px]">
                     {/* Botón Comprar voto - Línea separada arriba del área */}
-                    <a
+                    {/* <a
                         href="https://forms.gle/VDYSJFaXWjomPJTm7"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -84,7 +84,7 @@ const ExploreCard = ({ id, imgUrl, title, index, active, handleClick, area, care
                     >
                         <FaTicketAlt className="text-[10px] sm:text-[11px] lg:text-[12px]" />
                         Comprar voto
-                    </a>
+                    </a> */}
                     
                     <p 
                         className="mt-2 font-bold text-[16px] sm:text-[18px] leading-[20px] uppercase tracking-wider"

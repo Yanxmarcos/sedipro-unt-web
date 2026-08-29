@@ -134,26 +134,17 @@ const Todos = () => {
                     className="grid md:grid-cols-2 gap-6 mt-6"
                 >
                     {/* Botón de compra */}
+                    {/* Compra de votos finalizada */}
                     <div className="glass-card p-6 sm:p-8 rounded-[32px] border border-border/10 relative group hover:border-primary/30 transition-all duration-300 flex flex-col items-center justify-center">
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-[32px] group-hover:from-primary/10 group-hover:to-secondary/10 transition-all duration-300" />
+
                         <div className="relative text-center">
                             <h4 className="text-2xl font-bold text-foreground mb-4">
-                                ¡Listo para participar!
+                                Compra de votos finalizada
                             </h4>
-                            <p className="text-foreground/70 mb-6">
-                                Al realizar tu compra, entras automáticamente a la rifa y podrás llevarte uno de nuestros increíbles premios.
-                            </p>
-                            <a
-                                href="https://forms.gle/VDYSJFaXWjomPJTm7"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-3 bg-primary hover:bg-primary/80 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/30"
-                            >
-                                <FaTicketAlt className="text-xl" />
-                                Comprar voto
-                            </a>
-                            <p className="text-foreground/50 text-sm mt-4">
-                                Al comprar, participas automáticamente en la rifa
+
+                            <p className="text-foreground/70">
+                                La etapa de compra de votos ha finalizado. Gracias a todos los participantes por ser parte de esta actividad.
                             </p>
                         </div>
                     </div>
