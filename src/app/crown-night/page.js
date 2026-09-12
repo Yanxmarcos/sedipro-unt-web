@@ -12,7 +12,8 @@ import {
     Insights,
     Feedback,
     Todos,
-    ResultadosEnVivo 
+    ResultadosEnVivo ,
+    Publicaciones
 } from './sections'
 import { Navbar, Footer, BackToTop } from './components'
 import PixelSnow from './components/PixelSnow'
@@ -55,6 +56,7 @@ export default function CrownNightPage() {
                 <Navbar />
                 <Hero />
                 <About />
+                <Publicaciones />
                 <Miss />         
                 <Mister />     
                 <Todos />

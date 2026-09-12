@@ -813,6 +813,42 @@ export default function MasteryPage() {
 								width: 380,
 								height: 591,
 							},
+							{
+								src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FSediproUNT%2Fposts%2Fpfbid01Q1FLbRG5G3nK53UHBkQ6FWhm8MbSSbMSSWwCtmpeW8wFJsfvTMZFjmitRSw66YDl&show_text=true&width=500",
+								caption: "Publicación · 360° PM",
+								width: 500,
+								height: 659,
+							},
+							{
+								src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FSediproUNT%2Fposts%2Fpfbid0wPAhjHRbMYUVnZsFy3aBEMfUVsgEhgWaEPTtNq5UTdd8QfeKd5zqKYvtecj2MjJ2l&show_text=true&width=500",
+								caption: "Publicación · 360° PM",
+								width: 500,
+								height: 659,
+							},
+							{
+								src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FSediproUNT%2Fposts%2Fpfbid02ChGL8cZxhNRgwxmHpJCwXaKmNtToCoE7d2krmdfq7k5vNygqSDSRePxdZbZLQNuCl&show_text=true&width=500",
+								caption: "Publicación · 360° PM",
+								width: 500,
+								height: 737,
+							},
+							{
+								src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FSediproUNT%2Fposts%2Fpfbid0ZSDTCDse7tLSCnXHSGyCzDhaM5shAoBLU2PfpZav7GmysFEki4CKvhr1qwcm7zUQl&show_text=true&width=500",
+								caption: "Publicación · 360° PM",
+								width: 500,
+								height: 698,
+							},
+							{
+								src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FSediproUNT%2Fposts%2Fpfbid0wraap9s2NwD6otJkETL6mAiuWkFdva9RgJcXfoFZiPvse6XnsYojuGxQnCW5UYqal&show_text=true&width=500",
+								caption: "Publicación · 360° PM",
+								width: 500,
+								height: 717,
+							},
+							{
+								src: "https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F915191531283925%2F&show_text=false&width=380&t=0",
+								caption: "Reel · 360° PM",
+								width: 380,
+								height: 476,
+							},
 							// 👉 agrega aquí más publicaciones, con su width/height reales del embed de Facebook
 						];
 
