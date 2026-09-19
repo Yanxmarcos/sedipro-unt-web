@@ -8,6 +8,7 @@ import Link from 'next/link'
 const NAV_ITEMS = [
     { href: '/panel', label: 'Dashboard', iconKey: 'Dashboard', exact: true },
     { href: '/panel/asistencias', label: 'Asistencias', iconKey: 'Attendance' },
+    { href: '/panel/eventos', label: 'Eventos', iconKey: 'Attendance' },
     { href: '/panel/votaciones', label: 'Votaciones', iconKey: 'Vote' },
     { href: '/panel/sedipranos', label: 'Sedipranos', iconKey: 'Members' },
     { href: '/panel/usuarios', label: 'Usuarios', iconKey: 'Members', adminOnly: true },
@@ -543,7 +544,7 @@ export default function PanelLayout({ children }) {
     const isMobile = useIsMobile(768)
     const [collapsed, setCollapsed] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
-    const [darkMode, setDarkMode] = useState(false)
+    const [darkMode] = useState(false)
     const [settingsOpen, setSettingsOpen] = useState(false)
     const [userData, setUserData] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
@@ -563,13 +564,11 @@ export default function PanelLayout({ children }) {
     }, [pathname, visibleNavItems])
 
     useEffect(() => {
-        try {
-            setDarkMode(localStorage.getItem('sedipro_dark') === 'true')
-            setCollapsed(localStorage.getItem('sedipro_collapsed') === 'true')
-        } catch { }
+        try { setCollapsed(localStorage.getItem('sedipro_collapsed') === 'true') } catch { }
     }, [])
 
-    useEffect(() => { try { localStorage.setItem('sedipro_dark', darkMode) } catch { } }, [darkMode])
+    // Tema único temporalmente: el panel se mantiene en modo claro.
+    // useEffect(() => { try { localStorage.setItem('sedipro_dark', darkMode) } catch { } }, [darkMode])
     useEffect(() => { try { localStorage.setItem('sedipro_collapsed', collapsed) } catch { } }, [collapsed])
 
     useEffect(() => {
@@ -829,15 +828,15 @@ export default function PanelLayout({ children }) {
                     
                     <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
 
-                        <button
-                            onClick={() => setDarkMode(d => !d)}
+                        {/* <button
+                            onClick={() => setDarkMode(() => {})}
                             title={darkMode ? 'Modo claro' : 'Modo oscuro'} aria-label={darkMode ? 'Modo claro' : 'Modo oscuro'}
                             style={{ background: 'rgba(255,255,255,0.10)', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.88)', borderRadius: '10px', padding: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}
                             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.18)' }}
                             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.10)' }}
                         >
                             {darkMode ? <Icon.Sun /> : <Icon.Moon />}
-                        </button>
+                        </button> */}
 
                         <div style={{ width: '1px', height: '20px', backgroundColor: 'rgba(255,255,255,0.2)', margin: '0 5px' }} />
 

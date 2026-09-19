@@ -67,6 +67,10 @@ async function loadModels() {
             import('@/models/Sediprano'),
             import('@/models/Votacion'),
             import('@/models/Voto'),
+            import('@/models/Evento'),
+            import('@/models/PersonaExterna'),
+            import('@/models/InscripcionEvento'),
+            import('@/models/AsistenciaEvento'),
         ]);
     } catch (error) {
         // Si algún modelo no existe, no falla - solo ignora
