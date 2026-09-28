@@ -155,13 +155,13 @@ export default function ResultadosFase1() {
         const handleScroll = () => {
             const searchRect = searchNode.getBoundingClientRect();
             const sectionRect = sectionNode.getBoundingClientRect();
-            
+
             // La flecha se muestra SOLO cuando:
             // 1. El buscador NO es visible (scrolleó más allá)
             // 2. Y la sección de resultados todavía es visible (no scrolleó más allá de la sección)
             const isSearchVisible = searchRect.bottom > 0 && searchRect.top < window.innerHeight;
             const isSectionVisible = sectionRect.bottom > 0 && sectionRect.top < window.innerHeight;
-            
+
             setShowBackToSearch(!isSearchVisible && isSectionVisible);
         };
 
@@ -173,7 +173,7 @@ export default function ResultadosFase1() {
                     setShowBackToSearch(false);
                 }
             },
-            { 
+            {
                 threshold: 0,
                 rootMargin: '0px 0px 0px 0px'
             }
@@ -211,7 +211,7 @@ export default function ResultadosFase1() {
             {/* Buscador */}
             <div ref={searchAnchorRef} className="max-w-md mx-auto scroll-mt-28">
                 <div className="glass-card relative z-10 isolate rounded-full flex items-center gap-3 px-5 py-3 border border-transparent focus-within:border-primary/50 transition-colors">
-                    <Search size={18} className="text-on-surface-variant flex-shrink-0" />
+                    <Search size={18} className="text-[#cbc3d5] flex-shrink-0" />
                     <input
                         ref={inputRef}
                         type="text"
@@ -220,8 +220,8 @@ export default function ResultadosFase1() {
                         onKeyDown={handleKeyDown}
                         placeholder="Busca tu nombre o apellido"
                         aria-label="Buscar en el listado de resultados"
-                        className="relative z-10 w-full min-w-0 appearance-none rounded-full border-0 bg-transparent p-0 font-body-md text-body-md leading-none text-on-surface placeholder:text-on-surface-variant/60 shadow-none outline-none ring-0 focus:border-0 focus:shadow-none focus:outline-none focus:ring-0"
-                        style={{ 
+                        className="relative z-10 w-full min-w-0 appearance-none rounded-full border-0 bg-transparent p-0 font-body-md text-body-md leading-none text-[#dae2fd] placeholder:text-[#cbc3d5]/60 shadow-none outline-none ring-0 focus:border-0 focus:shadow-none focus:outline-none focus:ring-0"
+                        style={{
                             caretColor: '#6b46c1',
                             color: '#ffffff'
                         }}
@@ -230,7 +230,7 @@ export default function ResultadosFase1() {
                         <button
                             onClick={() => setInput('')}
                             aria-label="Limpiar búsqueda"
-                            className="relative z-10 text-on-surface-variant hover:text-primary transition-colors flex-shrink-0"
+                            className="relative z-10 text-[#cbc3d5] hover:text-primary transition-colors flex-shrink-0"
                         >
                             <X size={16} />
                         </button>
@@ -238,7 +238,7 @@ export default function ResultadosFase1() {
                 </div>
 
                 {query.length >= 2 && (
-                    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 mt-3 font-label-sm text-label-sm text-on-surface-variant">
+                    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 mt-3 font-label-sm text-label-sm text-[#cbc3d5]">
                         {matches.length > 0 ? (
                             <>
                                 <span>
@@ -301,10 +301,10 @@ export default function ResultadosFase1() {
                                 <User size={18} strokeWidth={2.5} />
                             </div>
                             <div className="min-w-0">
-                                <p className="font-headline-md text-body-md font-bold text-on-surface uppercase tracking-tight truncate">
+                                <p className="font-headline-md text-body-md font-bold text-[#dae2fd] uppercase tracking-tight truncate">
                                     {persona.apellidos}
                                 </p>
-                                <p className="font-body-md text-body-md text-on-surface-variant truncate">
+                                <p className="font-body-md text-body-md text-[#cbc3d5] truncate">
                                     {persona.nombres}
                                 </p>
                             </div>

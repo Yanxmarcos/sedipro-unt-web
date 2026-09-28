@@ -3,12 +3,12 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { 
-  BarChart3, 
-  ExternalLink, 
-  Shield, 
+import {
+  BarChart3,
+  ExternalLink,
+  Shield,
   RefreshCw,
-  TrendingUp 
+  TrendingUp
 } from 'lucide-react'
 import { TitleText, TypingText } from '../components'
 import { staggerContainer, fadeIn } from '../utils/motion'
@@ -81,7 +81,7 @@ const ResultadosEnVivo = () => {
                                 </h3>
 
                                 <p className="text-sm sm:text-base text-foreground/60 max-w-lg mb-6 lg:mb-8">
-                                    Consulta los cómputos actualizados de la votación. 
+                                    Consulta los cómputos actualizados de la votación.
                                     Los datos se actualizan automáticamente desde el registro oficial de SEDIPRO UNT.
                                 </p>
 
@@ -90,7 +90,7 @@ const ResultadosEnVivo = () => {
                                     href="https://script.google.com/a/macros/unitru.edu.pe/s/AKfycbznPLlb78sz9HIjFwUrh-KHhdITMES2Wf9Y7Qg1AGR02U2AH2cS34vw0jjWl4FjD2q7/exec"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="group/btn relative inline-flex items-center gap-3 px-8 py-4 bg-primary hover:bg-primary-hover text-white rounded-2xl font-semibold text-lg transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/40 hover:scale-[1.02]"
+                                    className="group/btn relative inline-flex items-center gap-3 px-8 py-4 bg-primary hover:bg-primary text-white rounded-2xl font-semibold text-lg transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/40 hover:scale-[1.02]"
                                 >
                                     <span>Ver Resultados</span>
                                     <ExternalLink className="w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />

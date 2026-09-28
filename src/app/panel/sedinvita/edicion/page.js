@@ -1,667 +1,484 @@
-// src/app/panel/sedinvita/edicion/page.js
 'use client'
 
+import { Calendar as AdminCalendarIcon } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from '@/components/ui/table'
+import { AdminSelect, AdminCheckbox } from '@/components/admin/form-controls'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
 import { useState, useEffect, useCallback } from 'react'
-
 export default function Page() {
-    const [dark, setDark] = useState(false)
-    const t = getTheme(dark)
-    
-    // Theme
-    useEffect(() => {
-        const stored = localStorage.getItem('sedipro_dark')
-        if (stored !== null) setDark(stored === 'true')
-        const onStorage = e => { if (e.key === 'sedipro_dark') setDark(e.newValue === 'true') }
-        window.addEventListener('storage', onStorage)
-        const interval = setInterval(() => {
-            const val = localStorage.getItem('sedipro_dark')
-            setDark(prev => { const next = val === 'true'; return prev !== next ? next : prev })
-        }, 400)
-        return () => { window.removeEventListener('storage', onStorage); clearInterval(interval) }
-    }, [])
-
-    // Estados
-    const [ediciones, setEdiciones] = useState([])
-    const [edicionActiva, setEdicionActiva] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
-    
-    // Formulario
-    const [showForm, setShowForm] = useState(false)
-    const [editingId, setEditingId] = useState(null)
-    const [formData, setFormData] = useState({
-        nombre: '',
-        anio: new Date().getFullYear(),
-        estado: 'planificacion',
-        fechaInicio: '',
-        fechaFin: '',
-        activa: false,
-        seleccionTurnosAbierta: false
+  const [ediciones, setEdiciones] = useState([])
+  const [edicionActiva, setEdicionActiva] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+  const [formData, setFormData] = useState({
+    nombre: '',
+    anio: new Date().getFullYear(),
+    estado: 'planificacion',
+    fechaInicio: '',
+    fechaFin: '',
+    activa: false,
+    seleccionTurnosAbierta: false,
+  })
+  const fetchEdiciones = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/sedinvita/ediciones', {
+        credentials: 'include',
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Error al cargar ediciones')
+      setEdiciones(json.data || [])
+      const activa = (json.data || []).find((e) => e.activa === true)
+      setEdicionActiva(activa || null)
+    } catch (err) {
+      console.error(err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+  useEffect(() => {
+    fetchEdiciones()
+  }, [fetchEdiciones])
+  const resetForm = useCallback(() => {
+    setFormData({
+      nombre: '',
+      anio: new Date().getFullYear(),
+      estado: 'planificacion',
+      fechaInicio: '',
+      fechaFin: '',
+      activa: false,
+      seleccionTurnosAbierta: false,
     })
-
-    // Cargar ediciones
-    const fetchEdiciones = useCallback(async () => {
-        setLoading(true)
-        setError(null)
-        try {
-            const res = await fetch('/api/sedinvita/ediciones', { credentials: 'include' })
-            const json = await res.json()
-            if (!res.ok) throw new Error(json.error || 'Error al cargar ediciones')
-            setEdiciones(json.data || [])
-            const activa = (json.data || []).find(e => e.activa === true)
-            setEdicionActiva(activa || null)
-        } catch (err) {
-            console.error(err)
-            setError(err.message)
-        } finally {
-            setLoading(false)
-        }
-    }, [])
-
-    useEffect(() => {
-        fetchEdiciones()
-    }, [fetchEdiciones])
-
-    // Resetear formulario
-    const resetForm = useCallback(() => {
-        setFormData({
-            nombre: '',
-            anio: new Date().getFullYear(),
-            estado: 'planificacion',
-            fechaInicio: '',
-            fechaFin: '',
-            activa: false,
-            seleccionTurnosAbierta: false
-        })
-        setEditingId(null)
-        setShowForm(false)
-    }, [])
-
-    // Guardar edición
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        setLoading(true)
-        try {
-            const url = editingId 
-                ? `/api/sedinvita/ediciones/${editingId}`
-                : '/api/sedinvita/ediciones'
-            const method = editingId ? 'PATCH' : 'POST'
-            
-            const payload = { ...formData }
-            if (payload.fechaInicio === '') payload.fechaInicio = null
-            if (payload.fechaFin === '') payload.fechaFin = null
-            
-            const res = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(payload)
-            })
-            const json = await res.json()
-            if (!res.ok) throw new Error(json.error || 'Error al guardar edición')
-            
-            await fetchEdiciones()
-            resetForm()
-        } catch (err) {
-            console.error(err)
-            setError(err.message)
-        } finally {
-            setLoading(false)
-        }
+    setEditingId(null)
+    setShowForm(false)
+  }, [])
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const url = editingId ? `/api/sedinvita/ediciones/${editingId}` : '/api/sedinvita/ediciones'
+      const method = editingId ? 'PATCH' : 'POST'
+      const payload = {
+        ...formData,
+      }
+      if (payload.fechaInicio === '') payload.fechaInicio = null
+      if (payload.fechaFin === '') payload.fechaFin = null
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Error al guardar edición')
+      await fetchEdiciones()
+      resetForm()
+    } catch (err) {
+      console.error(err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
-
-    // Activar edición
-    const handleToggleActiva = async (id, currentActiva) => {
-        if (currentActiva) return
-        if (!confirm('¿Activar esta edición? Se desactivará la actual.')) return
-        
-        setLoading(true)
-        try {
-            const res = await fetch(`/api/sedinvita/ediciones/${id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ activa: true })
-            })
-            const json = await res.json()
-            if (!res.ok) throw new Error(json.error || 'Error al activar edición')
-            await fetchEdiciones()
-        } catch (err) {
-            console.error(err)
-            setError(err.message)
-        } finally {
-            setLoading(false)
-        }
+  }
+  const handleToggleActiva = async (id, currentActiva) => {
+    if (currentActiva) return
+    if (!confirm('¿Activar esta edición? Se desactivará la actual.')) return
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/sedinvita/ediciones/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          activa: true,
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Error al activar edición')
+      await fetchEdiciones()
+    } catch (err) {
+      console.error(err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
-
-    // Abrir/Cerrar selección de turnos
-    const handleToggleSeleccionTurnos = async (id, currentValue) => {
-        setLoading(true)
-        try {
-            const res = await fetch(`/api/sedinvita/ediciones/${id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ seleccionTurnosAbierta: !currentValue })
-            })
-            const json = await res.json()
-            if (!res.ok) throw new Error(json.error || 'Error al actualizar')
-            await fetchEdiciones()
-        } catch (err) {
-            console.error(err)
-            setError(err.message)
-        } finally {
-            setLoading(false)
-        }
+  }
+  const handleToggleSeleccionTurnos = async (id, currentValue) => {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/sedinvita/ediciones/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          seleccionTurnosAbierta: !currentValue,
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Error al actualizar')
+      await fetchEdiciones()
+    } catch (err) {
+      console.error(err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
-
-    // Editar edición
-    const handleEdit = (edicion) => {
-        setFormData({
-            nombre: edicion.nombre || '',
-            anio: edicion.anio || new Date().getFullYear(),
-            estado: edicion.estado || 'planificacion',
-            fechaInicio: edicion.fechaInicio ? new Date(edicion.fechaInicio).toISOString().split('T')[0] : '',
-            fechaFin: edicion.fechaFin ? new Date(edicion.fechaFin).toISOString().split('T')[0] : '',
-            activa: edicion.activa || false,
-            seleccionTurnosAbierta: edicion.seleccionTurnosAbierta || false
-        })
-        setEditingId(edicion._id)
-        setShowForm(true)
-    }
-
-    const estados = ['planificacion', 'abierto', 'cerrado', 'finalizado']
-
-    return (
-        <div style={{
-            minHeight: '100%', padding: '20px 16px',
-            backgroundColor: t.pageBg, transition: 'background-color 0.3s',
-            fontFamily: 'Poppins, sans-serif',
-            maxWidth: '1200px', margin: '0 auto',
-        }}>
-            {/* Encabezado */}
-            <div style={{ marginBottom: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '11px', marginBottom: '4px' }}>
-                    <div>
-                        <h1 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '22px', color: t.titleText, margin: 0, lineHeight: 1.2 }}>
-                            Ediciones SEDInvita
-                        </h1>
-                        <p style={{ fontSize: '13px', color: t.bodyText, marginTop: '4px', marginBottom: 0 }}>
-                            Configuración de ediciones del evento
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Error */}
-            {error && (
-                <div style={{
-                    padding: '12px 16px',
-                    backgroundColor: '#FEE2E2',
-                    color: '#991B1B',
-                    borderRadius: '8px',
-                    marginBottom: '16px',
-                    fontSize: '13px'
-                }}>
-                    ⚠️ {error}
-                </div>
-            )}
-
-            {/* Botón crear */}
-            <div style={{ marginBottom: '16px' }}>
-                <button
-                    onClick={() => {
-                        if (showForm) {
-                            resetForm()
-                        } else {
-                            setFormData({
-                                nombre: '',
-                                anio: new Date().getFullYear(),
-                                estado: 'planificacion',
-                                fechaInicio: '',
-                                fechaFin: '',
-                                activa: false,
-                                seleccionTurnosAbierta: false
-                            })
-                            setEditingId(null)
-                            setShowForm(true)
-                        }
-                    }}
-                    style={{
-                        padding: '9px 18px',
-                        borderRadius: '10px',
-                        border: 'none',
-                        backgroundColor: '#672577',
-                        color: '#fff',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        transition: 'all 0.2s'
-                    }}
-                >
-                    {showForm ? 'Cancelar' : '+ Nueva Edición'}
-                </button>
-            </div>
-
-            {/* Formulario */}
-            {showForm && (
-                <form onSubmit={handleSubmit} style={{
-                    backgroundColor: t.cardBg,
-                    border: `1px solid ${t.cardBorder}`,
-                    borderRadius: '12px',
-                    padding: '20px',
-                    marginBottom: '20px',
-                    boxShadow: t.cardShadow
-                }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-                        <div>
-                            <label style={{ fontSize: '12px', fontWeight: 600, color: t.labelText, display: 'block', marginBottom: '4px' }}>
-                                Nombre *
-                            </label>
-                            <input
-                                value={formData.nombre}
-                                onChange={e => setFormData({ ...formData, nombre: e.target.value })}
-                                required
-                                placeholder="Ej: SEDInvita 2026"
-                                style={{
-                                    width: '100%',
-                                    padding: '8px 12px',
-                                    borderRadius: '8px',
-                                    border: `1px solid ${t.inputBorder}`,
-                                    backgroundColor: dark ? '#2d2b3e' : '#fff',
-                                    color: t.inputText,
-                                    fontSize: '13px',
-                                    fontFamily: 'Poppins, sans-serif'
-                                }}
-                            />
-                        </div>
-                        <div>
-                            <label style={{ fontSize: '12px', fontWeight: 600, color: t.labelText, display: 'block', marginBottom: '4px' }}>
-                                Año *
-                            </label>
-                            <input
-                                type="number"
-                                value={formData.anio}
-                                onChange={e => setFormData({ ...formData, anio: Number(e.target.value) })}
-                                required
-                                min={2000}
-                                max={2100}
-                                style={{
-                                    width: '100%',
-                                    padding: '8px 12px',
-                                    borderRadius: '8px',
-                                    border: `1px solid ${t.inputBorder}`,
-                                    backgroundColor: dark ? '#2d2b3e' : '#fff',
-                                    color: t.inputText,
-                                    fontSize: '13px',
-                                    fontFamily: 'Poppins, sans-serif'
-                                }}
-                            />
-                        </div>
-                        <div>
-                            <label style={{ fontSize: '12px', fontWeight: 600, color: t.labelText, display: 'block', marginBottom: '4px' }}>
-                                Estado
-                            </label>
-                            <select
-                                value={formData.estado}
-                                onChange={e => setFormData({ ...formData, estado: e.target.value })}
-                                style={{
-                                    width: '100%',
-                                    padding: '8px 12px',
-                                    borderRadius: '8px',
-                                    border: `1px solid ${t.inputBorder}`,
-                                    backgroundColor: dark ? '#2d2b3e' : '#fff',
-                                    color: t.inputText,
-                                    fontSize: '13px',
-                                    fontFamily: 'Poppins, sans-serif'
-                                }}
-                            >
-                                {estados.map(e => (
-                                    <option key={e} value={e}>{e.charAt(0).toUpperCase() + e.slice(1)}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label style={{ fontSize: '12px', fontWeight: 600, color: t.labelText, display: 'block', marginBottom: '4px' }}>
-                                Activa
-                            </label>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '6px' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={formData.activa}
-                                    onChange={e => setFormData({ ...formData, activa: e.target.checked })}
-                                    style={{ width: '18px', height: '18px', accentColor: '#672577', cursor: 'pointer' }}
-                                />
-                                <span style={{ fontSize: '12px', color: t.bodyText }}>
-                                    {formData.activa ? 'Edición activa' : 'Inactiva'}
-                                </span>
-                            </div>
-                        </div>
-                        <div>
-                            <label style={{ fontSize: '12px', fontWeight: 600, color: t.labelText, display: 'block', marginBottom: '4px' }}>
-                                Fecha Inicio
-                            </label>
-                            <input
-                                type="date"
-                                value={formData.fechaInicio}
-                                onChange={e => setFormData({ ...formData, fechaInicio: e.target.value })}
-                                style={{
-                                    width: '100%',
-                                    padding: '8px 12px',
-                                    borderRadius: '8px',
-                                    border: `1px solid ${t.inputBorder}`,
-                                    backgroundColor: dark ? '#2d2b3e' : '#fff',
-                                    color: t.inputText,
-                                    fontSize: '13px',
-                                    fontFamily: 'Poppins, sans-serif'
-                                }}
-                            />
-                        </div>
-                        <div>
-                            <label style={{ fontSize: '12px', fontWeight: 600, color: t.labelText, display: 'block', marginBottom: '4px' }}>
-                                Fecha Fin
-                            </label>
-                            <input
-                                type="date"
-                                value={formData.fechaFin}
-                                onChange={e => setFormData({ ...formData, fechaFin: e.target.value })}
-                                style={{
-                                    width: '100%',
-                                    padding: '8px 12px',
-                                    borderRadius: '8px',
-                                    border: `1px solid ${t.inputBorder}`,
-                                    backgroundColor: dark ? '#2d2b3e' : '#fff',
-                                    color: t.inputText,
-                                    fontSize: '13px',
-                                    fontFamily: 'Poppins, sans-serif'
-                                }}
-                            />
-                        </div>
-                        <div style={{ gridColumn: '1 / -1' }}>
-                            <label style={{ fontSize: '12px', fontWeight: 600, color: t.labelText, display: 'block', marginBottom: '4px' }}>
-                                Selección Pública de Turnos
-                            </label>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '6px' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={formData.seleccionTurnosAbierta}
-                                    onChange={e => setFormData({ ...formData, seleccionTurnosAbierta: e.target.checked })}
-                                    style={{ width: '18px', height: '18px', accentColor: '#672577', cursor: 'pointer' }}
-                                />
-                                <span style={{ fontSize: '12px', color: t.bodyText }}>
-                                    {formData.seleccionTurnosAbierta ? 'Abierta' : 'Cerrada'}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            style={{
-                                padding: '9px 24px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                backgroundColor: '#672577',
-                                color: '#fff',
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '13px',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                opacity: loading ? 0.6 : 1,
-                                transition: 'all 0.2s'
-                            }}
-                        >
-                            {loading ? 'Guardando...' : editingId ? 'Actualizar' : 'Crear'}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={resetForm}
-                            style={{
-                                padding: '9px 24px',
-                                borderRadius: '8px',
-                                border: `1px solid ${t.cardBorder}`,
-                                backgroundColor: 'transparent',
-                                color: t.bodyText,
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '13px',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Cancelar
-                        </button>
-                    </div>
-                </form>
-            )}
-
-            {/* Tabla de ediciones */}
-            <div style={{
-                backgroundColor: t.cardBg,
-                border: `1px solid ${t.cardBorder}`,
-                boxShadow: t.cardShadow,
-                borderRadius: '14px',
-                overflow: 'hidden',
-            }}>
-                <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
-                        <thead>
-                            <tr style={{ backgroundColor: t.tableHead }}>
-                                {['Año', 'Nombre', 'Estado', 'Activa', 'Turnos', 'Acciones'].map(h => (
-                                    <th key={h} style={{
-                                        padding: '11px 14px', textAlign: 'left',
-                                        fontFamily: 'Poppins,sans-serif', fontSize: '11px',
-                                        fontWeight: 700, color: t.tableHeadText,
-                                        textTransform: 'uppercase', letterSpacing: '0.05em',
-                                        whiteSpace: 'nowrap',
-                                        borderBottom: `1px solid ${t.tableBorder}`,
-                                    }}>{h}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loading ? (
-                                <SkeletonRows dark={dark} count={5} />
-                            ) : ediciones.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} style={{ padding: '56px 20px', textAlign: 'center' }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: t.dividerText }}>
-                                            <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: t.emptyIcon, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <Ico.Calendar />
-                                            </div>
-                                            <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '14px', margin: 0 }}>
-                                                No hay ediciones registradas
-                                            </p>
-                                            <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', margin: 0, opacity: 0.7 }}>
-                                                Crea la primera edición usando el botón "Nueva Edición"
-                                            </p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : (
-                                ediciones.map((ed, i) => {
-                                    const isEven = i % 2 === 1
-                                    const isActiva = ed.activa === true
-                                    return (
-                                        <tr
-                                            key={ed._id}
-                                            style={{ 
-                                                backgroundColor: isEven ? t.tableRowAlt : t.tableRow, 
-                                                borderBottom: `1px solid ${t.tableBorder}`,
-                                                transition: 'background-color 0.1s'
-                                            }}
-                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = t.tableRowHover}
-                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = isEven ? t.tableRowAlt : t.tableRow}
-                                        >
-                                            <td style={{ padding: '11px 14px', fontFamily: 'Poppins,sans-serif', fontSize: '13px', fontWeight: 600, color: t.titleText }}>
-                                                {ed.anio}
-                                            </td>
-                                            <td style={{ padding: '11px 14px', fontFamily: 'Poppins,sans-serif', fontSize: '13px', color: t.inputText }}>
-                                                {ed.nombre}
-                                            </td>
-                                            <td style={{ padding: '11px 14px' }}>
-                                                <span style={{
-                                                    fontFamily: 'Poppins,sans-serif', fontSize: '11px',
-                                                    padding: '3px 10px', borderRadius: '6px',
-                                                    backgroundColor: ed.estado === 'planificacion' ? '#FEF3C7' : 
-                                                                  ed.estado === 'abierto' ? '#D1FAE5' :
-                                                                  ed.estado === 'cerrado' ? '#FEE2E2' : '#E5E7EB',
-                                                    color: ed.estado === 'planificacion' ? '#92400E' :
-                                                          ed.estado === 'abierto' ? '#065F46' :
-                                                          ed.estado === 'cerrado' ? '#991B1B' : '#374151'
-                                                }}>
-                                                    {ed.estado?.charAt(0).toUpperCase() + ed.estado?.slice(1)}
-                                                </span>
-                                            </td>
-                                            <td style={{ padding: '11px 14px' }}>
-                                                {isActiva ? (
-                                                    <span style={{ color: '#065F46', fontWeight: 600, fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                        Activa
-                                                    </span>
-                                                ) : (
-                                                    <button
-                                                        onClick={() => handleToggleActiva(ed._id, isActiva)}
-                                                        style={{
-                                                            padding: '4px 12px',
-                                                            borderRadius: '6px',
-                                                            border: 'none',
-                                                            backgroundColor: '#E5E7EB',
-                                                            color: '#374151',
-                                                            fontSize: '11px',
-                                                            fontFamily: 'Poppins, sans-serif',
-                                                            cursor: 'pointer'
-                                                        }}
-                                                    >
-                                                        Activar
-                                                    </button>
-                                                )}
-                                            </td>
-                                            <td style={{ padding: '11px 14px' }}>
-                                                <span style={{ 
-                                                    fontSize: '12px', 
-                                                    color: ed.seleccionTurnosAbierta ? '#065F46' : '#991B1B',
-                                                    fontWeight: 500,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '4px'
-                                                }}>
-                                                    {ed.seleccionTurnosAbierta ? '🔓 Abierta' : '🔒 Cerrada'}
-                                                </span>
-                                            </td>
-                                            <td style={{ padding: '11px 14px' }}>
-                                                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                                                    <button
-                                                        onClick={() => handleEdit(ed)}
-                                                        title="Editar edición"
-                                                        className="p-1.5 rounded-lg transition-colors" 
-                                                        style={{ color: 'var(--color-edit)', backgroundColor: dark ? '#2d2b3e' : '#dbeafe' }}
-                                                    >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                                    </button>
-                                                    {isActiva && (
-                                                        <button
-                                                            onClick={() => handleToggleSeleccionTurnos(ed._id, ed.seleccionTurnosAbierta)}
-                                                            style={{
-                                                                padding: '4px 10px',
-                                                                borderRadius: '6px',
-                                                                border: 'none',
-                                                                backgroundColor: '#FEF3C7',
-                                                                color: '#92400E',
-                                                                fontSize: '11px',
-                                                                fontFamily: 'Poppins, sans-serif',
-                                                                cursor: 'pointer'
-                                                            }}
-                                                        >
-                                                            {ed.seleccionTurnosAbierta ? 'Cerrar' : 'Abrir'}
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-                {!loading && ediciones.length > 0 && (
-                    <div style={{ padding: '10px 16px', borderTop: `1px solid ${t.tableBorder}` }}>
-                        <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: t.bodyText, margin: 0 }}>
-                            {ediciones.length} edición{ediciones.length !== 1 ? 'es' : ''} registrada{ediciones.length !== 1 ? 's' : ''}
-                            {edicionActiva && ` • Activa: ${edicionActiva.nombre} (${edicionActiva.anio})`}
-                        </p>
-                    </div>
-                )}
-            </div>
-
-            <style>{`
-                @keyframes spin { to { transform: rotate(360deg); } }
-                @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-                @keyframes slideUp { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
-                @keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.4 } }
-                ::-webkit-scrollbar { width: 0; height: 0; }
-            `}</style>
+  }
+  const handleEdit = (edicion) => {
+    setFormData({
+      nombre: edicion.nombre || '',
+      anio: edicion.anio || new Date().getFullYear(),
+      estado: edicion.estado || 'planificacion',
+      fechaInicio: edicion.fechaInicio ? new Date(edicion.fechaInicio).toISOString().split('T')[0] : '',
+      fechaFin: edicion.fechaFin ? new Date(edicion.fechaFin).toISOString().split('T')[0] : '',
+      activa: edicion.activa || false,
+      seleccionTurnosAbierta: edicion.seleccionTurnosAbierta || false,
+    })
+    setEditingId(edicion._id)
+    setShowForm(true)
+  }
+  const estados = ['planificacion', 'abierto', 'cerrado', 'finalizado']
+  return (
+    <div className="space-y-6">
+      <div className="mb-4">
+        <div className="flex items-center gap-3 mb-1">
+          <div>
+            <h1 className="text-foreground m-0 text-2xl font-semibold tracking-tight">Ediciones SEDInvita</h1>
+            <p className="text-sm text-muted-foreground mt-1 mb-0">Configuración de ediciones del evento</p>
+          </div>
         </div>
-    )
-}
+      </div>
 
-// ─────────────────────────────────────────────
-// TEMA
-// ─────────────────────────────────────────────
-function getTheme(dark) {
-    return {
-        pageBg:        dark ? '#0E0818' : '#f8f5fa',
-        cardBg:        dark ? '#160C22' : '#ffffff',
-        cardBorder:    dark ? 'rgba(103,37,119,0.28)' : 'rgba(214,182,223,0.55)',
-        cardShadow:    dark ? '0 8px 32px rgba(0,0,0,0.45)' : '0 4px 24px rgba(103,37,119,0.10)',
-        inputBg:       dark ? '#1F1030' : '#f9f6fb',
-        inputBorder:   dark ? 'rgba(103,37,119,0.35)' : '#e5d9ef',
-        inputText:     dark ? '#EAD8F5' : '#111827',
-        labelText:     dark ? '#C8A8D8' : '#4A1A5E',
-        bodyText:      dark ? '#9880B0' : '#6B7280',
-        tableHead:     dark ? '#1A0D2E' : '#f5f0f9',
-        tableHeadText: dark ? '#C8A8D8' : '#4A1A5E',
-        tableRow:      dark ? '#160C22' : '#ffffff',
-        tableRowAlt:   dark ? '#1A0D2B' : '#faf7fc',
-        tableRowHover: dark ? 'rgba(103,37,119,0.10)' : 'rgba(103,37,119,0.05)',
-        tableBorder:   dark ? 'rgba(103,37,119,0.16)' : 'rgba(214,182,223,0.45)',
-        dividerText:   dark ? '#6B5080' : '#c4aed4',
-        emptyIcon:     dark ? 'rgba(103,37,119,0.18)' : 'rgba(103,37,119,0.08)',
-        titleText:     dark ? '#EAD8F5' : '#4A1A5E',
-        modalBg:       dark ? '#1A0D2E' : '#ffffff',
-        divider:       dark ? 'rgba(103,37,119,0.22)' : 'rgba(103,37,119,0.15)',
-        tabActive:     dark ? 'rgba(103,37,119,0.30)' : '#ffffff',
-        tabBg:         dark ? 'rgba(255,255,255,0.04)' : 'rgba(103,37,119,0.06)',
-        tabBorder:     dark ? 'rgba(103,37,119,0.22)' : 'rgba(103,37,119,0.18)',
-        overlayBg:     'rgba(0,0,0,0.55)',
-    }
-}
+      {error && (
+        <div className="pt-3 pr-4 pb-3 pl-4 bg-muted text-destructive rounded-xl mb-4 text-sm">
+          ⚠️ {error}
+        </div>
+      )}
 
-// ─────────────────────────────────────────────
-// ÍCONOS SVG inline// ─────────────────────────────────────────────
-const Ico = {
-    Calendar: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
-}
+      <div className="mb-4">
+        <Button
+          onClick={() => {
+            if (showForm) {
+              resetForm()
+            } else {
+              setFormData({
+                nombre: '',
+                anio: new Date().getFullYear(),
+                estado: 'planificacion',
+                fechaInicio: '',
+                fechaFin: '',
+                activa: false,
+                seleccionTurnosAbierta: false,
+              })
+              setEditingId(null)
+              setShowForm(true)
+            }
+          }}
+          type="button"
+          variant="default"
+          className="items-center"
+        >
+          {showForm ? 'Cancelar' : '+ Nueva Edición'}
+        </Button>
+      </div>
 
-// ─────────────────────────────────────────────
-// SKELETON ROWS
-// ─────────────────────────────────────────────
+      {showForm && (
+        <form onSubmit={handleSubmit} className="bg-card border rounded-xl p-4 mb-4 shadow-xs space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label className="text-sm font-semibold text-muted-foreground block mb-1">Nombre *</Label>
+              <Input
+                value={formData.nombre}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    nombre: e.target.value,
+                  })
+                }
+                required
+                placeholder="Ej: SEDInvita 2026"
+                className="w-full"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label className="text-sm font-semibold text-muted-foreground block mb-1">Año *</Label>
+              <Input
+                type="number"
+                value={formData.anio}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    anio: Number(e.target.value),
+                  })
+                }
+                required
+                min={2000}
+                max={2100}
+                className="w-full"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label className="text-sm font-semibold text-muted-foreground block mb-1">Estado</Label>
+              <AdminSelect
+                value={formData.estado}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    estado: e.target.value,
+                  })
+                }
+                className="w-full"
+              >
+                {estados.map((e) => (
+                  <option key={e} value={e}>
+                    {e.charAt(0).toUpperCase() + e.slice(1)}
+                  </option>
+                ))}
+              </AdminSelect>
+            </div>
+            <div>
+              <Label className="text-sm font-semibold text-muted-foreground block mb-1">Activa</Label>
+              <div className="flex items-center gap-2 pt-1.5">
+                <AdminCheckbox
+                  checked={formData.activa}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      activa: e.target.checked,
+                    })
+                  }
+                />
+                <span className="text-sm text-muted-foreground">
+                  {formData.activa ? 'Edición activa' : 'Inactiva'}
+                </span>
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label className="text-sm font-semibold text-muted-foreground block mb-1">Fecha Inicio</Label>
+              <Input
+                type="date"
+                value={formData.fechaInicio}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    fechaInicio: e.target.value,
+                  })
+                }
+                className="w-full"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label className="text-sm font-semibold text-muted-foreground block mb-1">Fecha Fin</Label>
+              <Input
+                type="date"
+                value={formData.fechaFin}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    fechaFin: e.target.value,
+                  })
+                }
+                className="w-full"
+              />
+            </div>
+            <div
+              style={{
+                gridColumn: '1 / -1',
+              }}
+            >
+              <Label className="text-sm font-semibold text-muted-foreground block mb-1">
+                Selección Pública de Turnos
+              </Label>
+              <div className="flex items-center gap-2 pt-1.5">
+                <AdminCheckbox
+                  checked={formData.seleccionTurnosAbierta}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      seleccionTurnosAbierta: e.target.checked,
+                    })
+                  }
+                />
+                <span className="text-sm text-muted-foreground">
+                  {formData.seleccionTurnosAbierta ? 'Abierta' : 'Cerrada'}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2 mt-4">
+            <Button
+              disabled={loading}
+              style={{
+                opacity: loading ? 0.6 : 1,
+              }}
+              type="submit"
+              variant="default"
+            >
+              {loading ? 'Guardando...' : editingId ? 'Actualizar' : 'Crear'}
+            </Button>
+            <Button type="button" onClick={resetForm} variant="outline">
+              Cancelar
+            </Button>
+          </div>
+        </form>
+      )}
+
+      <Card className="overflow-hidden gap-0 py-0">
+        <div className="overflow-x-auto">
+          <Table className="w-full">
+            <TableHeader>
+              <TableRow>
+                {['Año', 'Nombre', 'Estado', 'Activa', 'Turnos', 'Acciones'].map((h) => (
+                  <TableHead key={h}>{h}</TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                <SkeletonRows count={5} />
+              ) : ediciones.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6}>
+                    <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                      <div
+                        style={{
+                          width: '60px',
+                          height: '60px',
+                        }}
+                        className="rounded-full bg-muted flex items-center justify-center"
+                      >
+                        <AdminCalendarIcon className="size-4" />
+                      </div>
+                      <p className="text-sm m-0">No hay ediciones registradas</p>
+                      <p
+                        style={{
+                          opacity: 0.7,
+                        }}
+                        className="text-sm m-0"
+                      >
+                        Crea la primera edición usando el botón "Nueva Edición"
+                      </p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                ediciones.map((ed, i) => {
+                  const isEven = i % 2 === 1
+                  const isActiva = ed.activa === true
+                  return (
+                    <TableRow key={ed._id}>
+                      <TableCell>{ed.anio}</TableCell>
+                      <TableCell>{ed.nombre}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="">
+                          {ed.estado?.charAt(0).toUpperCase() + ed.estado?.slice(1)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {isActiva ? (
+                          <span className="text-foreground font-semibold text-sm flex items-center gap-1">
+                            Activa
+                          </span>
+                        ) : (
+                          <Button
+                            onClick={() => handleToggleActiva(ed._id, isActiva)}
+                            variant="outline"
+                            type="button"
+                          >
+                            Activar
+                          </Button>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-destructive font-medium flex items-center gap-1">
+                          {ed.seleccionTurnosAbierta ? '🔓 Abierta' : '🔒 Cerrada'}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1.5 flex-wrap">
+                          <Button
+                            onClick={() => handleEdit(ed)}
+                            title="Editar edición"
+                            variant="outline"
+                            type="button"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              className="h-4 w-4"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                              />
+                            </svg>
+                          </Button>
+                          {isActiva && (
+                            <Button
+                              onClick={() => handleToggleSeleccionTurnos(ed._id, ed.seleccionTurnosAbierta)}
+                              variant="outline"
+                              type="button"
+                            >
+                              {ed.seleccionTurnosAbierta ? 'Cerrar' : 'Abrir'}
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        {!loading && ediciones.length > 0 && (
+          <div className="pt-2 pr-4 pb-2 pl-4 border-t">
+            <p className="text-sm text-muted-foreground m-0">
+              {ediciones.length} edición{ediciones.length !== 1 ? 'es' : ''} registrada
+              {ediciones.length !== 1 ? 's' : ''}
+              {edicionActiva && ` • Activa: ${edicionActiva.nombre} (${edicionActiva.anio})`}
+            </p>
+          </div>
+        )}
+      </Card>
+    </div>
+  )
+}
 function SkeletonRows({ dark, count = 5 }) {
-    const t = getTheme(dark)
-    return Array.from({ length: count }).map((_, i) => (
-        <tr key={i} style={{ borderBottom: `1px solid ${t.tableBorder}` }}>
-            {[60, 80, 60, 80, 60, 80].map((w, j) => (
-                <td key={j} style={{ padding: '13px 14px' }}>
-                    <div style={{
-                        height: '12px', borderRadius: '6px', width: `${w}px`, maxWidth: '100%',
-                        backgroundColor: dark ? 'rgba(103,37,119,0.12)' : 'rgba(103,37,119,0.07)',
-                        animation: 'pulse 1.4s ease-in-out infinite',
-                    }} />
-                </td>
-            ))}
-        </tr>
-    ))
+  return Array.from({
+    length: count,
+  }).map((_, i) => (
+    <TableRow key={i}>
+      {[60, 80, 60, 80, 60, 80].map((w, j) => (
+        <TableCell key={j}>
+          <div
+            style={{
+              height: '12px',
+              width: `${w}px`,
+              maxWidth: '100%',
+            }}
+            className="rounded-xl bg-muted animate-pulse"
+          />
+        </TableCell>
+      ))}
+    </TableRow>
+  ))
 }

@@ -65,7 +65,7 @@ function PolaroidCard({ photo, index }) {
                 y: ty,
                 rotate: photo.rotate,
                 // Estilos de diseño
-                backgroundColor: 'var(--color-background)',
+                backgroundColor: '#0b1326',
                 border: '4px solid rgba(214, 182, 223, 0.3)',
                 boxShadow: '0 4px 20px rgba(103, 37, 119, 0.15)',
             }}
@@ -84,7 +84,7 @@ function PolaroidCard({ photo, index }) {
                 )}
             </div>
             {/* Efecto de brillo en hover */}
-            <div 
+            <div
                 className="absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none"
                 style={{
                     background: 'linear-gradient(135deg, rgba(103, 37, 119, 0.1), rgba(52, 84, 161, 0.05))',

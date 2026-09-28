@@ -1,21 +1,54 @@
-Aplicación web para contabilizar asistencias y votaciones de miembros de Sedipro UNT.
-# sedipro-asistencia-app
+# SEDIPRO UNT — Frontend
 
-## Eventos e inscripciones externas
+Sitio público y panel interno de SEDIPRO UNT, construido con Next.js 16.2.2.
+El navegador se comunica únicamente con las rutas `/api/*` de este proyecto;
+el proxy del servidor reenvía cada petición al backend independiente.
 
-El módulo **Eventos** mantiene separados a los miembros internos de SEDIPRO y a los participantes externos. Incluye formulario público, reutilización de personas por correo/DNI, importación de CSV/XLSX de Google Forms, QR seguro y check-in manual o por QR.
+## Desarrollo local
 
-### Formato de importación
+1. Inicia el backend en `http://localhost:6001`.
+2. Copia `.env.example` como `.env.local`.
+3. Instala las dependencias con `npm install`.
+4. Ejecuta `npm run dev` y abre `http://localhost:7000`.
 
-La primera fila debe contener encabezados. Son obligatorios `Nombres`, `Apellidos` y `Correo electrónico` (también se reconocen `Nombre`, `Apellido`, `Correo`, `Email`). Opcionalmente se reconocen `DNI`, `Celular`, `Organización` y `Universidad`.
+## Comandos
 
-### Google Sheets
-
-Para que el botón **Crear hoja del evento** cree y sincronice una hoja, configura estas variables únicamente en el servidor:
-
-```env
-GOOGLE_SERVICE_ACCOUNT_EMAIL=cuenta-servicio@proyecto.iam.gserviceaccount.com
-GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\\n...\\n-----END PRIVATE KEY-----\\n"
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run test:panel
 ```
 
-La cuenta de servicio será propietaria de las hojas. Comparte la hoja creada con las cuentas de la directiva desde Google Sheets. Nunca publiques estas credenciales en el repositorio ni en variables expuestas al navegador.
+Las pruebas de Playwright y su configuración sí forman parte del repositorio.
+Los resultados generados en `test-results`, `playwright-report` y `coverage` se
+ignoran porque se recrean en cada ejecución.
+
+## Variables de entorno
+
+| Variable       | Uso                                                         |
+| -------------- | ----------------------------------------------------------- |
+| `API_BASE_URL` | Origen privado del backend usado por el proxy del servidor. |
+
+En producción configura `API_BASE_URL=https://api-sediprount.vercel.app` en
+Vercel. La URI de MongoDB, el secreto JWT y el token de UploadThing pertenecen
+exclusivamente al backend.
+
+## Despliegue en Vercel
+
+1. Importa este repositorio y deja **Root Directory** en `.`.
+2. Conserva la detección automática de Next.js.
+3. Configura `API_BASE_URL=https://api-sediprount.vercel.app` en Production y
+   Preview.
+4. Despliega y vincula el dominio `sediprount.org`.
+
+Antes de publicar ejecuta:
+
+```bash
+npm ci
+npm run lint
+npm run build
+```
+
+`TEMPLATE-LICENSE.md` contiene la licencia MIT de la plantilla usada como base
+del panel y debe permanecer en el repositorio.

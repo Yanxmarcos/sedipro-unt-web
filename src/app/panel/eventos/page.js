@@ -1,10 +1,19 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { AdminCheckbox } from "@/components/admin/form-controls";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-
-const input =
-  "mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-purple-700";
+import { Trash2 } from "lucide-react";
+import { AdminConfirm } from "@/components/admin/form-controls";
+import { usePanelSession } from "@/components/admin/panel-session";
+import { panelApi } from "@/lib/panel-api";
+const input = "mt-1 w-full outline-none";
 const initial = {
   titulo: "",
   descripcion: "",
@@ -15,8 +24,10 @@ const initial = {
   estado: "borrador",
   inscripcionAbierta: false,
 };
-
 export default function EventosPage() {
+  const { permissions } = usePanelSession();
+  const [archiveTarget, setArchiveTarget] = useState(null);
+  const [archiving, setArchiving] = useState(false);
   const [events, setEvents] = useState([]);
   const [form, setForm] = useState(initial);
   const [open, setOpen] = useState(false);
@@ -38,7 +49,11 @@ export default function EventosPage() {
   useEffect(() => {
     load();
   }, [load]);
-  const set = (key, value) => setForm((x) => ({ ...x, [key]: value }));
+  const set = (key, value) =>
+    setForm((x) => ({
+      ...x,
+      [key]: value,
+    }));
   async function submit(e) {
     e.preventDefault();
     setSaving(true);
@@ -46,7 +61,9 @@ export default function EventosPage() {
     try {
       const r = await fetch("/api/eventos", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(form),
       });
       const d = await r.json();
@@ -61,112 +78,120 @@ export default function EventosPage() {
     }
   }
   return (
-    <div className="mx-auto max-w-6xl p-5 sm:p-8">
+    <div className="space-y-6">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Eventos</h1>
-          <p className="text-sm text-slate-600">
+          <h1 className="text-foreground text-2xl font-semibold tracking-tight">
+            Eventos
+          </h1>
+          <p className="text-sm text-muted-foreground">
             Inscripciones externas, QR y control presencial.
           </p>
         </div>
-        <button
-          className="rounded-lg bg-[#672577] px-4 py-2 font-semibold text-white"
+        <Button
           onClick={() => setOpen((x) => !x)}
+          type="button"
+          variant="default"
         >
           {open ? "Cancelar" : "+ Crear evento"}
-        </button>
+        </Button>
       </div>
       {error && (
-        <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <p className="mb-4 rounded-lg bg-muted p-3 text-sm text-destructive">
           {error}
         </p>
       )}
       {open && (
         <form
           onSubmit={submit}
-          className="mb-6 rounded-xl border bg-white p-5 shadow-sm"
+          className="mb-6 rounded-xl border bg-card p-6 shadow-xs space-y-6"
         >
-          <h2 className="mb-4 font-bold">Nuevo evento</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className="text-sm font-medium">
+          <h2 className="mb-4 text-lg font-semibold">Nuevo evento</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Label className="text-sm font-medium grid gap-2">
               Título
-              <input
+              <Input
                 required
-                className={input}
                 value={form.titulo}
                 onChange={(e) => set("titulo", e.target.value)}
+                className={cn(input, "")}
               />
-            </label>
-            <label className="text-sm font-medium">
+            </Label>
+            <Label className="text-sm font-medium grid gap-2">
               Lugar
-              <input
-                className={input}
+              <Input
                 value={form.lugar}
                 onChange={(e) => set("lugar", e.target.value)}
+                className={cn(input, "")}
               />
-            </label>
-            <label className="text-sm font-medium">
+            </Label>
+            <Label className="text-sm font-medium grid gap-2">
               Inicio
-              <input
+              <Input
                 required
                 type="datetime-local"
-                className={input}
                 value={form.fechaInicio}
                 onChange={(e) => set("fechaInicio", e.target.value)}
+                className={cn(input, "")}
               />
-            </label>
-            <label className="text-sm font-medium">
+            </Label>
+            <Label className="text-sm font-medium grid gap-2">
               Fin
-              <input
+              <Input
                 type="datetime-local"
-                className={input}
                 value={form.fechaFin}
                 onChange={(e) => set("fechaFin", e.target.value)}
+                className={cn(input, "")}
               />
-            </label>
-            <label className="text-sm font-medium">
+            </Label>
+            <Label className="text-sm font-medium grid gap-2">
               Cupo{" "}
-              <span className="font-normal text-slate-500">
+              <span className="font-normal text-muted-foreground">
                 vacío = ilimitado
               </span>
-              <input
+              <Input
                 min="1"
                 type="number"
-                className={input}
                 value={form.cupo}
                 onChange={(e) => set("cupo", e.target.value)}
+                className={cn(input, "")}
               />
-            </label>
-            <label className="flex items-center gap-2 pt-6 text-sm">
-              <input
-                type="checkbox"
+            </Label>
+            <Label className="flex items-center gap-2 pt-6 text-sm">
+              <AdminCheckbox
                 checked={form.inscripcionAbierta}
                 onChange={(e) => set("inscripcionAbierta", e.target.checked)}
               />
               Abrir inscripción al publicarlo
-            </label>
+            </Label>
           </div>
-          <label className="mt-4 block text-sm font-medium">
+          <Label className="mt-4 text-sm font-medium grid gap-2">
             Descripción
-            <textarea
-              className={input}
+            <Textarea
               value={form.descripcion}
               onChange={(e) => set("descripcion", e.target.value)}
+              className={cn(input, "")}
             />
-          </label>
-          <button
+          </Label>
+          <Button
             disabled={saving}
-            className="mt-4 rounded-lg bg-[#672577] px-4 py-2 font-semibold text-white disabled:opacity-50"
+            type="submit"
+            variant="default"
+            className="mt-4 disabled:opacity-50"
           >
             {saving ? "Guardando…" : "Crear borrador"}
-          </button>
+          </Button>
         </form>
       )}
-      <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border bg-muted shadow-sm">
         {loading ? (
-          <p className="p-8 text-center text-slate-500">Cargando eventos…</p>
+          <p className="p-8 text-center text-muted-foreground">
+            Cargando eventos…
+          </p>
         ) : events.length === 0 ? (
-          <p className="p-8 text-center text-slate-500">Aún no hay eventos.</p>
+          <p className="p-8 text-center text-muted-foreground">
+            Aún no hay eventos.
+          </p>
         ) : (
           <div className="divide-y">
             {events.map((event) => (
@@ -176,32 +201,76 @@ export default function EventosPage() {
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="font-bold text-slate-900">{event.titulo}</h2>
-                    <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-800">
+                    <h2 className="text-foreground text-lg font-semibold">
+                      {event.titulo}
+                    </h2>
+                    <Badge variant="secondary" className="">
                       {event.estado}
-                    </span>
+                    </Badge>
                   </div>
-                  <p className="mt-1 text-sm text-slate-600">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     {new Date(event.fechaInicio).toLocaleString("es-PE")} ·{" "}
                     {event.lugar || "Sin lugar"}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     {event.totalInscripciones} inscritos ·{" "}
                     {event.totalAsistencias} presentes
                     {event.cupo ? ` · cupo ${event.cupo}` : ""}
                   </p>
                 </div>
-                <Link
-                  className="rounded-lg border border-purple-300 px-3 py-2 text-sm font-semibold text-purple-800"
-                  href={`/panel/eventos/${event._id}`}
-                >
-                  Gestionar
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/panel/eventos/${event._id}`}
+                    className={buttonVariants({
+                      variant: "outline",
+                    })}
+                  >
+                    Gestionar
+                  </Link>
+                  {permissions.canDelete && (
+                    <Button
+                      variant="outline"
+                      size="icon-sm"
+                      title="Eliminar"
+                      aria-label={"Eliminar " + event.titulo}
+                      onClick={() => setArchiveTarget(event)}
+                    >
+                      <Trash2 />
+                    </Button>
+                  )}
+                </div>
               </article>
             ))}
           </div>
         )}
       </div>
+      <AdminConfirm
+        show={Boolean(archiveTarget)}
+        title="Eliminar evento"
+        message="El evento dejará de estar disponible. Sus inscripciones y asistencias se conservan en el historial."
+        confirmText={archiving ? "Eliminando…" : "Eliminar"}
+        type="error"
+        onCancel={() => {
+          if (!archiving) setArchiveTarget(null);
+        }}
+        onConfirm={async () => {
+          if (archiving) return;
+          setArchiving(true);
+          setError("");
+          try {
+            await panelApi("/api/eventos/" + archiveTarget._id, {
+              method: "DELETE",
+            });
+            setArchiveTarget(null);
+            await load();
+          } catch (failure) {
+            setError(failure.message);
+            setArchiveTarget(null);
+          } finally {
+            setArchiving(false);
+          }
+        }}
+      />
     </div>
   );
 }

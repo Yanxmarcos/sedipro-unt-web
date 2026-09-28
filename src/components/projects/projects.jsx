@@ -22,20 +22,20 @@ import { FadeIn } from "@/components/ui/motion-primitives";
  */
 
 const PROJECTS = [
-    {
-        id: "360pm",
-        icon: Sparkles,
-        iconLabel: "360° PROJECT MASTERY",
-        title:
-            "360° PROJECT MASTERY",
-        description:
-            "Es un programa experiencial holístico diseñado para estudiantes y profesionales apasionados por la gestión de proyectos que desean potenciar sus competencias y convertirse en los próximos referentes del ecosistema de Project Management en el Perú.",
-        meta: "Virtual: Miércoles 7 y Sábado 17 de octubre, 2026 | Presencial: Sábado 24 de octubre, 2026.",
-        href: "/360pm",
-        imageRatio: 1080 / 1350,
-        image: "/360pm/360pm-logo.webp",
-        imageAlt: "Publicidad 360° PROJECT MASTERY",
-    },
+    // {
+    //     id: "360pm",
+    //     icon: Sparkles,
+    //     iconLabel: "360° PROJECT MASTERY",
+    //     title:
+    //         "360° PROJECT MASTERY",
+    //     description:
+    //         "Es un programa experiencial holístico diseñado para estudiantes y profesionales apasionados por la gestión de proyectos que desean potenciar sus competencias y convertirse en los próximos referentes del ecosistema de Project Management en el Perú.",
+    //     meta: "Virtual: Miércoles 7 y Sábado 17 de octubre, 2026 | Presencial: Sábado 24 de octubre, 2026.",
+    //     href: "/360pm",
+    //     imageRatio: 1080 / 1350,
+    //     image: "/360pm/360pm-logo.webp",
+    //     imageAlt: "Publicidad 360° PROJECT MASTERY",
+    // },
     {
         id: "sedichampions",
         icon: Sparkles,

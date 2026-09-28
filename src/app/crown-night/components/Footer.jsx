@@ -19,7 +19,7 @@ const Footer = () => {
             variants={footerVariants}
             initial="hidden"
             whileInView="show"
-            className="bg-surface-container-lowest border-t border-outline-variant/30 py-12 px-4 sm:px-6 md:px-8 relative overflow-hidden"
+            className="bg-[#060e20] border-t border-[#494453]/30 py-12 px-4 sm:px-6 md:px-8 relative overflow-hidden"
         >
             {/* Gradiente de fondo sutil */}
             <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
@@ -49,16 +49,16 @@ const Footer = () => {
                                     className="w-auto h-auto object-contain"
                                 />
                             </motion.div>
-                            <span className="text-label-md font-headline-md font-bold text-on-surface">
+                            <span className="text-label-md font-headline-md font-bold text-[#dae2fd]">
                                 SEDIPRO UNT
                             </span>
                         </div>
 
-                        <p className="font-body-md text-body-md text-on-surface-variant font-label-sm text-label-sm text-center md:text-left">
+                        <p className="font-body-md text-body-md text-[#cbc3d5] font-label-sm text-label-sm text-center md:text-left">
                             Sección Estudiantil de Dirección de
                         </p>
 
-                        <p className="font-body-md text-body-md text-on-surface-variant font-label-sm text-label-sm text-center md:text-left">
+                        <p className="font-body-md text-body-md text-[#cbc3d5] font-label-sm text-label-sm text-center md:text-left">
                             Proyectos de la UNT.
                         </p>
                     </motion.a>
@@ -102,7 +102,7 @@ const Footer = () => {
                                     transition: { duration: 0.4 }
                                 }}
                                 whileTap={{ scale: 0.9 }}
-                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
+                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-[#cbc3d5] hover:text-primary hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
                             >
                                 <social.icon size={18} />
                             </motion.a>
@@ -115,7 +115,7 @@ const Footer = () => {
                         whileHover={{ scale: 1.05 }}
                         transition={{ type: 'spring', stiffness: 300 }}
                     >
-                        <span className="font-label-sm text-body-md text-on-surface-variant text-label-sm">
+                        <span className="font-label-sm text-body-md text-[#cbc3d5] text-label-sm">
                             Hecho con
                         </span>
                         <motion.div
@@ -130,7 +130,7 @@ const Footer = () => {
                         >
                             <Heart size={14} className="text-orange-500 fill-orange-500" />
                         </motion.div>
-                        <span className="font-label-sm text-body-md text-on-surface-variant text-label-sm">
+                        <span className="font-label-sm text-body-md text-[#cbc3d5] text-label-sm">
                             por
                         </span>
                         <span className="font-label-sm text-label-md font-semibold text-orange-500 text-label-sm">
@@ -154,13 +154,13 @@ const Footer = () => {
 
                 {/* Línea divisoria y copyright */}
                 <motion.div
-                    className="mt-10 pt-6 border-t border-outline-variant/20 text-center"
+                    className="mt-10 pt-6 border-t border-[#494453]/20 text-center"
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     transition={{ delay: 0.3 }}
                     viewport={{ once: true }}
                 >
-                    <p className="text-xs text-on-surface-variant/60">
+                    <p className="text-xs text-[#cbc3d5]/60">
                         © 2026 SEDIPRO UNT. Todos los derechos reservados.
                     </p>
                 </motion.div>

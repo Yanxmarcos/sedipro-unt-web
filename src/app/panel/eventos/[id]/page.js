@@ -1,116 +1,128 @@
-"use client";
+'use client'
 
-import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
-
+import { Badge } from '@/components/ui/badge'
+import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from '@/components/ui/table'
+import { AdminSelect } from '@/components/admin/form-controls'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
 export default function GestionEventoPage() {
-  const routeParams = useParams();
-  const [id, setId] = useState(null);
-  const [event, setEvent] = useState(null);
-  const [regs, setRegs] = useState([]);
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
+  const routeParams = useParams()
+  const [id, setId] = useState(null)
+  const [event, setEvent] = useState(null)
+  const [regs, setRegs] = useState([])
+  const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
   const [field, setField] = useState({
-    clave: "",
-    etiqueta: "",
-    tipo: "texto",
+    clave: '',
+    etiqueta: '',
+    tipo: 'texto',
     requerido: false,
-    opciones: "",
-  });
+    opciones: '',
+  })
   useEffect(() => {
-    setId(routeParams.id);
-  }, [routeParams.id]);
+    setId(routeParams.id)
+  }, [routeParams.id])
   const load = useCallback(async () => {
-    if (!id) return;
-    setLoading(true);
+    if (!id) return
+    setLoading(true)
     try {
       const [a, b] = await Promise.all([
         fetch(`/api/eventos/${id}`),
         fetch(`/api/eventos/${id}/inscripciones`),
-      ]);
-      const da = await a.json();
-      const db = await b.json();
-      if (!a.ok) throw new Error(da.error);
-      if (!b.ok) throw new Error(db.error);
-      setEvent(da.data);
-      setRegs(db.data);
+      ])
+      const da = await a.json()
+      const db = await b.json()
+      if (!a.ok) throw new Error(da.error)
+      if (!b.ok) throw new Error(db.error)
+      setEvent(da.data)
+      setRegs(db.data)
     } catch (e) {
-      setError(e.message);
+      setError(e.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [id]);
+  }, [id])
   useEffect(() => {
-    load();
-  }, [load]);
+    load()
+  }, [load])
   async function patch(data) {
     const r = await fetch(`/api/eventos/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(data),
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error);
-    setEvent(d.data);
-    return d.data;
+    })
+    const d = await r.json()
+    if (!r.ok) throw new Error(d.error)
+    setEvent(d.data)
+    return d.data
   }
   async function togglePublish() {
     try {
-      const next = event.estado === "publicado" ? "cerrado" : "publicado";
-      await patch({ estado: next, inscripcionAbierta: next === "publicado" });
+      const next = event.estado === 'publicado' ? 'cerrado' : 'publicado'
+      await patch({
+        estado: next,
+        inscripcionAbierta: next === 'publicado',
+      })
       setNotice(
-        next === "publicado"
-          ? "Evento publicado e inscripciones abiertas."
-          : "Inscripciones cerradas.",
-      );
+        next === 'publicado' ? 'Evento publicado e inscripciones abiertas.' : 'Inscripciones cerradas.',
+      )
     } catch (e) {
-      setError(e.message);
+      setError(e.message)
     }
   }
   async function createSheet() {
     try {
       const r = await fetch(`/api/eventos/${id}/google-sheet`, {
-        method: "POST",
-      });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error);
-      setEvent((x) => ({ ...x, googleSheetUrl: d.data.url }));
-      setNotice("Hoja de Google creada correctamente.");
+        method: 'POST',
+      })
+      const d = await r.json()
+      if (!r.ok) throw new Error(d.error)
+      setEvent((x) => ({
+        ...x,
+        googleSheetUrl: d.data.url,
+      }))
+      setNotice('Hoja de Google creada correctamente.')
     } catch (e) {
-      setError(e.message);
+      setError(e.message)
     }
   }
   async function importFile(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    setError("");
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setError('')
     try {
-      const f = new FormData();
-      f.append("file", file);
+      const f = new FormData()
+      f.append('file', file)
       const r = await fetch(`/api/eventos/${id}/importar`, {
-        method: "POST",
+        method: 'POST',
         body: f,
-      });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error);
+      })
+      const d = await r.json()
+      if (!r.ok) throw new Error(d.error)
       setNotice(
-        `Importación terminada: ${d.data.created} creados, ${d.data.duplicates} duplicados omitidos${d.data.errors.length ? `, ${d.data.errors.length} con error` : ""}.`,
-      );
-      await load();
+        `Importación terminada: ${d.data.created} creados, ${d.data.duplicates} duplicados omitidos${d.data.errors.length ? `, ${d.data.errors.length} con error` : ''}.`,
+      )
+      await load()
     } catch (e) {
-      setError(e.message);
+      setError(e.message)
     } finally {
-      setUploading(false);
-      e.target.value = "";
+      setUploading(false)
+      e.target.value = ''
     }
   }
   async function addField(e) {
-    e.preventDefault();
-    if (!field.clave || !field.etiqueta) return;
+    e.preventDefault()
+    if (!field.clave || !field.etiqueta) return
     try {
       await patch({
         camposPersonalizados: [
@@ -118,72 +130,64 @@ export default function GestionEventoPage() {
           {
             ...field,
             opciones: field.opciones
-              .split(",")
+              .split(',')
               .map((x) => x.trim())
               .filter(Boolean),
           },
         ],
-      });
+      })
       setField({
-        clave: "",
-        etiqueta: "",
-        tipo: "texto",
+        clave: '',
+        etiqueta: '',
+        tipo: 'texto',
         requerido: false,
-        opciones: "",
-      });
+        opciones: '',
+      })
     } catch (e) {
-      setError(e.message);
+      setError(e.message)
     }
   }
   async function deleteField(i) {
     try {
       await patch({
-        camposPersonalizados: event.camposPersonalizados.filter(
-          (_, n) => n !== i,
-        ),
-      });
+        camposPersonalizados: event.camposPersonalizados.filter((_, n) => n !== i),
+      })
     } catch (e) {
-      setError(e.message);
+      setError(e.message)
     }
   }
-  if (loading)
-    return <div className="p-8 text-center text-slate-700">Cargando evento…</div>;
-  if (!event)
-    return (
-      <div className="p-8 text-red-700">{error || "Evento no encontrado"}</div>
-    );
+  if (loading) return <div className="space-y-6">Cargando evento…</div>
+  if (!event) return <div className="space-y-6">{error || 'Evento no encontrado'}</div>
   const publicUrl =
-    typeof window !== "undefined"
+    typeof window !== 'undefined'
       ? `${window.location.origin}/eventos/${event.slug}`
-      : `/eventos/${event.slug}`;
+      : `/eventos/${event.slug}`
   return (
-    <div className="mx-auto max-w-6xl p-5 text-slate-800 sm:p-8">
+    <div className="space-y-6">
       <Link
         href="/panel/eventos"
-        className="text-sm font-semibold text-purple-800"
+        className={buttonVariants({
+          variant: 'outline',
+        })}
       >
         ← Todos los eventos
       </Link>
       <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">{event.titulo}</h1>
-          <p className="text-sm text-slate-600">
-            {new Date(event.fechaInicio).toLocaleString("es-PE")} ·{" "}
-            {event.lugar || "Sin lugar"}
+          <h1 className="text-foreground text-2xl font-semibold tracking-tight">{event.titulo}</h1>
+          <p className="text-sm text-muted-foreground">
+            {new Date(event.fechaInicio).toLocaleString('es-PE')} · {event.lugar || 'Sin lugar'}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
-            onClick={togglePublish}
-            className="rounded-lg bg-[#672577] px-3 py-2 text-sm font-semibold text-white"
-          >
-            {event.estado === "publicado"
-              ? "Cerrar inscripción"
-              : "Publicar y abrir"}
-          </button>
+          <Button onClick={togglePublish} variant="outline" type="button">
+            {event.estado === 'publicado' ? 'Cerrar inscripción' : 'Publicar y abrir'}
+          </Button>
           <Link
             href={`/panel/eventos/${id}/checkin`}
-            className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white"
+            className={buttonVariants({
+              variant: 'outline',
+            })}
           >
             Abrir check-in
           </Link>
@@ -191,166 +195,163 @@ export default function GestionEventoPage() {
       </div>
       {(error || notice) && (
         <p
-          className={`mt-4 rounded-lg p-3 text-sm ${error ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-700"}`}
+          className={cn(
+            `mt-4 rounded-lg p-3 text-sm ${error ? 'bg-muted text-destructive' : 'bg-muted text-foreground'} `,
+            '',
+          )}
         >
           {error || notice}
         </p>
       )}
       <div className="mt-6 grid gap-5 lg:grid-cols-2">
-        <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="font-bold text-[#672577]">Formulario público</h2>
-          <p className="mt-2 break-all rounded bg-slate-50 p-2 text-sm text-slate-700">
-            {publicUrl}
-          </p>
+        <section className="rounded-xl border border-border bg-muted p-5 shadow-sm">
+          <h2 className="text-[var(--primary)] text-lg font-semibold">Formulario público</h2>
+          <p className="mt-2 break-all rounded bg-background p-2 text-sm text-foreground">{publicUrl}</p>
           <a
-            className="mt-3 inline-block text-sm font-semibold text-purple-800 underline"
             href={publicUrl}
             target="_blank"
+            className="mt-3 inline-block text-sm font-semibold text-foreground underline"
           >
             Abrir formulario
           </a>
-          <hr className="my-5 border-slate-200" />
-          <h2 className="font-bold text-[#672577]">Google Sheets</h2>
+          <hr className="my-5 border-border" />
+          <h2 className="text-[var(--primary)] text-lg font-semibold">Google Sheets</h2>
           {event.googleSheetUrl ? (
             <a
-              className="mt-2 inline-block text-sm font-semibold text-purple-800 underline"
               href={event.googleSheetUrl}
               target="_blank"
+              className="mt-2 inline-block text-sm font-semibold text-foreground underline"
             >
               Abrir hoja vinculada ↗
             </a>
           ) : (
-            <button
-              onClick={createSheet}
-              className="mt-3 rounded-lg border border-purple-300 px-3 py-2 text-sm font-semibold text-purple-800"
-            >
+            <Button onClick={createSheet} variant="outline" type="button" className="mt-3">
               Crear hoja del evento
-            </button>
+            </Button>
           )}
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-2 text-xs text-muted-foreground">
             Requiere las credenciales de Google configuradas en el servidor.
           </p>
         </section>
-        <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="font-bold text-[#672577]">Importar respuestas de Google Forms</h2>
-          <p className="mt-2 text-sm text-slate-600">
-            Admite CSV, XLS o XLSX. Columnas requeridas: Nombres, Apellidos y
-            Correo electrónico. Reconoce DNI, Celular y
-            Organización/Universidad.
+        <section className="rounded-xl border border-border bg-muted p-5 shadow-sm">
+          <h2 className="text-[var(--primary)] text-lg font-semibold">Importar respuestas de Google Forms</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Admite CSV, XLS o XLSX. Columnas requeridas: Nombres, Apellidos y Correo electrónico. Reconoce
+            DNI, Celular y Organización/Universidad.
           </p>
-          <label className="mt-4 inline-block cursor-pointer rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white">
-            {uploading ? "Importando…" : "Seleccionar archivo"}
-            <input
+          <Label className="mt-4 cursor-pointer rounded-lg bg-muted px-3 py-2 text-sm font-semibold text-foreground grid gap-2">
+            {uploading ? 'Importando…' : 'Seleccionar archivo'}
+            <Input
               disabled={uploading}
-              className="hidden"
               type="file"
               accept=".csv,.xls,.xlsx"
               onChange={importFile}
+              className="hidden"
             />
-          </label>
+          </Label>
         </section>
-        <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
-          <h2 className="font-bold text-[#672577]">Campos personalizados</h2>
-          <form onSubmit={addField} className="mt-3 grid gap-2 md:grid-cols-5">
-            <input
+        <section className="rounded-xl border border-border bg-muted p-5 shadow-sm lg:col-span-2">
+          <h2 className="text-[var(--primary)] text-lg font-semibold">Campos personalizados</h2>
+          <form onSubmit={addField} className="mt-3 grid gap-2 md:grid-cols-5 space-y-6">
+            <Input
               required
               placeholder="clave, ej. carrera"
-              className="rounded border border-slate-300 p-2 text-sm text-slate-800"
               value={field.clave}
               onChange={(e) =>
-                setField((x) => ({ ...x, clave: e.target.value }))
+                setField((x) => ({
+                  ...x,
+                  clave: e.target.value,
+                }))
               }
             />
-            <input
+            <Input
               required
               placeholder="Etiqueta"
-              className="rounded border border-slate-300 p-2 text-sm text-slate-800"
               value={field.etiqueta}
               onChange={(e) =>
-                setField((x) => ({ ...x, etiqueta: e.target.value }))
+                setField((x) => ({
+                  ...x,
+                  etiqueta: e.target.value,
+                }))
               }
             />
-            <select
-              className="rounded border border-slate-300 p-2 text-sm text-slate-800"
+            <AdminSelect
               value={field.tipo}
               onChange={(e) =>
-                setField((x) => ({ ...x, tipo: e.target.value }))
+                setField((x) => ({
+                  ...x,
+                  tipo: e.target.value,
+                }))
               }
             >
               <option value="texto">Texto</option>
               <option value="numero">Número</option>
               <option value="seleccion">Selección</option>
               <option value="textarea">Texto largo</option>
-            </select>
-            <input
+            </AdminSelect>
+            <Input
               placeholder="Opciones separadas por coma"
-              className="rounded border border-slate-300 p-2 text-sm text-slate-800"
               value={field.opciones}
               onChange={(e) =>
-                setField((x) => ({ ...x, opciones: e.target.value }))
+                setField((x) => ({
+                  ...x,
+                  opciones: e.target.value,
+                }))
               }
             />
-            <button className="rounded bg-purple-700 p-2 text-sm font-semibold text-white">
+            <Button type="submit" variant="default">
               Agregar campo
-            </button>
+            </Button>
           </form>
           <div className="mt-3 flex flex-wrap gap-2">
             {event.camposPersonalizados?.map((f, i) => (
-              <span
-                key={`${f.clave}-${i}`}
-                className="rounded bg-purple-50 px-2 py-1 text-sm text-purple-900"
-              >
+              <Badge key={`${f.clave}-${i}`} variant="secondary" className="">
                 {f.etiqueta}
-                {f.requerido ? " *" : ""}{" "}
-                <button
-                  onClick={() => deleteField(i)}
-                  className="ml-1 font-bold text-red-700"
-                >
+                {f.requerido ? ' *' : ''}{' '}
+                <Button onClick={() => deleteField(i)} variant="destructive" type="button" className="ml-1">
                   ×
-                </button>
-              </span>
+                </Button>
+              </Badge>
             ))}
           </div>
         </section>
       </div>
-      <section className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <section className="mt-6 overflow-hidden rounded-xl border border-border bg-muted shadow-sm">
         <div className="flex justify-between p-5">
-          <h2 className="font-bold text-[#672577]">Inscritos ({regs.length})</h2>
-          <span className="text-sm text-slate-600">
-            {event.totalAsistencias} presentes
-          </span>
+          <h2 className="text-[var(--primary)] text-lg font-semibold">Inscritos ({regs.length})</h2>
+          <span className="text-sm text-muted-foreground">{event.totalAsistencias} presentes</span>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-              <tr>
-                <th className="p-3">Persona</th>
-                <th className="p-3">Correo</th>
-                <th className="p-3">Código</th>
-                <th className="p-3">Estado</th>
-                <th className="p-3">Asistencia</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 text-slate-700">
+          <Table className="min-w-full">
+            <TableHeader className="uppercase">
+              <TableRow>
+                <TableHead>Persona</TableHead>
+                <TableHead>Correo</TableHead>
+                <TableHead>Código</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Asistencia</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-slate-200">
               {regs.map((r) => (
-                <tr key={r._id}>
-                  <td className="p-3 font-medium">
+                <TableRow key={r._id}>
+                  <TableCell>
                     {r.personaId?.nombres} {r.personaId?.apellidos}
-                  </td>
-                  <td className="p-3">{r.personaId?.correo}</td>
-                  <td className="p-3 font-mono text-xs">{r.codigo}</td>
-                  <td className="p-3">{r.estado}</td>
-                  <td className="p-3">
+                  </TableCell>
+                  <TableCell>{r.personaId?.correo}</TableCell>
+                  <TableCell>{r.codigo}</TableCell>
+                  <TableCell>{r.estado}</TableCell>
+                  <TableCell>
                     {r.asistencia
-                      ? `${r.asistencia.estado} · ${new Date(r.asistencia.hora).toLocaleTimeString("es-PE")}`
-                      : "—"}
-                  </td>
-                </tr>
+                      ? `${r.asistencia.estado} · ${new Date(r.asistencia.hora).toLocaleTimeString('es-PE')}`
+                      : '—'}
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </section>
     </div>
-  );
+  )
 }
