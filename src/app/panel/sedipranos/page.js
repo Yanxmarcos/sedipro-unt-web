@@ -1,33 +1,13 @@
 import SedipranosTable from '@/components/SedipranosTable'
-
 export default function PageSedipranos() {
-    return (
-        <div
-            style={{
-                padding: '28px',
-                minHeight: '100%',
-                fontFamily: 'Poppins, sans-serif',
-            }}
-        >
-            <div style={{ marginBottom: '24px' }}>
-                <h1
-                    style={{
-                        fontFamily: 'Montserrat, sans-serif',
-                        fontWeight: 700,
-                        fontSize: '22px',
-                        color: 'var(--color-primary-active)',
-                        margin: 0,
-                        lineHeight: 1.2,
-                    }}
-                >
-                    Sedipranos
-                </h1>
-                <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '6px', marginBottom: 0 }}>
-                    Directorio de miembros de SEDIPRO UNT
-                </p>
-            </div>
+  return (
+    <div className="space-y-6">
+      <div className="mb-6">
+        <h1 className="text-foreground m-0 text-2xl font-semibold tracking-tight">Sedipranos</h1>
+        <p className="text-sm text-muted-foreground mt-1.5 mb-0">Directorio de miembros de SEDIPRO UNT</p>
+      </div>
 
-            <SedipranosTable />
-        </div>
-    )
+      <SedipranosTable />
+    </div>
+  )
 }

@@ -1,79 +1,22 @@
-import { NextResponse } from 'next/server';
-import { verifyToken } from './lib/jwt';
-import { TOKEN_NAME } from './lib/cookies';
+import { NextResponse } from 'next/server'
 
-const publicRoutes = ['/login'];
-const publicApiRoutes = ['/api/auth/login'];
-
-const protectedRoutes = [
-    '/panel',
-    '/api/asistencias',
-    '/api/encargados',
-    '/api/registro',
-    '/api/sedipranos',
-    '/api/users',
-    '/registro',
-    '/api/dashboard',
-];
+const protectedPrefixes = ['/panel', '/registro']
 
 export default function proxy(request) {
-    const { pathname } = request.nextUrl;
-    const token = request.cookies.get(TOKEN_NAME)?.value;
+  const { pathname } = request.nextUrl
+  const protectedPage = protectedPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  )
 
-    const isPublicRoute = publicRoutes.some(route => pathname === route);
-    const isPublicApiRoute = publicApiRoutes.some(route => pathname.startsWith(route));
-    
-    if (isPublicRoute || isPublicApiRoute) {
-        if (token && pathname === '/login') {
-            const verified = verifyToken(token);
-            if (verified) {
-                return NextResponse.redirect(new URL('/panel', request.url));
-            }
-        }
-        return NextResponse.next();
-    }
-    
-    const needsAuth = protectedRoutes.some(route => pathname.startsWith(route));
-    
-    if (needsAuth) {
-        if (!token) {
-            const loginUrl = new URL('/login', request.url);
-            loginUrl.searchParams.set('redirect', pathname);
-            return NextResponse.redirect(loginUrl);
-        }
+  if (protectedPage && !request.cookies.has('auth_token')) {
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(loginUrl)
+  }
 
-        const verified = verifyToken(token);
-        if (!verified) {
-            const response = NextResponse.redirect(new URL('/login', request.url));
-            response.cookies.delete(TOKEN_NAME);
-            return response;
-        }
-    
-        const requestHeaders = new Headers(request.headers);
-        requestHeaders.set('x-user-id', verified.id);
-        requestHeaders.set('x-user-rol', verified.rol);
-        
-        return NextResponse.next({
-            request: {
-                headers: requestHeaders,
-            },
-        });
-    }
-    
-    return NextResponse.next();
+  return NextResponse.next()
 }
 
 export const config = {
-    matcher: [
-        '/panel/:path*',
-        '/login',
-        '/registro/:path*',
-        '/api/auth/:path*',
-        '/api/asistencias/:path*',
-        '/api/encargados/:path*',
-        '/api/registro/:path*',
-        '/api/sedipranos/:path*',
-        '/api/users/:path*',
-        '/api/dashboard/:path*',
-    ],
-};
+  matcher: ['/panel/:path*', '/registro/:path*'],
+}

@@ -28,7 +28,7 @@ export function HeroCtas() {
                         className="focus-ring group inline-flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-white shadow-2xl transition-all duration-300 hover:scale-[1.02]"
                         style={{
                             backgroundColor: 'var(--color-accent)',
-                            border: '1px solid var(--color-accent-hover)',
+                            border: '1px solid var(--color-accent)',
                         }}
                     >
                         Proyectos

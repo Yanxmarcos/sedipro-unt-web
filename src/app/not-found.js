@@ -77,7 +77,7 @@ export default function NotFound() {
 						{/* Botón */}
 						<Link
 							href="/"
-							className="block w-full py-2.5 px-4 rounded-lg font-semibold text-sm font-poppins text-white transition-all duration-200 focus:outline-none bg-primary hover:bg-primary-hover active:bg-primary-active text-center"
+							className="block w-full py-2.5 px-4 rounded-lg font-semibold text-sm font-poppins text-white transition-all duration-200 focus:outline-none bg-primary hover:bg-primary active:bg-primary text-center"
 							style={{
 								boxShadow: '0 4px 14px rgba(103,37,119,0.35)'
 							}}

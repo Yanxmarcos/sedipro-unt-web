@@ -59,7 +59,7 @@ const ShaderBackground = () => {
     vec4 bgColor2 = vec4(0.231, 0.004, 0.569, 1.0);  // #3b0191
     // Color acento morado claro: #6b46c1
     vec4 accentColor = vec4(0.420, 0.275, 0.757, 1.0); // #6b46c1
-    
+
     // Color de líneas: morado claro con opacidad
     vec4 lineColor = vec4(0.420, 0.275, 0.757, 0.8); // #6b46c1 semi-transparente
     // ===========================================
@@ -100,15 +100,15 @@ const ShaderBackground = () => {
       space.x += random(space.y * warpFrequency + iTime * warpSpeed + 2.0) * warpAmplitude * horizontalFade;
 
       vec4 lines = vec4(0.0);
-      
+
       // Gradiente animado similar al hero: azul oscuro → morado intenso → morado claro
       float gradientFactor = (sin(iTime * 0.2) + 1.0) / 2.0;
-      
+
       // Primera mezcla: base azul oscuro con morado intenso
       vec4 mixed1 = mix(bgColor1, bgColor2, uv.x * 1.2);
       // Segunda mezcla: añadir morado claro en los bordes
       vec4 mixed2 = mix(mixed1, accentColor, gradientFactor * 0.6);
-      
+
       // Añadir un poco de variación vertical
       vec4 dynamicBg = mix(mixed2, bgColor2, uv.y * 0.5);
 
@@ -135,10 +135,10 @@ const ShaderBackground = () => {
       fragColor = dynamicBg;
       fragColor *= verticalFade;
       fragColor.a = 1.0;
-      
+
       // Añadir las líneas con brillo sutil
       fragColor += lines * 0.8;
-      
+
       // Viñeta sutil para dar profundidad
       float vignette = 1.0 - (length(uv - 0.5) * 0.3);
       fragColor.rgb *= vignette;
@@ -439,7 +439,13 @@ export default function Home() {
     };
 
     return (
-        <>
+        <div
+            className="min-h-screen bg-[#0b1326] font-poppins text-[#dae2fd]"
+            style={{
+                '--color-primary': '#b497ff',
+                '--color-secondary': '#b4c5ff',
+            }}
+        >
             {/* TopNavBar - Actualizado con gradiente hero */}
             <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-3 bg-[#0b1326]/80 backdrop-blur-2xl rounded-full mt-4 mx-4 md:mx-auto max-w-container-max border border-white/10 shadow-2xl">
                 <div className="flex items-center gap-3">
@@ -452,7 +458,7 @@ export default function Home() {
                             src="/img/sedinvita-logo.webp"
                         />
                     </div>
-                    <span className="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">
+                    <span className="font-headline-md text-headline-md font-bold text-[#dae2fd] tracking-tight">
                         SEDInvita 2026
                     </span>
                 </div>
@@ -460,8 +466,8 @@ export default function Home() {
                     <a
                         href="#inicio"
                         className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'inicio'
-                            ? 'text-on-surface-variant font-bold hover:text-primary border-b-2'
-                            : 'text-on-surface-variant/60 border-on-surface-variant/60 font-medium'
+                            ? 'text-[#cbc3d5] font-bold hover:text-primary border-b-2'
+                            : 'text-[#cbc3d5]/60 border-[#cbc3d5]/60 font-medium'
                             }`}
                     >
                         Inicio
@@ -469,8 +475,8 @@ export default function Home() {
                     <a
                         href="#nuevos-talentos"
                         className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'nuevos-talentos'
-                            ? 'text-on-surface-variant font-bold hover:text-primary border-b-2'
-                            : 'text-on-surface-variant/60 border-on-surface-variant/60 font-medium'
+                            ? 'text-[#cbc3d5] font-bold hover:text-primary border-b-2'
+                            : 'text-[#cbc3d5]/60 border-[#cbc3d5]/60 font-medium'
                             }`}
                     >
                         Nuevos Talentos
@@ -478,8 +484,8 @@ export default function Home() {
                     <a
                         href="#fases"
                         className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'fases'
-                            ? 'text-on-surface-variant font-bold hover:text-primary border-b-2'
-                            : 'text-on-surface-variant/60 border-on-surface-variant/60 font-medium'
+                            ? 'text-[#cbc3d5] font-bold hover:text-primary border-b-2'
+                            : 'text-[#cbc3d5]/60 border-[#cbc3d5]/60 font-medium'
                             }`}
                     >
                         Fases
@@ -487,8 +493,8 @@ export default function Home() {
                     <a
                         href="#beneficios"
                         className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'beneficios'
-                            ? 'text-on-surface-variant font-bold hover:text-primary border-b-2'
-                            : 'text-on-surface-variant/60 border-on-surface-variant/60 font-medium'
+                            ? 'text-[#cbc3d5] font-bold hover:text-primary border-b-2'
+                            : 'text-[#cbc3d5]/60 border-[#cbc3d5]/60 font-medium'
                             }`}
                     >
                         Beneficios
@@ -496,8 +502,8 @@ export default function Home() {
                     <a
                         href="#areas"
                         className={`pb-1 font-label-md text-label-md transition-all duration-300 ${activeSection === 'areas'
-                            ? 'text-on-surface-variant font-bold hover:text-primary border-b-2'
-                            : 'text-on-surface-variant/60 border-on-surface-variant/60 font-medium'
+                            ? 'text-[#cbc3d5] font-bold hover:text-primary border-b-2'
+                            : 'text-[#cbc3d5]/60 border-[#cbc3d5]/60 font-medium'
                             }`}
                     >
                         Áreas
@@ -513,7 +519,9 @@ export default function Home() {
                     </a>
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="md:hidden text-on-surface"
+                        className="md:hidden text-[#dae2fd]"
+                        aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+                        aria-expanded={mobileMenuOpen}
                     >
                         {mobileMenuOpen ? (
                             <X size={28} />
@@ -530,7 +538,7 @@ export default function Home() {
                         <a
                             href="#inicio"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="font-semibold text-on-surface"
+                            className="font-semibold text-[#dae2fd]"
                         >
                             Inicio
                         </a>
@@ -542,28 +550,28 @@ export default function Home() {
                                     document.getElementById('nuevos-talentos')?.scrollIntoView({ behavior: 'smooth' });
                                 }, 100);
                             }}
-                            className="font-semibold text-on-surface"
+                            className="font-semibold text-[#dae2fd]"
                         >
                             Nuevos Talentos
                         </a>
                         <a
                             href="#fases"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="font-semibold text-on-surface"
+                            className="font-semibold text-[#dae2fd]"
                         >
                             Fases
                         </a>
                         <a
                             href="#beneficios"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="font-semibold text-on-surface"
+                            className="font-semibold text-[#dae2fd]"
                         >
                             Beneficios
                         </a>
                         <a
                             href="#areas"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="font-semibold text-on-surface"
+                            className="font-semibold text-[#dae2fd]"
                         >
                             Áreas
                         </a>
@@ -601,17 +609,17 @@ export default function Home() {
                     }}></div>
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop w-full grid grid-cols-1 md:grid-cols-2 gap-stack-lg items-center relative z-10">
                         <div className="space-y-stack-md text-center md:text-left flex flex-col items-center md:items-start mt-12 md:mt-0">
-                            <h1 className="font-display-lg text-[32px] sm:text-[36px] md:text-display-lg text-on-surface leading-tight text-glow">
-                                Conecta, lidera y <br /><span className="text-primary-container">transforma</span> tu futuro académico.
+                            <h1 className="font-display-lg text-[32px] sm:text-[36px] md:text-display-lg text-[#dae2fd] leading-tight text-glow">
+                                Conecta, lidera y <br /><span className="text-primary">transforma</span> tu futuro académico.
                             </h1>
-                            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-lg mx-auto md:mx-0">
+                            <p className="font-body-lg text-body-lg text-[#cbc3d5] max-w-lg mx-auto md:mx-0">
                                 Únete a la comunidad de líderes más influyente de la UNT. <strong>SEDInvita</strong> es el punto de partida para tu crecimiento profesional y personal.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                                <button onClick={scrollToNuevosTalentos} className="px-8 py-4 bg-on-primary-container text-on-primary rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
+                                <button onClick={scrollToNuevosTalentos} className="px-8 py-4 bg-[#e1d2ff] text-[#3b0191] rounded-2xl font-label-md text-label-md font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
                                     {titulo_boton_cta}
                                 </button>
-                                <a href="https://sediprount.org" target='_blank' className="px-8 py-4 glass-card text-on-surface rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
+                                <a href="https://sediprount.org" target='_blank' className="px-8 py-4 glass-card text-[#dae2fd] rounded-2xl font-label-md text-label-md font-bold hover:bg-white/10 transition-colors">
                                     SEDIPRO UNT
                                 </a>
                             </div>
@@ -650,10 +658,10 @@ export default function Home() {
 
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop relative z-10">
                         <div className="text-center mb-stack-lg space-y-4">
-                            <h2 className="font-headline-lg text-headline-lg md:text-display-lg text-on-surface leading-tight">
+                            <h2 className="font-headline-lg text-headline-lg md:text-display-lg text-[#dae2fd] leading-tight">
                                 Conoce nuestros <span className="text-primary">Nuevos Talentos</span>
                             </h2>
-                            <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+                            <p className="font-body-md text-body-md text-[#cbc3d5] max-w-2xl mx-auto">
                                 Descubre a los estudiantes que destacaron en el proceso de selección y que hoy forman parte de la Generación 2026 de <strong>SEDIPRO UNT.</strong>
                             </p>
                         </div>
@@ -717,20 +725,20 @@ export default function Home() {
                 </section>
 
                 {/* Chronogram Section (Phases) */}
-                <section className="py-stack-lg bg-surface-container-lowest relative overflow-hidden" id="fases">
+                <section className="py-stack-lg bg-[#060e20] relative overflow-hidden" id="fases">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
                         <div className="text-center mb-stack-lg space-y-4">
-                            <h2 className="font-headline-lg text-headline-lg text-on-surface">Fases de SEDInvita</h2>
-                            <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+                            <h2 className="font-headline-lg text-headline-lg text-[#dae2fd]">Fases de SEDInvita</h2>
+                            <p className="font-body-md text-body-md text-[#cbc3d5] max-w-2xl mx-auto">
                                 Diseñamos un camino estructurado para identificar el talento de cada estudiante.
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-stack-md">
                             <div className={`${CONFIG_FASES[1].clase} p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative`}>
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                    <span className="font-display-lg text-display-lg font-extrabold text-on-surface">01</span>
+                                    <span className="font-display-lg text-display-lg font-extrabold text-[#dae2fd]">01</span>
                                 </div>
-                                <div className="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-primary mb-stack-sm">
+                                <div className="w-12 h-12 rounded-xl bg-[#f9bd22]/10 flex items-center justify-center text-primary mb-stack-sm">
                                     <Image
                                         alt="Background Hito"
                                         width={50}
@@ -739,16 +747,16 @@ export default function Home() {
                                         src="/img/hito5.webp"
                                     />
                                 </div>
-                                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 1</h3>
-                                <p className="font-body-md text-body-md text-on-surface-variant">
+                                <h3 className="font-headline-md text-headline-md text-[#dae2fd] mb-2">FASE 1</h3>
+                                <p className="font-body-md text-body-md text-[#cbc3d5]">
                                     Periodo de inscripciones abiertas. <br /> <strong>Del 1 al 18 de junio.</strong>
                                 </p>
                             </div>
                             <div className={`${CONFIG_FASES[2].clase} p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative`}>
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                    <span className="font-display-lg text-display-lg font-extrabold text-on-surface">02</span>
+                                    <span className="font-display-lg text-display-lg font-extrabold text-[#dae2fd]">02</span>
                                 </div>
-                                <div className="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-secondary mb-stack-sm">
+                                <div className="w-12 h-12 rounded-xl bg-[#f9bd22]/10 flex items-center justify-center text-secondary mb-stack-sm">
                                     <Image
                                         alt="Background Hito"
                                         width={50}
@@ -757,16 +765,16 @@ export default function Home() {
                                         src="/img/hito3.webp"
                                     />
                                 </div>
-                                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 2</h3>
-                                <p className="font-body-md text-body-md text-on-surface-variant">
+                                <h3 className="font-headline-md text-headline-md text-[#dae2fd] mb-2">FASE 2</h3>
+                                <p className="font-body-md text-body-md text-[#cbc3d5]">
                                     Inducción I: Dinámicas.<br /> <strong>27 de junio.</strong>
                                 </p>
                             </div>
                             <div className={`${CONFIG_FASES[3].clase} p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative`}>
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                    <span className="font-display-lg text-display-lg font-extrabold text-on-surface">03</span>
+                                    <span className="font-display-lg text-display-lg font-extrabold text-[#dae2fd]">03</span>
                                 </div>
-                                <div className="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-tertiary mb-stack-sm">
+                                <div className="w-12 h-12 rounded-xl bg-[#f9bd22]/10 flex items-center justify-center text-[#f9bd22] mb-stack-sm">
                                     <Image
                                         alt="Background Hito"
                                         width={50}
@@ -775,16 +783,16 @@ export default function Home() {
                                         src="/img/hito4.webp"
                                     />
                                 </div>
-                                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 3</h3>
-                                <p className="font-body-md text-body-md text-on-surface-variant">
+                                <h3 className="font-headline-md text-headline-md text-[#dae2fd] mb-2">FASE 3</h3>
+                                <p className="font-body-md text-body-md text-[#cbc3d5]">
                                     Inducción II: Desarrollo de proyectos.<br /><strong>Del 1 al 7 de julio.</strong>
                                 </p>
                             </div>
                             <div className={`${CONFIG_FASES[4].clase} p-stack-md rounded-2xl group hover:border-primary/50 transition-all duration-500 relative`}>
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                    <span className="font-display-lg text-display-lg font-extrabold text-on-surface">04</span>
+                                    <span className="font-display-lg text-display-lg font-extrabold text-[#dae2fd]">04</span>
                                 </div>
-                                <div className="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-primary mb-stack-sm">
+                                <div className="w-12 h-12 rounded-xl bg-[#f9bd22]/10 flex items-center justify-center text-primary mb-stack-sm">
                                     <Image
                                         alt="Background Hito"
                                         width={50}
@@ -793,8 +801,8 @@ export default function Home() {
                                         src="/img/hito2.webp"
                                     />
                                 </div>
-                                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">FASE 4</h3>
-                                <p className="font-body-md text-body-md text-on-surface-variant">
+                                <h3 className="font-headline-md text-headline-md text-[#dae2fd] mb-2">FASE 4</h3>
+                                <p className="font-body-md text-body-md text-[#cbc3d5]">
                                     Etapa de entrevistas personales.<br /> <strong>Del 13 al 18 de julio.</strong>
                                 </p>
                             </div>
@@ -803,11 +811,11 @@ export default function Home() {
                 </section>
 
                 {/* PUBLICACION DE RESULTADOS */}
-                {/* <section className="py-stack-lg bg-surface-container-lowest relative overflow-hidden" id="resultados">
+                {/* <section className="py-stack-lg bg-[#060e20] relative overflow-hidden" id="resultados">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
                         <div className="text-center mb-stack-lg space-y-4">
-                            <h2 className="font-headline-lg text-headline-lg text-on-surface">Resultados de la Fase 1</h2>
-                            <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+                            <h2 className="font-headline-lg text-headline-lg text-[#dae2fd]">Resultados de la Fase 1</h2>
+                            <p className="font-body-md text-body-md text-[#cbc3d5] max-w-2xl mx-auto">
                                 En esta sección se encuentran los estudiantes que superaron la Fase 1 y han sido habilitados para participar en la <strong>Fase 2.</strong>
                             </p>
                         </div>
@@ -816,13 +824,13 @@ export default function Home() {
                 </section> */}
 
                 {/* Benefits Section */}
-                <section className="py-stack-lg bg-surface relative overflow-hidden" id="beneficios">
+                <section className="py-stack-lg bg-[#0b1326] relative overflow-hidden" id="beneficios">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-10">
                         <div className="text-center mb-12 mt-6">
-                            <h3 className="font-headline-lg text-headline-lg font-bold text-on-surface">
+                            <h3 className="font-headline-lg text-headline-lg font-bold text-[#dae2fd]">
                                 SEDInvita 2026
                             </h3>
-                            <p className="mt-2 font-body-md text-body-md text-on-surface-variant">
+                            <p className="mt-2 font-body-md text-body-md text-[#cbc3d5]">
                                 Conoce más sobre SEDIPRO UNT y descubre lo que significa formar parte de nuestra comunidad.
                             </p>
                         </div>
@@ -883,10 +891,10 @@ export default function Home() {
                     </div>
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-stack-lg items-center">
                         <div className="lg:col-span-5 space-y-stack-md">
-                            <h2 className="font-display-lg text-headline-lg md:text-display-lg text-on-surface leading-tight">
+                            <h2 className="font-display-lg text-headline-lg md:text-display-lg text-[#dae2fd] leading-tight">
                                 ¿Por qué ser parte de <span className="text-primary">SEDIPRO UNT</span>?
                             </h2>
-                            <p className="font-body-lg text-body-lg text-on-surface-variant">
+                            <p className="font-body-lg text-body-lg text-[#cbc3d5]">
                                 Más que una organización, somos una incubadora de líderes. Descubre cómo potenciar tus habilidades blandas y técnicas en un entorno real.
                             </p>
                             <ul className="space-y-4">
@@ -895,8 +903,8 @@ export default function Home() {
                                         <Check size={20} strokeWidth={2.5} />
                                     </div>
                                     <div>
-                                        <h4 className="font-headline-md text-body-lg font-bold text-on-surface">Metodología PMI + Ágil</h4>
-                                        <p className="font-body-md text-body-md text-on-surface-variant">
+                                        <h4 className="font-headline-md text-body-lg font-bold text-[#dae2fd]">Metodología PMI + Ágil</h4>
+                                        <p className="font-body-md text-body-md text-[#cbc3d5]">
                                             Aprende y aplica buenas prácticas en gestión de proyectos con estándares PMI y herramientas ágiles.
                                         </p>
                                     </div>
@@ -906,8 +914,8 @@ export default function Home() {
                                         <Check size={20} strokeWidth={2.5} />
                                     </div>
                                     <div>
-                                        <h4 className="font-headline-md text-body-lg font-bold text-on-surface">Tres Enfoques de Impacto</h4>
-                                        <p className="font-body-md text-body-md text-on-surface-variant">
+                                        <h4 className="font-headline-md text-body-lg font-bold text-[#dae2fd]">Tres Enfoques de Impacto</h4>
+                                        <p className="font-body-md text-body-md text-[#cbc3d5]">
                                             Trabajamos desde lo académico, social y ambiental para formar profesionales capacitados en dirección de proyectos.
                                         </p>
                                     </div>
@@ -917,8 +925,8 @@ export default function Home() {
                                         <Check size={20} strokeWidth={2.5} />
                                     </div>
                                     <div>
-                                        <h4 className="font-headline-md text-body-lg font-bold text-on-surface">Formación de Líderes</h4>
-                                        <p className="font-body-md text-body-md text-on-surface-variant">
+                                        <h4 className="font-headline-md text-body-lg font-bold text-[#dae2fd]">Formación de Líderes</h4>
+                                        <p className="font-body-md text-body-md text-[#cbc3d5]">
                                             Desarrolla habilidades de liderazgo con valores como innovación, integridad, trabajo en equipo y vocación de servicio.
                                         </p>
                                     </div>
@@ -929,7 +937,7 @@ export default function Home() {
                             <div className="space-y-4 pt-12">
                                 <a
                                     href="https://www.facebook.com/SediproUNT/posts/pfbid02PjWsMHJDriaFfzskH2fn9TSmxpFtC1gJ8TG7HDKeGfsY2Q55u6f6MSGXpzPBgUwvl"
-                                    className="aspect-square rounded-2xl bg-surface-variant overflow-hidden relative block hover:opacity-90 transition-opacity"
+                                    className="aspect-square rounded-2xl bg-[#2d3449] overflow-hidden relative block hover:opacity-90 transition-opacity"
                                     target="_blank" // Opcional: abre en nueva pestaña
                                     rel="noopener noreferrer" // Seguridad para target="_blank"
                                 >
@@ -973,7 +981,7 @@ export default function Home() {
                                 </a>
                                 <a
                                     href="https://www.facebook.com/photo.php?fbid=1243271171298490&set=pb.100068468572320.-2207520000&type=3"
-                                    className="aspect-square rounded-2xl bg-surface-variant overflow-hidden relative block hover:opacity-90 transition-opacity"
+                                    className="aspect-square rounded-2xl bg-[#2d3449] overflow-hidden relative block hover:opacity-90 transition-opacity"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
@@ -991,11 +999,11 @@ export default function Home() {
                 </section>
 
                 {/* Areas */}
-                <section className="py-stack-lg bg-surface-container-lowest relative overflow-hidden" id="areas">
+                <section className="py-stack-lg bg-[#060e20] relative overflow-hidden" id="areas">
                     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
                         <div className="text-center mb-stack-lg space-y-4">
-                            <h2 className="font-headline-lg text-headline-lg text-on-surface">Áreas de SEDIPRO UNT</h2>
-                            <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+                            <h2 className="font-headline-lg text-headline-lg text-[#dae2fd]">Áreas de SEDIPRO UNT</h2>
+                            <p className="font-body-md text-body-md text-[#cbc3d5] max-w-2xl mx-auto">
                                 Conoce nuestras áreas y atrévete a ser el próximo fichaje de SEDIPRO UNT. Tu próxima gran oportunidad comienza aquí.
                             </p>
                         </div>
@@ -1032,10 +1040,10 @@ export default function Home() {
                     </div>
                     <div className="max-w-container-max mx-auto glass-card-extra-light rounded-[32px] p-stack-lg md:p-24 text-center space-y-stack-md relative z-10 border-white/5 backdrop-blur-sm">
                         <div className="absolute inset-0 bg-gradient-to-tr from-[#3b0191]/10 via-transparent to-[#6b46c1]/10 pointer-events-none rounded-[32px]"></div>
-                        <h2 className="font-display-lg text-headline-lg md:text-[56px] text-on-surface leading-tight relative z-10">
+                        <h2 className="font-display-lg text-headline-lg md:text-[56px] text-[#dae2fd] leading-tight relative z-10">
                             ¡Proceso de <br />Selección Finalizado!
                         </h2>
-                        <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto relative z-10">
+                        <p className="font-body-lg text-body-lg text-[#cbc3d5] max-w-xl mx-auto relative z-10">
                             Agradecemos a todos los postulantes por su participación y felicitamos a quienes forman parte de la nueva generación de SEDIPRO UNT. ¡Les damos la bienvenida!
                         </p>
                         {/* <div className="pt-4 relative z-10">
@@ -1049,7 +1057,7 @@ export default function Home() {
 
             <ScrollToTopButton />
             {/* Footer */}
-            <footer className="bg-surface-container-lowest border-t border-outline-variant/30 py-12">
+            <footer className="bg-[#060e20] border-t border-[#494453]/30 py-12">
                 <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-stack-md">
                         <a
@@ -1068,16 +1076,16 @@ export default function Home() {
                                         className="w-auto h-auto object-contain"
                                     />
                                 </div>
-                                <span className="text-label-md font-headline-md font-bold text-on-surface">
+                                <span className="text-label-md font-headline-md font-bold text-[#dae2fd]">
                                     SEDIPRO UNT
                                 </span>
                             </div>
 
-                            <p className="font-body-md text-body-md text-on-surface-variant font-label-sm text-label-sm">
+                            <p className="font-body-md text-body-md text-[#cbc3d5] font-label-sm text-label-sm">
                                 Sección Estudiantil de Dirección de
                             </p>
 
-                            <p className="font-body-md text-body-md text-on-surface-variant font-label-sm text-label-sm">
+                            <p className="font-body-md text-body-md text-[#cbc3d5] font-label-sm text-label-sm">
                                 Proyectos de la UNT.
                             </p>
                         </a>
@@ -1087,7 +1095,7 @@ export default function Home() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="Facebook"
-                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-[#cbc3d5] hover:text-primary hover:scale-110 transition-all duration-300"
                             >
                                 <FaFacebookF size={18} />
                             </a>
@@ -1096,7 +1104,7 @@ export default function Home() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="Instagram"
-                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-[#cbc3d5] hover:text-primary hover:scale-110 transition-all duration-300"
                             >
                                 <FaInstagram size={18} />
                             </a>
@@ -1105,7 +1113,7 @@ export default function Home() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="LinkedIn"
-                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-[#cbc3d5] hover:text-primary hover:scale-110 transition-all duration-300"
                             >
                                 <FaLinkedinIn size={18} />
                             </a>
@@ -1114,7 +1122,7 @@ export default function Home() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="YouTube"
-                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-[#cbc3d5] hover:text-primary hover:scale-110 transition-all duration-300"
                             >
                                 <FaYoutube size={18} />
                             </a>
@@ -1123,18 +1131,18 @@ export default function Home() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="TikTok"
-                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-on-surface-variant hover:text-primary hover:scale-110 transition-all duration-300"
+                                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-[#cbc3d5] hover:text-primary hover:scale-110 transition-all duration-300"
                             >
                                 <FaTiktok size={18} />
                             </a>
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <span className="font-label-sm text-body-md text-on-surface-variant text-label-sm">
+                            <span className="font-label-sm text-body-md text-[#cbc3d5] text-label-sm">
                                 Hecho con
                             </span>
                             <Heart size={14} className="text-orange-500 fill-orange-500 animate-pulse" />
-                            <span className="font-label-sm text-body-md text-on-surface-variant text-label-sm">
+                            <span className="font-label-sm text-body-md text-[#cbc3d5] text-label-sm">
                                 por
                             </span>
                             <span className="font-label-sm text-label-md font-semibold text-orange-500 text-label-sm">
@@ -1152,14 +1160,14 @@ export default function Home() {
                         </div>
                     </div>
 
-                    <div className="mt-10 pt-6 border-t border-outline-variant/20 text-center">
+                    <div className="mt-10 pt-6 border-t border-[#494453]/20 text-center">
                         {/* <Link href="/login" className="w-full flex justify-center items-center gap-1 mt-1 group cursor-pointer">
-                            <Lock size={14} className="text-outline-variant group-hover:text-primary transition-colors duration-200" />
-                            <span className="text-xs text-outline-variant group-hover:text-primary transition-colors duration-200">
+                            <Lock size={14} className="text-[#494453] group-hover:text-primary transition-colors duration-200" />
+                            <span className="text-xs text-[#494453] group-hover:text-primary transition-colors duration-200">
                                 Administración
                             </span>
                         </Link> */}
-                        <p className="text-xs text-on-surface-variant/60 mt-5">
+                        <p className="text-xs text-[#cbc3d5]/60 mt-5">
                             © 2026 SEDIPRO UNT. Todos los derechos reservados.
                         </p>
                     </div>
@@ -1168,7 +1176,7 @@ export default function Home() {
 
             {/* Modales */}
             {/* <TurnoModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} /> */}
-            {/* <TurnoTemporalModal 
+            {/* <TurnoTemporalModal
                 isOpen={showTemporalModal}
                 onClose={() => setShowTemporalModal(false)}
             /> */}
@@ -1180,7 +1188,7 @@ export default function Home() {
                 image={selectedPoster?.src}
                 area={selectedPoster?.area}
             />
-        </>
+        </div>
     );
 }
 
@@ -1428,11 +1436,11 @@ const PosterModal = ({ isOpen, onClose, image, area }) => {
                     to { opacity: 1; }
                 }
                 @keyframes scaleIn {
-                    from { 
+                    from {
                         opacity: 0;
                         transform: scale(0.92) translateY(20px);
                     }
-                    to { 
+                    to {
                         opacity: 1;
                         transform: scale(1) translateY(0);
                     }
@@ -1441,7 +1449,7 @@ const PosterModal = ({ isOpen, onClose, image, area }) => {
                     -webkit-overflow-scrolling: touch;
                     overscroll-behavior: contain;
                 }
-                
+
                 @media (max-width: 768px) {
                     .modal-overlay {
                         padding: 12px;
@@ -1465,7 +1473,7 @@ const PosterModal = ({ isOpen, onClose, image, area }) => {
                         padding: 8px !important;
                     }
                 }
-                
+
                 @media (max-width: 480px) {
                     .modal-overlay {
                         padding: 8px;

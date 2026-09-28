@@ -1,1541 +1,1263 @@
-// src/app/panel/sedinvita/areas/page.js
-'use client'
+"use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
-
+import {
+  Users as AdminUsersIcon,
+  Search as AdminSearchIcon,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  TableHead,
+  TableRow,
+  TableHeader,
+  TableCell,
+  TableBody,
+  Table,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { AdminSelect } from "@/components/admin/form-controls";
+import { Label } from "@/components/ui/label";
+import { useState, useEffect, useCallback, useMemo } from "react";
 export default function Page() {
-    const [dark, setDark] = useState(false)
-    const t = getTheme(dark)
-    
-    // Theme
-    useEffect(() => {
-        const stored = localStorage.getItem('sedipro_dark')
-        if (stored !== null) setDark(stored === 'true')
-        const onStorage = e => { if (e.key === 'sedipro_dark') setDark(e.newValue === 'true') }
-        window.addEventListener('storage', onStorage)
-        const interval = setInterval(() => {
-            const val = localStorage.getItem('sedipro_dark')
-            setDark(prev => { const next = val === 'true'; return prev !== next ? next : prev })
-        }, 400)
-        return () => { window.removeEventListener('storage', onStorage); clearInterval(interval) }
-    }, [])
-
-    // Estados
-    const [edicionActiva, setEdicionActiva] = useState(null)
-    const [areas, setAreas] = useState([])
-    const [postulantesSinArea, setPostulantesSinArea] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [loadingAction, setLoadingAction] = useState(false)
-    const [error, setError] = useState(null)
-    const [busquedaPostulante, setBusquedaPostulante] = useState('')
-    const [areaSeleccionada, setAreaSeleccionada] = useState(null)
-    const [mensajeConfirmacion, setMensajeConfirmacion] = useState(null)
-
-    // NUEVO: Filtro de fase
-    const [faseFilter, setFaseFilter] = useState('fase4')
-    const fases = ['fase3', 'fase4']
-
-    // NUEVO: datos de Fase 4
-    const [postulantesFase4, setPostulantesFase4] = useState([])
-    const [areasFase4, setAreasFase4] = useState([])
-    const [postulantesFase4SinArea, setPostulantesFase4SinArea] = useState([])
-
-    // NUEVO: pestaña activa — 'principal' | 'secundaria'
-    const [vista, setVista] = useState('principal')
-    // NUEVO: data de segunda opción (viene en la misma respuesta de por-area)
-    const [areasSecundaria, setAreasSecundaria] = useState([])
-    const [totalSecundaria, setTotalSecundaria] = useState(0)
-    const [postulantesSinSecundaria, setPostulantesSinSecundaria] = useState([])
-    const [areaSecundariaSeleccionada, setAreaSecundariaSeleccionada] = useState(null)
-
-    // Cargar edición activa
-    const fetchEdicionActiva = useCallback(async () => {
-        try {
-            const res = await fetch('/api/sedinvita/ediciones', { credentials: 'include' })
-            const json = await res.json()
-            if (!res.ok) throw new Error(json.error || 'Error al cargar ediciones')
-            const activa = (json.data || []).find(e => e.activa === true)
-            setEdicionActiva(activa || null)
-            return activa
-        } catch (err) {
-            console.error(err)
-            setError(err.message)
-            return null
-        }
-    }, [])
-
-    // Cargar datos de Fase 4
-    const cargarDatosFase4 = useCallback(async (edicionId) => {
-        try {
-            const res = await fetch(`/api/sedinvita/postulantes/fase4?edicionId=${edicionId}`, {
-                credentials: 'include'
-            })
-            const json = await res.json()
-            if (!res.ok) throw new Error(json.error || 'Error al cargar Fase 4')
-            
-            setPostulantesFase4(json.postulantes || [])
-            setAreasFase4(json.areas || [])
-            setPostulantesFase4SinArea(json.sinArea || [])
-        } catch (err) {
-            console.error(err)
-            setError(err.message)
-        }
-    }, [])
-
-    // Cargar todas las áreas y postulantes
-    const cargarDatos = useCallback(async () => {
-        const activa = await fetchEdicionActiva()
-        if (!activa) {
-            setLoading(false)
-            return
-        }
-
-        setLoading(true)
-        setError(null)
-
-        try {
-            // Cargar datos de Fase 3 (siempre)
-            const [areasRes, sinAreaRes] = await Promise.all([
-                fetch('/api/sedinvita/postulantes/por-area', {
-                    credentials: 'include'
-                }),
-                fetch(`/api/sedinvita/postulantes/sin-area?edicionId=${activa._id}`, {
-                    credentials: 'include'
-                })
-            ])
-
-            const areasJson = await areasRes.json()
-            if (!areasRes.ok) throw new Error(areasJson.error || 'Error al cargar áreas')
-
-            const sinAreaJson = await sinAreaRes.json()
-            if (!sinAreaRes.ok) throw new Error(sinAreaJson.error || 'Error al cargar postulantes sin área')
-
-            setAreas(areasJson.areas || [])
-            setPostulantesSinArea(sinAreaJson.data || [])
-            // NUEVO: datos de área secundaria (misma respuesta de por-area, sin round-trip extra)
-            setAreasSecundaria(areasJson.areasSecundaria || [])
-            setTotalSecundaria(areasJson.totalSecundaria || 0)
-            setPostulantesSinSecundaria(areasJson.postulantesSinSecundaria || [])
-
-            // Cargar datos de Fase 4
-            await cargarDatosFase4(activa._id)
-
-        } catch (err) {
-            console.error(err)
-            setError(err.message)
-        } finally {
-            setLoading(false)
-        }
-    }, [fetchEdicionActiva, cargarDatosFase4])
-
-    useEffect(() => {
-        cargarDatos()
-    }, [cargarDatos])
-
-    // Quitar área de un postulante
-    const handleQuitarArea = async (codigoMatricula, nombreCompleto) => {
-        if (!confirm(`¿Estás seguro de quitar el área de ${nombreCompleto} (${codigoMatricula})?`)) {
-            return
-        }
-
-        setLoadingAction(true)
-        setError(null)
-
-        try {
-            const res = await fetch(
-                `/api/sedinvita/admin/quitar-area?codigo=${codigoMatricula}`,
-                {
-                    method: 'DELETE',
-                    credentials: 'include'
-                }
-            )
-
-            const json = await res.json()
-            if (!res.ok) throw new Error(json.error || 'Error al quitar área')
-
-            setMensajeConfirmacion(`Área quitada correctamente de ${nombreCompleto}`)
-            setTimeout(() => setMensajeConfirmacion(null), 4000)
-
-            // Recargar datos
-            await cargarDatos()
-
-        } catch (err) {
-            console.error(err)
-            setError(err.message)
-        } finally {
-            setLoadingAction(false)
-        }
+  const [edicionActiva, setEdicionActiva] = useState(null);
+  const [areas, setAreas] = useState([]);
+  const [postulantesSinArea, setPostulantesSinArea] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingAction, setLoadingAction] = useState(false);
+  const [error, setError] = useState(null);
+  const [busquedaPostulante, setBusquedaPostulante] = useState("");
+  const [areaSeleccionada, setAreaSeleccionada] = useState(null);
+  const [mensajeConfirmacion, setMensajeConfirmacion] = useState(null);
+  const [faseFilter, setFaseFilter] = useState("fase4");
+  const fases = ["fase3", "fase4"];
+  const [postulantesFase4, setPostulantesFase4] = useState([]);
+  const [areasFase4, setAreasFase4] = useState([]);
+  const [postulantesFase4SinArea, setPostulantesFase4SinArea] = useState([]);
+  const [vista, setVista] = useState("principal");
+  const [areasSecundaria, setAreasSecundaria] = useState([]);
+  const [totalSecundaria, setTotalSecundaria] = useState(0);
+  const [postulantesSinSecundaria, setPostulantesSinSecundaria] = useState([]);
+  const [areaSecundariaSeleccionada, setAreaSecundariaSeleccionada] =
+    useState(null);
+  const fetchEdicionActiva = useCallback(async () => {
+    try {
+      const res = await fetch("/api/sedinvita/ediciones", {
+        credentials: "include",
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Error al cargar ediciones");
+      const activa = (json.data || []).find((e) => e.activa === true);
+      setEdicionActiva(activa || null);
+      return activa;
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+      return null;
     }
-
-    // NUEVO: Asignar área final a un postulante de Fase 4
-    const handleAsignarAreaFinal = async (codigoMatricula, areaFinal, nombreCompleto) => {
-        if (!areaFinal) {
-            setError('Debes seleccionar un área')
-            return
-        }
-
-        if (!confirm(`¿Asignar el área "${getAreaNombre(areaFinal)}" a ${nombreCompleto} (${codigoMatricula})?`)) {
-            return
-        }
-
-        setLoadingAction(true)
-        setError(null)
-
-        try {
-            const res = await fetch('/api/sedinvita/admin/asignar-area-final', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ codigoMatricula, areaFinal }),
-                credentials: 'include'
-            })
-
-            const json = await res.json()
-            if (!res.ok) throw new Error(json.error || 'Error al asignar área final')
-
-            setMensajeConfirmacion(`Área final "${getAreaNombre(areaFinal)}" asignada a ${nombreCompleto}`)
-            setTimeout(() => setMensajeConfirmacion(null), 4000)
-
-            await cargarDatos()
-
-        } catch (err) {
-            console.error(err)
-            setError(err.message)
-        } finally {
-            setLoadingAction(false)
-        }
+  }, []);
+  const cargarDatosFase4 = useCallback(async (edicionId) => {
+    try {
+      const res = await fetch(
+        `/api/sedinvita/postulantes/fase4?edicionId=${edicionId}`,
+        {
+          credentials: "include",
+        },
+      );
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Error al cargar Fase 4");
+      setPostulantesFase4(json.postulantes || []);
+      setAreasFase4(json.areas || []);
+      setPostulantesFase4SinArea(json.sinArea || []);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
     }
-
-    // NUEVO: Quitar solo el área secundaria de un postulante (mantiene la principal intacta)
-    const handleQuitarAreaSecundaria = async (codigoMatricula, nombreCompleto) => {
-        if (!confirm(`¿Estás seguro de quitar el área de segunda opción de ${nombreCompleto} (${codigoMatricula})? Su área principal no se verá afectada.`)) {
-            return
-        }
-
-        setLoadingAction(true)
-        setError(null)
-
-        try {
-            const res = await fetch(
-                `/api/sedinvita/admin/quitar-area?codigo=${codigoMatricula}&tipo=secundaria`,
-                {
-                    method: 'DELETE',
-                    credentials: 'include'
-                }
-            )
-
-            const json = await res.json()
-            if (!res.ok) throw new Error(json.error || 'Error al quitar área de segunda opción')
-
-            setMensajeConfirmacion(`Área de segunda opción quitada correctamente de ${nombreCompleto}`)
-            setTimeout(() => setMensajeConfirmacion(null), 4000)
-
-            await cargarDatos()
-
-        } catch (err) {
-            console.error(err)
-            setError(err.message)
-        } finally {
-            setLoadingAction(false)
-        }
+  }, []);
+  const cargarDatos = useCallback(async () => {
+    const activa = await fetchEdicionActiva();
+    if (!activa) {
+      setLoading(false);
+      return;
     }
-
-    // Colores por área
-    const getAreaColors = (areaId) => {
-        const colors = {
-            gth: { bg: 'bg-green-500/10', border: 'border-green-500/50', text: 'text-green-400' },
-            pmo: { bg: 'bg-yellow-500/10', border: 'border-yellow-500/50', text: 'text-yellow-400' },
-            ti: { bg: 'bg-orange-500/10', border: 'border-orange-500/50', text: 'text-orange-400' },
-            mkt: { bg: 'bg-red-500/10', border: 'border-red-500/50', text: 'text-red-400' },
-            ltkyfnz: { bg: 'bg-cyan-500/10', border: 'border-cyan-500/50', text: 'text-cyan-400' },
-        }
-        return colors[areaId] || { bg: 'bg-gray-500/10', border: 'border-gray-500/50', text: 'text-gray-400' }
+    setLoading(true);
+    setError(null);
+    try {
+      const [areasRes, sinAreaRes] = await Promise.all([
+        fetch("/api/sedinvita/postulantes/por-area", {
+          credentials: "include",
+        }),
+        fetch(`/api/sedinvita/postulantes/sin-area?edicionId=${activa._id}`, {
+          credentials: "include",
+        }),
+      ]);
+      const areasJson = await areasRes.json();
+      if (!areasRes.ok)
+        throw new Error(areasJson.error || "Error al cargar áreas");
+      const sinAreaJson = await sinAreaRes.json();
+      if (!sinAreaRes.ok)
+        throw new Error(
+          sinAreaJson.error || "Error al cargar postulantes sin área",
+        );
+      setAreas(areasJson.areas || []);
+      setPostulantesSinArea(sinAreaJson.data || []);
+      setAreasSecundaria(areasJson.areasSecundaria || []);
+      setTotalSecundaria(areasJson.totalSecundaria || 0);
+      setPostulantesSinSecundaria(areasJson.postulantesSinSecundaria || []);
+      await cargarDatosFase4(activa._id);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-
-    const getAreaNombre = (areaId) => {
-        const nombres = {
-            gth: 'GTH',
-            pmo: 'PMO',
-            ti: 'TI',
-            mkt: 'MKT',
-            ltkyfnz: 'LTK & FNZ'
-        }
-        return nombres[areaId] || areaId
+  }, [fetchEdicionActiva, cargarDatosFase4]);
+  useEffect(() => {
+    cargarDatos();
+  }, [cargarDatos]);
+  const handleQuitarArea = async (codigoMatricula, nombreCompleto) => {
+    if (
+      !confirm(
+        `¿Estás seguro de quitar el área de ${nombreCompleto} (${codigoMatricula})?`,
+      )
+    ) {
+      return;
     }
-
-    // Filtrar postulantes sin área
-    const postulantesSinAreaFiltrados = useMemo(() => {
-        let resultado = postulantesSinArea
-        if (busquedaPostulante.trim()) {
-            const busqueda = busquedaPostulante.trim().toLowerCase()
-            resultado = resultado.filter(p => 
-                p.codigoMatricula?.toLowerCase().includes(busqueda) ||
-                p.nombres?.toLowerCase().includes(busqueda) ||
-                p.apellidos?.toLowerCase().includes(busqueda) ||
-                `${p.apellidos} ${p.nombres}`.toLowerCase().includes(busqueda) ||
-                p.correoElectronico?.toLowerCase().includes(busqueda) ||
-                p.numeroCelular?.toLowerCase().includes(busqueda)
-            )
-        }
-        return resultado
-    }, [postulantesSinArea, busquedaPostulante])
-
-    // NUEVO: Filtrar postulantes sin área secundaria (mismo patrón que arriba)
-    const postulantesSinSecundariaFiltrados = useMemo(() => {
-        let resultado = postulantesSinSecundaria
-        if (busquedaPostulante.trim()) {
-            const busqueda = busquedaPostulante.trim().toLowerCase()
-            resultado = resultado.filter(p =>
-                p.codigoMatricula?.toLowerCase().includes(busqueda) ||
-                p.nombres?.toLowerCase().includes(busqueda) ||
-                p.apellidos?.toLowerCase().includes(busqueda) ||
-                `${p.apellidos} ${p.nombres}`.toLowerCase().includes(busqueda) ||
-                p.correoElectronico?.toLowerCase().includes(busqueda) ||
-                p.numeroCelular?.toLowerCase().includes(busqueda)
-            )
-        }
-        return resultado
-    }, [postulantesSinSecundaria, busquedaPostulante])
-
-    // NUEVO: Postulantes de Fase 4 filtrados por búsqueda
-    const postulantesFase4Filtrados = useMemo(() => {
-        let resultado = postulantesFase4
-        if (busquedaPostulante.trim()) {
-            const busqueda = busquedaPostulante.trim().toLowerCase()
-            resultado = resultado.filter(p =>
-                p.codigoMatricula?.toLowerCase().includes(busqueda) ||
-                p.nombres?.toLowerCase().includes(busqueda) ||
-                p.apellidos?.toLowerCase().includes(busqueda) ||
-                `${p.apellidos} ${p.nombres}`.toLowerCase().includes(busqueda) ||
-                p.correoElectronico?.toLowerCase().includes(busqueda) ||
-                p.numeroCelular?.toLowerCase().includes(busqueda)
-            )
-        }
-        return resultado
-    }, [postulantesFase4, busquedaPostulante])
-
-    const totalConArea = areas.reduce((acc, area) => acc + area.postulantes.length, 0)
-    const totalFase4ConArea = areasFase4.reduce((acc, area) => acc + area.postulantes.length, 0)
-
-    return (
-        <div style={{
-            minHeight: '100%', padding: '20px 16px',
-            backgroundColor: t.pageBg, transition: 'background-color 0.3s',
-            fontFamily: 'Poppins, sans-serif',
-            maxWidth: '1200px', margin: '0 auto',
-        }}>
-            {/* Encabezado */}
-            <div style={{ marginBottom: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '11px', marginBottom: '4px' }}>
-                    <div>
-                        <h1 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '22px', color: t.titleText, margin: 0, lineHeight: 1.2 }}>
-                            Áreas
-                        </h1>
-                        <p style={{ fontSize: '13px', color: t.bodyText, marginTop: '4px', marginBottom: 0 }}>
-                            {faseFilter === 'fase3' 
-                                ? `Postulantes agrupados por área seleccionada • ${totalConArea} con área • ${postulantesSinArea.length} sin área`
-                                : `Postulantes en Fase 4 • ${totalFase4ConArea} con área final • ${postulantesFase4SinArea.length} sin asignar`
-                            }
-                            {edicionActiva && ` • ${edicionActiva.nombre} (${edicionActiva.anio})`}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Filtro de Fase */}
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: t.labelText }}>
-                    Fase:
-                </label>
-                <select
-                    value={faseFilter}
-                    onChange={e => {
-                        setFaseFilter(e.target.value)
-                        setAreaSeleccionada(null)
-                        setAreaSecundariaSeleccionada(null)
-                    }}
-                    style={{
-                        padding: '6px 24px 6px 12px',
-                        borderRadius: '8px',
-                        border: `1px solid ${t.inputBorder}`,
-                        backgroundColor: dark ? '#2d2b3e' : '#fff',
-                        color: t.inputText,
-                        fontSize: '13px',
-                        fontFamily: 'Poppins, sans-serif',
-                        cursor: 'pointer',
-                        minWidth: '110px'
-                    }}
-                >
-                    {fases.map(f => (
-                        <option key={f} value={f}>{f.charAt(0).toUpperCase() + f.slice(1)}</option>
-                    ))}
-                </select>
-            </div>
-
-            {mensajeConfirmacion && (
-                <div style={{ 
-                    padding: '12px 16px', 
-                    backgroundColor: dark ? 'rgba(34,197,94,0.15)' : '#ecfdf5', 
-                    color: '#065f46', 
-                    borderRadius: '8px', 
-                    marginBottom: '16px', 
-                    fontSize: '13px',
-                    border: '1px solid #6ee7b7'
-                }}>
-                    {mensajeConfirmacion}
-                </div>
-            )}
-
-            {error && (
-                <div style={{
-                    padding: '12px 16px',
-                    backgroundColor: '#FEE2E2',
-                    color: '#991B1B',
-                    borderRadius: '8px',
-                    marginBottom: '16px',
-                    fontSize: '13px'
-                }}>
-                    {error}
-                </div>
-            )}
-
-            {!edicionActiva && !error && !loading && (
-                <div style={{
-                    backgroundColor: t.cardBg,
-                    border: `1px solid ${t.cardBorder}`,
-                    borderRadius: '14px',
-                    padding: '56px 20px',
-                    textAlign: 'center',
-                    boxShadow: t.cardShadow
-                }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: t.dividerText }}>
-                        <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: t.emptyIcon, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Ico.Users />
-                        </div>
-                        <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '14px', margin: 0 }}>
-                            No hay edición activa
-                        </p>
-                        <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', margin: 0, opacity: 0.7 }}>
-                            Activa una edición en la sección "Ediciones" para gestionar áreas
-                        </p>
-                    </div>
-                </div>
-            )}
-
-            {edicionActiva && faseFilter === 'fase3' && (
-                <>
-                    {/* ============================================================ */}
-                    {/* SELECTOR DE PESTAÑAS - SOLO PARA FASE 3 */}
-                    {/* ============================================================ */}
-                    {!loading && (
-                        <div style={{
-                            display: 'inline-flex',
-                            gap: '4px',
-                            padding: '4px',
-                            backgroundColor: t.tabBg,
-                            border: `1px solid ${t.tabBorder}`,
-                            borderRadius: '10px',
-                            marginBottom: '20px',
-                        }}>
-                            <button
-                                onClick={() => { setVista('principal'); setAreaSeleccionada(null) }}
-                                style={{
-                                    padding: '7px 16px',
-                                    borderRadius: '7px',
-                                    border: 'none',
-                                    backgroundColor: vista === 'principal' ? t.tabActive : 'transparent',
-                                    color: vista === 'principal' ? t.titleText : t.bodyText,
-                                    fontFamily: 'Poppins, sans-serif',
-                                    fontSize: '13px',
-                                    fontWeight: vista === 'principal' ? 600 : 500,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                    boxShadow: vista === 'principal' ? t.cardShadow : 'none',
-                                }}
-                            >
-                                Primera Opción
-                            </button>
-                            <button
-                                onClick={() => { setVista('secundaria'); setAreaSecundariaSeleccionada(null) }}
-                                style={{
-                                    padding: '7px 16px',
-                                    borderRadius: '7px',
-                                    border: 'none',
-                                    backgroundColor: vista === 'secundaria' ? t.tabActive : 'transparent',
-                                    color: vista === 'secundaria' ? t.titleText : t.bodyText,
-                                    fontFamily: 'Poppins, sans-serif',
-                                    fontSize: '13px',
-                                    fontWeight: vista === 'secundaria' ? 600 : 500,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                    boxShadow: vista === 'secundaria' ? t.cardShadow : 'none',
-                                }}
-                            >
-                                Segunda Opción
-                            </button>
-                        </div>
-                    )}
-
-                    {vista === 'principal' && (
-                    <>
-                    {/* Tarjetas de resumen */}
-                    {!loading && areas.length > 0 && (
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                            gap: '12px',
-                            marginBottom: '20px'
-                        }}>
-                            {areas.map(area => {
-                                const colors = getAreaColors(area.area)
-                                const count = area.postulantes.length
-                                const isSelected = areaSeleccionada === area.area
-                                return (
-                                    <div
-                                        key={area.area}
-                                        onClick={() => setAreaSeleccionada(isSelected ? null : area.area)}
-                                        style={{
-                                            backgroundColor: isSelected ? colors.bg : t.cardBg,
-                                            border: `1px solid ${isSelected ? colors.border : t.cardBorder}`,
-                                            borderRadius: '12px',
-                                            padding: '14px',
-                                            textAlign: 'center',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s',
-                                            boxShadow: isSelected ? `0 0 0 2px ${colors.border}` : t.cardShadow,
-                                            transform: isSelected ? 'scale(1.02)' : 'scale(1)'
-                                        }}
-                                    >
-                                        <p style={{ fontSize: '11px', color: t.bodyText, margin: 0 }}>{getAreaNombre(area.area)}</p>
-                                        <p style={{ fontSize: '22px', fontWeight: 700, color: t.bodyText, margin: '4px 0' }}>
-                                            {count}
-                                        </p>
-                                        <p style={{ fontSize: '10px', color: t.bodyText, margin: 0, opacity: 0.6 }}>
-                                            postulantes
-                                        </p>
-                                    </div>
-                                )
-                            })}
-                            <div
-                                onClick={() => setAreaSeleccionada(null)}
-                                style={{
-                                    backgroundColor: areaSeleccionada === null ? 'rgba(156, 163, 175, 0.1)' : t.cardBg,
-                                    border: `1px solid ${areaSeleccionada === null ? 'rgba(156, 163, 175, 0.5)' : t.cardBorder}`,
-                                    borderRadius: '12px',
-                                    padding: '14px',
-                                    textAlign: 'center',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                    boxShadow: areaSeleccionada === null ? '0 0 0 2px rgba(156, 163, 175, 0.3)' : t.cardShadow,
-                                    transform: areaSeleccionada === null ? 'scale(1.02)' : 'scale(1)'
-                                }}
-                            >
-                                <p style={{ fontSize: '11px', color: t.bodyText, margin: 0 }}>Sin área</p>
-                                <p style={{ fontSize: '22px', fontWeight: 700, color: '#9CA3AF', margin: '4px 0' }}>
-                                    {postulantesSinArea.length}
-                                </p>
-                                <p style={{ fontSize: '10px', color: t.bodyText, margin: 0, opacity: 0.6 }}>
-                                    postulantes
-                                </p>
-                            </div>
-                        </div>
-                    )}
-
-                    {loading && (
-                        <div style={{ textAlign: 'center', padding: '40px', color: t.bodyText }}>
-                            Cargando postulantes...
-                        </div>
-                    )}
-
-                    {/* TABLA DE POSTULANTES POR ÁREA (cuando se selecciona un área) */}
-                    {!loading && areaSeleccionada !== null && (
-                        <div style={{
-                            backgroundColor: t.cardBg,
-                            border: `1px solid ${t.cardBorder}`,
-                            boxShadow: t.cardShadow,
-                            borderRadius: '14px',
-                            overflow: 'hidden',
-                            marginBottom: '20px'
-                        }}>
-                            {(() => {
-                                const area = areas.find(a => a.area === areaSeleccionada)
-                                if (!area) return null
-                                
-                                const postulantesFiltrados = area.postulantes.filter(p => {
-                                    if (!busquedaPostulante.trim()) return true
-                                    const busqueda = busquedaPostulante.trim().toLowerCase()
-                                    return (
-                                        p.codigoMatricula?.toLowerCase().includes(busqueda) ||
-                                        p.nombres?.toLowerCase().includes(busqueda) ||
-                                        p.apellidos?.toLowerCase().includes(busqueda) ||
-                                        `${p.apellidos} ${p.nombres}`.toLowerCase().includes(busqueda) ||
-                                        p.correoElectronico?.toLowerCase().includes(busqueda) ||
-                                        p.numeroCelular?.toLowerCase().includes(busqueda)
-                                    )
-                                })
-
-                                const colors = getAreaColors(area.area)
-
-                                return (
-                                    <>
-                                        <div style={{ 
-                                            padding: '12px 16px', 
-                                            borderBottom: `1px solid ${t.tableBorder}`,
-                                            backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#f8f5fa',
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            flexWrap: 'wrap',
-                                            gap: '8px'
-                                        }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                <div>
-                                                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '15px', color: t.titleText, margin: 0 }}>
-                                                        {getAreaNombre(area.area)}
-                                                    </p>
-                                                    <p style={{ fontSize: '12px', color: t.bodyText, margin: 0 }}>
-                                                        {postulantesFiltrados.length} postulante{postulantesFiltrados.length !== 1 ? 's' : ''}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() => setAreaSeleccionada(null)}
-                                                style={{
-                                                    padding: '4px 12px',
-                                                    borderRadius: '6px',
-                                                    border: `1px solid ${t.cardBorder}`,
-                                                    backgroundColor: 'transparent',
-                                                    color: t.bodyText,
-                                                    fontSize: '11px',
-                                                    cursor: 'pointer'
-                                                }}
-                                            >
-                                                Cerrar
-                                            </button>
-                                        </div>
-                                        {postulantesFiltrados.length === 0 ? (
-                                            <div style={{ padding: '40px 20px', textAlign: 'center', color: t.bodyText }}>
-                                                No hay postulantes en esta área
-                                            </div>
-                                        ) : (
-                                            <div style={{ overflowX: 'auto' }}>
-                                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                                                    <thead>
-                                                        <tr style={{ backgroundColor: t.tableHead }}>
-                                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Código</th>
-                                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Postulante</th>
-                                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Correo</th>
-                                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Celular</th>
-                                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Fecha Elección</th>
-                                                            <th style={{ padding: '10px 14px', textAlign: 'center', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Acción</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {postulantesFiltrados.map((p, i) => {
-                                                            const isEven = i % 2 === 1
-                                                            return (
-                                                                <tr
-                                                                    key={p.codigoMatricula}
-                                                                    style={{
-                                                                        backgroundColor: isEven ? t.tableRowAlt : t.tableRow,
-                                                                        borderBottom: i < postulantesFiltrados.length - 1 ? `1px solid ${t.tableBorder}` : 'none'
-                                                                    }}
-                                                                    onMouseEnter={e => e.currentTarget.style.backgroundColor = t.tableRowHover}
-                                                                    onMouseLeave={e => e.currentTarget.style.backgroundColor = isEven ? t.tableRowAlt : t.tableRow}
-                                                                >
-                                                                    <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: '12px', fontWeight: 600, color: t.bodyText }}>
-                                                                        {p.codigoMatricula}
-                                                                    </td>
-                                                                    <td style={{ padding: '10px 14px', fontWeight: 500, color: t.bodyText }}>
-                                                                        {p.apellidos} {p.nombres}
-                                                                    </td>
-                                                                    <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
-                                                                        {p.correoElectronico || '—'}
-                                                                    </td>
-                                                                    <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
-                                                                        {p.numeroCelular || '—'}
-                                                                    </td>
-                                                                    <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
-                                                                        {p.fechaEleccion ? new Date(p.fechaEleccion).toLocaleString('es-PE') : '—'}
-                                                                    </td>
-                                                                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
-                                                                        <button
-                                                                            onClick={() => handleQuitarArea(p.codigoMatricula, `${p.apellidos} ${p.nombres}`)}
-                                                                            disabled={loadingAction}
-                                                                            style={{
-                                                                                padding: '4px 12px',
-                                                                                borderRadius: '6px',
-                                                                                border: 'none',
-                                                                                backgroundColor: loadingAction ? '#9CA3AF' : '#EF4444',
-                                                                                color: '#fff',
-                                                                                fontSize: '11px',
-                                                                                fontWeight: 600,
-                                                                                cursor: loadingAction ? 'not-allowed' : 'pointer',
-                                                                                transition: 'all 0.2s',
-                                                                                opacity: loadingAction ? 0.6 : 1
-                                                                            }}
-                                                                            onMouseEnter={e => {
-                                                                                if (!loadingAction) e.currentTarget.style.backgroundColor = '#DC2626'
-                                                                            }}
-                                                                            onMouseLeave={e => {
-                                                                                if (!loadingAction) e.currentTarget.style.backgroundColor = '#EF4444'
-                                                                            }}
-                                                                        >
-                                                                            {loadingAction ? '...' : 'Quitar área'}
-                                                                        </button>
-                                                                    </td>
-                                                                </tr>
-                                                            )
-                                                        })}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        )}
-                                    </>
-                                )
-                            })()}
-                        </div>
-                    )}
-
-                    {/* ============================================================ */}
-                    {/* TABLA DE POSTULANTES SIN ÁREA (SIEMPRE VISIBLE AL FINAL) */}
-                    {/* ============================================================ */}
-                    {!loading && (
-                        <div style={{
-                            backgroundColor: t.cardBg,
-                            border: `1px solid ${t.cardBorder}`,
-                            boxShadow: t.cardShadow,
-                            borderRadius: '14px',
-                            overflow: 'hidden',
-                        }}>
-                            <div style={{ 
-                                padding: '12px 16px', 
-                                borderBottom: `1px solid ${t.tableBorder}`,
-                                backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#f8f5fa',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                flexWrap: 'wrap',
-                                gap: '10px'
-                            }}>
-                                <div>
-                                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '15px', color: t.titleText, margin: 0 }}>
-                                        Postulantes sin área
-                                    </p>
-                                    <p style={{ fontSize: '12px', color: t.bodyText, margin: 0 }}>
-                                        {postulantesSinArea.length} postulante{postulantesSinArea.length !== 1 ? 's' : ''} en Fase 3 que aún no han elegido área
-                                    </p>
-                                </div>
-                                <div style={{ position: 'relative', minWidth: '200px' }}>
-                                    <span style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: t.dividerText, pointerEvents: 'none' }}>
-                                        <Ico.Search />
-                                    </span>
-                                    <input
-                                        value={busquedaPostulante}
-                                        onChange={e => setBusquedaPostulante(e.target.value)}
-                                        placeholder="Buscar postulante..."
-                                        style={{
-                                            width: '100%',
-                                            padding: '6px 12px 6px 32px',
-                                            borderRadius: '8px',
-                                            border: `1px solid ${t.inputBorder}`,
-                                            backgroundColor: dark ? '#2d2b3e' : '#fff',
-                                            color: t.inputText,
-                                            fontSize: '12px',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            outline: 'none',
-                                        }}
-                                        onFocus={e => { e.target.style.borderColor = '#672577' }}
-                                        onBlur={e => { e.target.style.borderColor = t.inputBorder }}
-                                    />
-                                </div>
-                            </div>
-
-                            {postulantesSinAreaFiltrados.length === 0 ? (
-                                <div style={{ padding: '56px 20px', textAlign: 'center', color: t.dividerText }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                                        <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: t.emptyIcon, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <Ico.Users />
-                                        </div>
-                                        <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '14px', margin: 0 }}>
-                                            {busquedaPostulante ? 'No hay postulantes que coincidan con la búsqueda' : '¡Excelente! Todos los postulantes ya tienen área asignada'}
-                                        </p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div style={{ overflowX: 'auto' }}>
-                                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                                        <thead>
-                                            <tr style={{ backgroundColor: t.tableHead }}>
-                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Código</th>
-                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Postulante</th>
-                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Correo</th>
-                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Celular</th>
-                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Estado</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {postulantesSinAreaFiltrados.map((p, i) => {
-                                                const isEven = i % 2 === 1
-                                                return (
-                                                    <tr
-                                                        key={p.codigoMatricula}
-                                                        style={{
-                                                            backgroundColor: isEven ? t.tableRowAlt : t.tableRow,
-                                                            borderBottom: i < postulantesSinAreaFiltrados.length - 1 ? `1px solid ${t.tableBorder}` : 'none'
-                                                        }}
-                                                        onMouseEnter={e => e.currentTarget.style.backgroundColor = t.tableRowHover}
-                                                        onMouseLeave={e => e.currentTarget.style.backgroundColor = isEven ? t.tableRowAlt : t.tableRow}
-                                                    >
-                                                        <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: '12px', fontWeight: 600, color: t.bodyText }}>
-                                                            {p.codigoMatricula}
-                                                        </td>
-                                                        <td style={{ padding: '10px 14px', fontWeight: 500, color: t.bodyText }}>
-                                                            {p.apellidos} {p.nombres}
-                                                        </td>
-                                                        <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
-                                                            {p.correoElectronico || '—'}
-                                                        </td>
-                                                        <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
-                                                            {p.numeroCelular || '—'}
-                                                        </td>
-                                                        <td style={{ padding: '10px 14px' }}>
-                                                            <span style={{
-                                                                padding: '2px 10px',
-                                                                borderRadius: '12px',
-                                                                fontSize: '11px',
-                                                                fontWeight: 600,
-                                                                backgroundColor: '#FEF3C7',
-                                                                color: '#92400E'
-                                                            }}>
-                                                                Sin área
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                )
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                            {postulantesSinAreaFiltrados.length > 0 && (
-                                <div style={{ padding: '10px 16px', borderTop: `1px solid ${t.tableBorder}` }}>
-                                    <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: t.bodyText, margin: 0 }}>
-                                        {postulantesSinAreaFiltrados.length} postulante{postulantesSinAreaFiltrados.length !== 1 ? 's' : ''} sin área
-                                        {postulantesSinAreaFiltrados.length !== postulantesSinArea.length && 
-                                            ` (${postulantesSinArea.length - postulantesSinAreaFiltrados.length} ocultos por búsqueda)`}
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                    </>
-                    )}
-
-                    {/* ============================================================ */}
-                    {/* NUEVO: VISTA SEGUNDA OPCIÓN — mismo patrón visual que arriba */}
-                    {/* ============================================================ */}
-                    {vista === 'secundaria' && (
-                    <>
-                        {/* Tarjetas de resumen — segunda opción */}
-                        {!loading && areasSecundaria.length > 0 && (
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                                gap: '12px',
-                                marginBottom: '20px'
-                            }}>
-                                {areasSecundaria.map(area => {
-                                    const colors = getAreaColors(area.area)
-                                    const count = area.postulantes.length
-                                    const isSelected = areaSecundariaSeleccionada === area.area
-                                    return (
-                                        <div
-                                            key={area.area}
-                                            onClick={() => setAreaSecundariaSeleccionada(isSelected ? null : area.area)}
-                                            style={{
-                                                backgroundColor: isSelected ? colors.bg : t.cardBg,
-                                                border: `1px solid ${isSelected ? colors.border : t.cardBorder}`,
-                                                borderRadius: '12px',
-                                                padding: '14px',
-                                                textAlign: 'center',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.2s',
-                                                boxShadow: isSelected ? `0 0 0 2px ${colors.border}` : t.cardShadow,
-                                                transform: isSelected ? 'scale(1.02)' : 'scale(1)'
-                                            }}
-                                        >
-                                            <p style={{ fontSize: '11px', color: t.bodyText, margin: 0 }}>{getAreaNombre(area.area)}</p>
-                                            <p style={{ fontSize: '22px', fontWeight: 700, color: t.bodyText, margin: '4px 0' }}>
-                                                {count}
-                                            </p>
-                                            <p style={{ fontSize: '10px', color: t.bodyText, margin: 0, opacity: 0.6 }}>
-                                                postulantes
-                                            </p>
-                                        </div>
-                                    )
-                                })}
-                                <div
-                                    onClick={() => setAreaSecundariaSeleccionada(null)}
-                                    style={{
-                                        backgroundColor: areaSecundariaSeleccionada === null ? 'rgba(156, 163, 175, 0.1)' : t.cardBg,
-                                        border: `1px solid ${areaSecundariaSeleccionada === null ? 'rgba(156, 163, 175, 0.5)' : t.cardBorder}`,
-                                        borderRadius: '12px',
-                                        padding: '14px',
-                                        textAlign: 'center',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s',
-                                        boxShadow: areaSecundariaSeleccionada === null ? '0 0 0 2px rgba(156, 163, 175, 0.3)' : t.cardShadow,
-                                        transform: areaSecundariaSeleccionada === null ? 'scale(1.02)' : 'scale(1)'
-                                    }}
-                                >
-                                    <p style={{ fontSize: '11px', color: t.bodyText, margin: 0 }}>Sin 2ª opción</p>
-                                    <p style={{ fontSize: '22px', fontWeight: 700, color: '#9CA3AF', margin: '4px 0' }}>
-                                        {postulantesSinSecundaria.length}
-                                    </p>
-                                    <p style={{ fontSize: '10px', color: t.bodyText, margin: 0, opacity: 0.6 }}>
-                                        postulantes
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-
-                        {loading && (
-                            <div style={{ textAlign: 'center', padding: '40px', color: t.bodyText }}>
-                                Cargando postulantes...
-                            </div>
-                        )}
-
-                        {/* TABLA DE POSTULANTES POR ÁREA SECUNDARIA (cuando se selecciona un área) */}
-                        {!loading && areaSecundariaSeleccionada !== null && (
-                            <div style={{
-                                backgroundColor: t.cardBg,
-                                border: `1px solid ${t.cardBorder}`,
-                                boxShadow: t.cardShadow,
-                                borderRadius: '14px',
-                                overflow: 'hidden',
-                                marginBottom: '20px'
-                            }}>
-                                {(() => {
-                                    const area = areasSecundaria.find(a => a.area === areaSecundariaSeleccionada)
-                                    if (!area) return null
-
-                                    const postulantesFiltrados = area.postulantes.filter(p => {
-                                        if (!busquedaPostulante.trim()) return true
-                                        const busqueda = busquedaPostulante.trim().toLowerCase()
-                                        return (
-                                            p.codigoMatricula?.toLowerCase().includes(busqueda) ||
-                                            p.nombres?.toLowerCase().includes(busqueda) ||
-                                            p.apellidos?.toLowerCase().includes(busqueda) ||
-                                            `${p.apellidos} ${p.nombres}`.toLowerCase().includes(busqueda) ||
-                                            p.correoElectronico?.toLowerCase().includes(busqueda) ||
-                                            p.numeroCelular?.toLowerCase().includes(busqueda)
-                                        )
-                                    })
-
-                                    return (
-                                        <>
-                                            <div style={{
-                                                padding: '12px 16px',
-                                                borderBottom: `1px solid ${t.tableBorder}`,
-                                                backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#f8f5fa',
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                flexWrap: 'wrap',
-                                                gap: '8px'
-                                            }}>
-                                                <div>
-                                                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '15px', color: t.titleText, margin: 0 }}>
-                                                        {getAreaNombre(area.area)} <span style={{ fontWeight: 500, fontSize: '12px', color: t.bodyText }}>(2ª opción)</span>
-                                                    </p>
-                                                    <p style={{ fontSize: '12px', color: t.bodyText, margin: 0 }}>
-                                                        {postulantesFiltrados.length} postulante{postulantesFiltrados.length !== 1 ? 's' : ''}
-                                                    </p>
-                                                </div>
-                                                <button
-                                                    onClick={() => setAreaSecundariaSeleccionada(null)}
-                                                    style={{
-                                                        padding: '4px 12px',
-                                                        borderRadius: '6px',
-                                                        border: `1px solid ${t.cardBorder}`,
-                                                        backgroundColor: 'transparent',
-                                                        color: t.bodyText,
-                                                        fontSize: '11px',
-                                                        cursor: 'pointer'
-                                                    }}
-                                                >
-                                                    Cerrar
-                                                </button>
-                                            </div>
-                                            {postulantesFiltrados.length === 0 ? (
-                                                <div style={{ padding: '40px 20px', textAlign: 'center', color: t.bodyText }}>
-                                                    No hay postulantes en esta área como segunda opción
-                                                </div>
-                                            ) : (
-                                                <div style={{ overflowX: 'auto' }}>
-                                                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                                                        <thead>
-                                                            <tr style={{ backgroundColor: t.tableHead }}>
-                                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Código</th>
-                                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Postulante</th>
-                                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Área Principal</th>
-                                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Correo</th>
-                                                                <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Fecha Elección</th>
-                                                                <th style={{ padding: '10px 14px', textAlign: 'center', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Acción</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {postulantesFiltrados.map((p, i) => {
-                                                                const isEven = i % 2 === 1
-                                                                return (
-                                                                    <tr
-                                                                        key={p.codigoMatricula}
-                                                                        style={{
-                                                                            backgroundColor: isEven ? t.tableRowAlt : t.tableRow,
-                                                                            borderBottom: i < postulantesFiltrados.length - 1 ? `1px solid ${t.tableBorder}` : 'none'
-                                                                        }}
-                                                                        onMouseEnter={e => e.currentTarget.style.backgroundColor = t.tableRowHover}
-                                                                        onMouseLeave={e => e.currentTarget.style.backgroundColor = isEven ? t.tableRowAlt : t.tableRow}
-                                                                    >
-                                                                        <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: '12px', fontWeight: 600, color: t.bodyText }}>
-                                                                            {p.codigoMatricula}
-                                                                        </td>
-                                                                        <td style={{ padding: '10px 14px', fontWeight: 500, color: t.bodyText }}>
-                                                                            {p.apellidos} {p.nombres}
-                                                                        </td>
-                                                                        <td style={{ padding: '10px 14px' }}>
-                                                                            <span style={{
-                                                                                padding: '2px 10px',
-                                                                                borderRadius: '12px',
-                                                                                fontSize: '11px',
-                                                                                fontWeight: 600,
-                                                                                color: t.bodyText
-                                                                            }}>
-                                                                                {p.nombreAreaPrincipal}
-                                                                            </span>
-                                                                        </td>
-                                                                        <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
-                                                                            {p.correoElectronico || '—'}
-                                                                        </td>
-                                                                        <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
-                                                                            {p.fechaEleccion ? new Date(p.fechaEleccion).toLocaleString('es-PE') : '—'}
-                                                                        </td>
-                                                                        <td style={{ padding: '10px 14px', textAlign: 'center' }}>
-                                                                            <button
-                                                                                onClick={() => handleQuitarAreaSecundaria(p.codigoMatricula, `${p.apellidos} ${p.nombres}`)}
-                                                                                disabled={loadingAction}
-                                                                                style={{
-                                                                                    padding: '4px 12px',
-                                                                                    borderRadius: '6px',
-                                                                                    border: 'none',
-                                                                                    backgroundColor: loadingAction ? '#9CA3AF' : '#EF4444',
-                                                                                    color: '#fff',
-                                                                                    fontSize: '11px',
-                                                                                    fontWeight: 600,
-                                                                                    cursor: loadingAction ? 'not-allowed' : 'pointer',
-                                                                                    transition: 'all 0.2s',
-                                                                                    opacity: loadingAction ? 0.6 : 1
-                                                                                }}
-                                                                                onMouseEnter={e => {
-                                                                                    if (!loadingAction) e.currentTarget.style.backgroundColor = '#DC2626'
-                                                                                }}
-                                                                                onMouseLeave={e => {
-                                                                                    if (!loadingAction) e.currentTarget.style.backgroundColor = '#EF4444'
-                                                                                }}
-                                                                            >
-                                                                                {loadingAction ? '...' : 'Quitar 2ª opción'}
-                                                                            </button>
-                                                                        </td>
-                                                                    </tr>
-                                                                )
-                                                            })}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            )}
-                                        </>
-                                    )
-                                })()}
-                            </div>
-                        )}
-
-                        {/* TABLA DE POSTULANTES SIN SEGUNDA OPCIÓN (siempre visible al final) */}
-                        {!loading && (
-                            <div style={{
-                                backgroundColor: t.cardBg,
-                                border: `1px solid ${t.cardBorder}`,
-                                boxShadow: t.cardShadow,
-                                borderRadius: '14px',
-                                overflow: 'hidden',
-                            }}>
-                                <div style={{
-                                    padding: '12px 16px',
-                                    borderBottom: `1px solid ${t.tableBorder}`,
-                                    backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#f8f5fa',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    flexWrap: 'wrap',
-                                    gap: '10px'
-                                }}>
-                                    <div>
-                                        <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '15px', color: t.titleText, margin: 0 }}>
-                                            Postulantes sin segunda opción
-                                        </p>
-                                        <p style={{ fontSize: '12px', color: t.bodyText, margin: 0 }}>
-                                            {postulantesSinSecundaria.length} postulante{postulantesSinSecundaria.length !== 1 ? 's' : ''} con área principal que aún no eligieron segunda opción
-                                        </p>
-                                    </div>
-                                    <div style={{ position: 'relative', minWidth: '200px' }}>
-                                        <span style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: t.dividerText, pointerEvents: 'none' }}>
-                                            <Ico.Search />
-                                        </span>
-                                        <input
-                                            value={busquedaPostulante}
-                                            onChange={e => setBusquedaPostulante(e.target.value)}
-                                            placeholder="Buscar postulante..."
-                                            style={{
-                                                width: '100%',
-                                                padding: '6px 12px 6px 32px',
-                                                borderRadius: '8px',
-                                                border: `1px solid ${t.inputBorder}`,
-                                                backgroundColor: dark ? '#2d2b3e' : '#fff',
-                                                color: t.inputText,
-                                                fontSize: '12px',
-                                                fontFamily: 'Poppins, sans-serif',
-                                                outline: 'none',
-                                            }}
-                                            onFocus={e => { e.target.style.borderColor = '#672577' }}
-                                            onBlur={e => { e.target.style.borderColor = t.inputBorder }}
-                                        />
-                                    </div>
-                                </div>
-
-                                {postulantesSinSecundariaFiltrados.length === 0 ? (
-                                    <div style={{ padding: '56px 20px', textAlign: 'center', color: t.dividerText }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                                            <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: t.emptyIcon, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <Ico.Users />
-                                            </div>
-                                            <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '14px', margin: 0 }}>
-                                                {busquedaPostulante ? 'No hay postulantes que coincidan con la búsqueda' : 'Todos los postulantes con área principal ya eligieron su segunda opción'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div style={{ overflowX: 'auto' }}>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                                            <thead>
-                                                <tr style={{ backgroundColor: t.tableHead }}>
-                                                    <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Código</th>
-                                                    <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Postulante</th>
-                                                    <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Área Principal</th>
-                                                    <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Correo</th>
-                                                    <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Celular</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {postulantesSinSecundariaFiltrados.map((p, i) => {
-                                                    const isEven = i % 2 === 1
-                                                    return (
-                                                        <tr
-                                                            key={p.codigoMatricula}
-                                                            style={{
-                                                                backgroundColor: isEven ? t.tableRowAlt : t.tableRow,
-                                                                borderBottom: i < postulantesSinSecundariaFiltrados.length - 1 ? `1px solid ${t.tableBorder}` : 'none'
-                                                            }}
-                                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = t.tableRowHover}
-                                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = isEven ? t.tableRowAlt : t.tableRow}
-                                                        >
-                                                            <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: '12px', fontWeight: 600, color: t.bodyText }}>
-                                                                {p.codigoMatricula}
-                                                            </td>
-                                                            <td style={{ padding: '10px 14px', fontWeight: 500, color: t.bodyText }}>
-                                                                {p.apellidos} {p.nombres}
-                                                            </td>
-                                                            <td style={{ padding: '10px 14px' }}>
-                                                                <span style={{
-                                                                    padding: '2px 10px',
-                                                                    borderRadius: '12px',
-                                                                    fontSize: '11px',
-                                                                    fontWeight: 600,
-                                                                    color: t.bodyText
-                                                                }}>
-                                                                    {p.nombreAreaPrincipal}
-                                                                </span>
-                                                            </td>
-                                                            <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
-                                                                {p.correoElectronico || '—'}
-                                                            </td>
-                                                            <td style={{ padding: '10px 14px', fontSize: '12px', color: t.bodyText }}>
-                                                                {p.numeroCelular || '—'}
-                                                            </td>
-                                                        </tr>
-                                                    )
-                                                })}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
-                                {postulantesSinSecundariaFiltrados.length > 0 && (
-                                    <div style={{ padding: '10px 16px', borderTop: `1px solid ${t.tableBorder}` }}>
-                                        <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: t.bodyText, margin: 0 }}>
-                                            {postulantesSinSecundariaFiltrados.length} postulante{postulantesSinSecundariaFiltrados.length !== 1 ? 's' : ''} sin segunda opción
-                                            {postulantesSinSecundariaFiltrados.length !== postulantesSinSecundaria.length &&
-                                                ` (${postulantesSinSecundaria.length - postulantesSinSecundariaFiltrados.length} ocultos por búsqueda)`}
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </>
-                    )}
-                </>
-            )}
-
-            {/* ============================================================ */}
-            {/* VISTA FASE 4 */}
-            {/* ============================================================ */}
-            {edicionActiva && faseFilter === 'fase4' && (
-                <>
-                {/* Tarjetas de resumen Fase 4 */}
-                {!loading && areasFase4.length > 0 && (
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                        gap: '12px',
-                        marginBottom: '20px'
-                    }}>
-                        {areasFase4.map(area => {
-                            const colors = getAreaColors(area.area)
-                            const count = area.postulantes.length
-                            const isSelected = areaSeleccionada === area.area
-                            return (
-                                <div
-                                    key={area.area}
-                                    onClick={() => setAreaSeleccionada(isSelected ? null : area.area)}
-                                    style={{
-                                        backgroundColor: isSelected ? colors.bg : t.cardBg,
-                                        border: `1px solid ${isSelected ? colors.border : t.cardBorder}`,
-                                        borderRadius: '12px',
-                                        padding: '14px',
-                                        textAlign: 'center',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s',
-                                        boxShadow: isSelected ? `0 0 0 2px ${colors.border}` : t.cardShadow,
-                                        transform: isSelected ? 'scale(1.02)' : 'scale(1)'
-                                    }}
-                                >
-                                    <p style={{ fontSize: '11px', color: t.bodyText, margin: 0 }}>{getAreaNombre(area.area)}</p>
-                                    <p style={{ fontSize: '22px', fontWeight: 700, color: t.bodyText, margin: '4px 0' }}>
-                                        {count}
-                                    </p>
-                                    <p style={{ fontSize: '10px', color: t.bodyText, margin: 0, opacity: 0.6 }}>
-                                        postulantes
-                                    </p>
-                                </div>
-                            )
-                        })}
-                        <div
-                            onClick={() => setAreaSeleccionada(null)}
-                            style={{
-                                backgroundColor: areaSeleccionada === null ? 'rgba(156, 163, 175, 0.1)' : t.cardBg,
-                                border: `1px solid ${areaSeleccionada === null ? 'rgba(156, 163, 175, 0.5)' : t.cardBorder}`,
-                                borderRadius: '12px',
-                                padding: '14px',
-                                textAlign: 'center',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                boxShadow: areaSeleccionada === null ? '0 0 0 2px rgba(156, 163, 175, 0.3)' : t.cardShadow,
-                                transform: areaSeleccionada === null ? 'scale(1.02)' : 'scale(1)'
-                            }}
-                        >
-                            <p style={{ fontSize: '11px', color: t.bodyText, margin: 0 }}>Sin asignar</p>
-                            <p style={{ fontSize: '22px', fontWeight: 700, color: '#9CA3AF', margin: '4px 0' }}>
-                                {postulantesFase4SinArea.length}
-                            </p>
-                            <p style={{ fontSize: '10px', color: t.bodyText, margin: 0, opacity: 0.6 }}>
-                                postulantes
-                            </p>
-                        </div>
-                    </div>
-                )}
-
-                {loading && (
-                    <div style={{ textAlign: 'center', padding: '40px', color: t.bodyText }}>
-                        Cargando postulantes...
-                    </div>
-                )}
-
-                {/* TABLA DE POSTULANTES DE FASE 4 */}
-                {!loading && (
-                    <div style={{
-                        backgroundColor: t.cardBg,
-                        border: `1px solid ${t.cardBorder}`,
-                        boxShadow: t.cardShadow,
-                        borderRadius: '14px',
-                        overflow: 'hidden',
-                    }}>
-                        <div style={{ 
-                            padding: '12px 16px', 
-                            borderBottom: `1px solid ${t.tableBorder}`,
-                            backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#f8f5fa',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            flexWrap: 'wrap',
-                            gap: '10px'
-                        }}>
-                            <div>
-                                <p style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '15px', color: t.titleText, margin: 0 }}>
-                                    Postulantes en Fase 4
-                                </p>
-                                <p style={{ fontSize: '12px', color: t.bodyText, margin: 0 }}>
-                                    {postulantesFase4.length} postulante{postulantesFase4.length !== 1 ? 's' : ''} en Fase 4
-                                    {postulantesFase4SinArea.length > 0 && ` • ${postulantesFase4SinArea.length} sin asignar`}
-                                </p>
-                            </div>
-                            <div style={{ position: 'relative', minWidth: '200px' }}>
-                                <span style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: t.dividerText, pointerEvents: 'none' }}>
-                                    <Ico.Search />
-                                </span>
-                                <input
-                                    value={busquedaPostulante}
-                                    onChange={e => setBusquedaPostulante(e.target.value)}
-                                    placeholder="Buscar postulante..."
-                                    style={{
-                                        width: '100%',
-                                        padding: '6px 12px 6px 32px',
-                                        borderRadius: '8px',
-                                        border: `1px solid ${t.inputBorder}`,
-                                        backgroundColor: dark ? '#2d2b3e' : '#fff',
-                                        color: t.inputText,
-                                        fontSize: '12px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        outline: 'none',
-                                    }}
-                                    onFocus={e => { e.target.style.borderColor = '#672577' }}
-                                    onBlur={e => { e.target.style.borderColor = t.inputBorder }}
-                                />
-                            </div>
-                        </div>
-
-                        {postulantesFase4Filtrados.length === 0 ? (
-                            <div style={{ padding: '56px 20px', textAlign: 'center', color: t.dividerText }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: t.emptyIcon, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <Ico.Users />
-                                    </div>
-                                    <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '14px', margin: 0 }}>
-                                        {busquedaPostulante ? 'No hay postulantes que coincidan con la búsqueda' : 'No hay postulantes en Fase 4'}
-                                    </p>
-                                </div>
-                            </div>
-                        ) : (
-                            <div style={{ overflowX: 'auto' }}>
-                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                                    <thead>
-                                        <tr style={{ backgroundColor: t.tableHead }}>
-                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Código</th>
-                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Postulante</th>
-                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Área Principal</th>
-                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Área Secundaria</th>
-                                            <th style={{ padding: '10px 14px', textAlign: 'left', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Área Final</th>
-                                            <th style={{ padding: '10px 14px', textAlign: 'center', color: t.tableHeadText, fontSize: '11px', fontWeight: 700 }}>Asignar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {postulantesFase4Filtrados.map((p, i) => {
-                                            const isEven = i % 2 === 1
-                                            const areaPrincipal = p.areaPrincipal || '—'
-                                            const areaSecundaria = p.areaSecundaria || null
-                                            const areaFinal = p.areaFinal || null
-
-                                            // Opciones para el selector
-                                            const opciones = []
-                                            if (areaPrincipal) opciones.push({ value: areaPrincipal, label: `${getAreaNombre(areaPrincipal)} (Principal)` })
-                                            if (areaSecundaria) opciones.push({ value: areaSecundaria, label: `${getAreaNombre(areaSecundaria)} (Secundaria)` })
-
-                                            // Si tiene área final asignada, mostrarla seleccionada
-                                            const valorActual = areaFinal || ''
-
-                                            return (
-                                                <tr
-                                                    key={p.codigoMatricula}
-                                                    style={{
-                                                        backgroundColor: isEven ? t.tableRowAlt : t.tableRow,
-                                                        borderBottom: i < postulantesFase4Filtrados.length - 1 ? `1px solid ${t.tableBorder}` : 'none'
-                                                    }}
-                                                    onMouseEnter={e => e.currentTarget.style.backgroundColor = t.tableRowHover}
-                                                    onMouseLeave={e => e.currentTarget.style.backgroundColor = isEven ? t.tableRowAlt : t.tableRow}
-                                                >
-                                                    <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: '12px', fontWeight: 600, color: t.bodyText }}>
-                                                        {p.codigoMatricula}
-                                                    </td>
-                                                    <td style={{ padding: '10px 14px', fontWeight: 500, color: t.bodyText }}>
-                                                        {p.apellidos} {p.nombres}
-                                                    </td>
-                                                    <td style={{ padding: '10px 14px' }}>
-                                                        {areaPrincipal !== '—' ? (
-                                                            <span style={{
-                                                                padding: '2px 10px',
-                                                                borderRadius: '12px',
-                                                                fontSize: '11px',
-                                                                fontWeight: 600,
-                                                                backgroundColor: getAreaColors(areaPrincipal).bg,
-                                                                color: t.bodyText,
-                                                                border: `1px solid ${getAreaColors(areaPrincipal).border}`
-                                                            }}>
-                                                                {getAreaNombre(areaPrincipal)}
-                                                            </span>
-                                                        ) : '—'}
-                                                    </td>
-                                                    <td style={{ padding: '10px 14px' }}>
-                                                        {areaSecundaria ? (
-                                                            <span style={{
-                                                                padding: '2px 10px',
-                                                                borderRadius: '12px',
-                                                                fontSize: '11px',
-                                                                fontWeight: 600,
-                                                                backgroundColor: getAreaColors(areaSecundaria).bg,
-                                                                color: t.bodyText,
-                                                                border: `1px solid ${getAreaColors(areaSecundaria).border}`
-                                                            }}>
-                                                                {getAreaNombre(areaSecundaria)}
-                                                            </span>
-                                                        ) : '—'}
-                                                    </td>
-                                                    <td style={{ padding: '10px 14px' }}>
-                                                        {areaFinal ? (
-                                                            <span style={{
-                                                                padding: '2px 10px',
-                                                                borderRadius: '12px',
-                                                                fontSize: '11px',
-                                                                fontWeight: 700,
-                                                                backgroundColor: getAreaColors(areaFinal).bg,
-                                                                color: getAreaColors(areaFinal).text,
-                                                                border: `2px solid ${getAreaColors(areaFinal).border}`
-                                                            }}>
-                                                                ✓ {getAreaNombre(areaFinal)}
-                                                            </span>
-                                                        ) : (
-                                                            <span style={{
-                                                                padding: '2px 10px',
-                                                                borderRadius: '12px',
-                                                                fontSize: '11px',
-                                                                fontWeight: 600,
-                                                                backgroundColor: '#FEF3C7',
-                                                                color: '#92400E'
-                                                            }}>
-                                                                Sin asignar
-                                                            </span>
-                                                        )}
-                                                    </td>
-                                                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
-                                                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
-                                                            <select
-                                                                value={valorActual}
-                                                                onChange={(e) => {
-                                                                    const selected = e.target.value
-                                                                    if (selected && selected !== areaFinal) {
-                                                                        handleAsignarAreaFinal(
-                                                                            p.codigoMatricula, 
-                                                                            selected, 
-                                                                            `${p.apellidos} ${p.nombres}`
-                                                                        )
-                                                                    }
-                                                                }}
-                                                                disabled={loadingAction}
-                                                                style={{
-                                                                    padding: '4px 8px',
-                                                                    borderRadius: '6px',
-                                                                    border: `1px solid ${t.inputBorder}`,
-                                                                    backgroundColor: dark ? '#2d2b3e' : '#fff',
-                                                                    color: t.inputText,
-                                                                    fontSize: '11px',
-                                                                    fontFamily: 'Poppins, sans-serif',
-                                                                    cursor: loadingAction ? 'not-allowed' : 'pointer',
-                                                                    minWidth: '120px',
-                                                                    opacity: loadingAction ? 0.6 : 1
-                                                                }}
-                                                            >
-                                                                <option value="">Seleccionar...</option>
-                                                                {opciones.map(opt => (
-                                                                    <option key={opt.value} value={opt.value}>
-                                                                        {opt.label}
-                                                                    </option>
-                                                                ))}
-                                                            </select>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            )
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                        {postulantesFase4Filtrados.length > 0 && (
-                            <div style={{ padding: '10px 16px', borderTop: `1px solid ${t.tableBorder}` }}>
-                                <p style={{ fontFamily: 'Poppins,sans-serif', fontSize: '12px', color: t.bodyText, margin: 0 }}>
-                                    {postulantesFase4Filtrados.length} postulante{postulantesFase4Filtrados.length !== 1 ? 's' : ''} en Fase 4
-                                    {postulantesFase4Filtrados.length !== postulantesFase4.length && 
-                                        ` (${postulantesFase4.length - postulantesFase4Filtrados.length} ocultos por búsqueda)`}
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                )}
-                </>
-            )}
-
-            <style>{`
-                @keyframes spin { to { transform: rotate(360deg); } }
-                @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-                @keyframes slideUp { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
-                @keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.4 } }
-                ::-webkit-scrollbar { width: 0; height: 0; }
-            `}</style>
+    setLoadingAction(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `/api/sedinvita/admin/quitar-area?codigo=${codigoMatricula}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        },
+      );
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Error al quitar área");
+      setMensajeConfirmacion(`Área quitada correctamente de ${nombreCompleto}`);
+      setTimeout(() => setMensajeConfirmacion(null), 4000);
+      await cargarDatos();
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+  const handleAsignarAreaFinal = async (
+    codigoMatricula,
+    areaFinal,
+    nombreCompleto,
+  ) => {
+    if (!areaFinal) {
+      setError("Debes seleccionar un área");
+      return;
+    }
+    if (
+      !confirm(
+        `¿Asignar el área "${getAreaNombre(areaFinal)}" a ${nombreCompleto} (${codigoMatricula})?`,
+      )
+    ) {
+      return;
+    }
+    setLoadingAction(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/sedinvita/admin/asignar-area-final", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          codigoMatricula,
+          areaFinal,
+        }),
+        credentials: "include",
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Error al asignar área final");
+      setMensajeConfirmacion(
+        `Área final "${getAreaNombre(areaFinal)}" asignada a ${nombreCompleto}`,
+      );
+      setTimeout(() => setMensajeConfirmacion(null), 4000);
+      await cargarDatos();
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+  const handleQuitarAreaSecundaria = async (
+    codigoMatricula,
+    nombreCompleto,
+  ) => {
+    if (
+      !confirm(
+        `¿Estás seguro de quitar el área de segunda opción de ${nombreCompleto} (${codigoMatricula})? Su área principal no se verá afectada.`,
+      )
+    ) {
+      return;
+    }
+    setLoadingAction(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `/api/sedinvita/admin/quitar-area?codigo=${codigoMatricula}&tipo=secundaria`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        },
+      );
+      const json = await res.json();
+      if (!res.ok)
+        throw new Error(json.error || "Error al quitar área de segunda opción");
+      setMensajeConfirmacion(
+        `Área de segunda opción quitada correctamente de ${nombreCompleto}`,
+      );
+      setTimeout(() => setMensajeConfirmacion(null), 4000);
+      await cargarDatos();
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+  const getAreaNombre = (areaId) => {
+    const nombres = {
+      gth: "GTH",
+      pmo: "PMO",
+      ti: "TI",
+      mkt: "MKT",
+      ltkyfnz: "LTK Y FNZ",
+    };
+    return nombres[areaId] || areaId;
+  };
+  const postulantesSinAreaFiltrados = useMemo(() => {
+    let resultado = postulantesSinArea;
+    if (busquedaPostulante.trim()) {
+      const busqueda = busquedaPostulante.trim().toLowerCase();
+      resultado = resultado.filter(
+        (p) =>
+          p.codigoMatricula?.toLowerCase().includes(busqueda) ||
+          p.nombres?.toLowerCase().includes(busqueda) ||
+          p.apellidos?.toLowerCase().includes(busqueda) ||
+          `${p.apellidos} ${p.nombres}`.toLowerCase().includes(busqueda) ||
+          p.correoElectronico?.toLowerCase().includes(busqueda) ||
+          p.numeroCelular?.toLowerCase().includes(busqueda),
+      );
+    }
+    return resultado;
+  }, [postulantesSinArea, busquedaPostulante]);
+  const postulantesSinSecundariaFiltrados = useMemo(() => {
+    let resultado = postulantesSinSecundaria;
+    if (busquedaPostulante.trim()) {
+      const busqueda = busquedaPostulante.trim().toLowerCase();
+      resultado = resultado.filter(
+        (p) =>
+          p.codigoMatricula?.toLowerCase().includes(busqueda) ||
+          p.nombres?.toLowerCase().includes(busqueda) ||
+          p.apellidos?.toLowerCase().includes(busqueda) ||
+          `${p.apellidos} ${p.nombres}`.toLowerCase().includes(busqueda) ||
+          p.correoElectronico?.toLowerCase().includes(busqueda) ||
+          p.numeroCelular?.toLowerCase().includes(busqueda),
+      );
+    }
+    return resultado;
+  }, [postulantesSinSecundaria, busquedaPostulante]);
+  const postulantesFase4Filtrados = useMemo(() => {
+    let resultado = postulantesFase4;
+    if (busquedaPostulante.trim()) {
+      const busqueda = busquedaPostulante.trim().toLowerCase();
+      resultado = resultado.filter(
+        (p) =>
+          p.codigoMatricula?.toLowerCase().includes(busqueda) ||
+          p.nombres?.toLowerCase().includes(busqueda) ||
+          p.apellidos?.toLowerCase().includes(busqueda) ||
+          `${p.apellidos} ${p.nombres}`.toLowerCase().includes(busqueda) ||
+          p.correoElectronico?.toLowerCase().includes(busqueda) ||
+          p.numeroCelular?.toLowerCase().includes(busqueda),
+      );
+    }
+    return resultado;
+  }, [postulantesFase4, busquedaPostulante]);
+  const totalConArea = areas.reduce(
+    (acc, area) => acc + area.postulantes.length,
+    0,
+  );
+  const totalFase4ConArea = areasFase4.reduce(
+    (acc, area) => acc + area.postulantes.length,
+    0,
+  );
+  return (
+    <div className="space-y-6">
+      <div className="mb-4">
+        <div className="flex items-center gap-3 mb-1">
+          <div>
+            <h1 className="text-foreground m-0 text-2xl font-semibold tracking-tight">
+              Áreas
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1 mb-0">
+              {faseFilter === "fase3"
+                ? `Postulantes agrupados por área seleccionada • ${totalConArea} con área • ${postulantesSinArea.length} sin área`
+                : `Postulantes en Fase 4 • ${totalFase4ConArea} con área final • ${postulantesFase4SinArea.length} sin asignar`}
+              {edicionActiva &&
+                ` • ${edicionActiva.nombre} (${edicionActiva.anio})`}
+            </p>
+          </div>
         </div>
-    )
-}
+      </div>
 
-// ─────────────────────────────────────────────
-// TEMA
-// ─────────────────────────────────────────────
-function getTheme(dark) {
-    return {
-        pageBg:        dark ? '#0E0818' : '#f8f5fa',
-        cardBg:        dark ? '#160C22' : '#ffffff',
-        cardBorder:    dark ? 'rgba(103,37,119,0.28)' : 'rgba(214,182,223,0.55)',
-        cardShadow:    dark ? '0 8px 32px rgba(0,0,0,0.45)' : '0 4px 24px rgba(103,37,119,0.10)',
-        inputBg:       dark ? '#1F1030' : '#f9f6fb',
-        inputBorder:   dark ? 'rgba(103,37,119,0.35)' : '#e5d9ef',
-        inputText:     dark ? '#EAD8F5' : '#111827',
-        labelText:     dark ? '#C8A8D8' : '#4A1A5E',
-        bodyText:      dark ? '#9880B0' : '#6B7280',
-        tableHead:     dark ? '#1A0D2E' : '#f5f0f9',
-        tableHeadText: dark ? '#C8A8D8' : '#4A1A5E',
-        tableRow:      dark ? '#160C22' : '#ffffff',
-        tableRowAlt:   dark ? '#1A0D2B' : '#faf7fc',
-        tableRowHover: dark ? 'rgba(103,37,119,0.10)' : 'rgba(103,37,119,0.05)',
-        tableBorder:   dark ? 'rgba(103,37,119,0.16)' : 'rgba(214,182,223,0.45)',
-        dividerText:   dark ? '#6B5080' : '#c4aed4',
-        emptyIcon:     dark ? 'rgba(103,37,119,0.18)' : 'rgba(103,37,119,0.08)',
-        titleText:     dark ? '#EAD8F5' : '#4A1A5E',
-        modalBg:       dark ? '#1A0D2E' : '#ffffff',
-        divider:       dark ? 'rgba(103,37,119,0.22)' : 'rgba(103,37,119,0.15)',
-        tabActive:     dark ? 'rgba(103,37,119,0.30)' : '#ffffff',
-        tabBg:         dark ? 'rgba(255,255,255,0.04)' : 'rgba(103,37,119,0.06)',
-        tabBorder:     dark ? 'rgba(103,37,119,0.22)' : 'rgba(103,37,119,0.18)',
-        overlayBg:     'rgba(0,0,0,0.55)',
-    }
-}
+      <div className="items-center flex-wrap mb-4 grid gap-2">
+        <Label className="text-sm font-semibold text-muted-foreground">
+          Fase:
+        </Label>
+        <AdminSelect
+          value={faseFilter}
+          onChange={(e) => {
+            setFaseFilter(e.target.value);
+            setAreaSeleccionada(null);
+            setAreaSecundariaSeleccionada(null);
+          }}
+          style={{
+            minWidth: "110px",
+          }}
+        >
+          {fases.map((f) => (
+            <option key={f} value={f}>
+              {f.charAt(0).toUpperCase() + f.slice(1)}
+            </option>
+          ))}
+        </AdminSelect>
+      </div>
 
-// ─────────────────────────────────────────────
-// ÍCONOS SVG inline
-// ─────────────────────────────────────────────
-const Ico = {
-    Search:   () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
-    Users:    () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+      {mensajeConfirmacion && (
+        <div className="pt-3 pr-4 pb-3 pl-4 bg-muted text-foreground rounded-xl mb-4 text-sm border">
+          {mensajeConfirmacion}
+        </div>
+      )}
+
+      {error && (
+        <div className="pt-3 pr-4 pb-3 pl-4 bg-muted text-destructive rounded-xl mb-4 text-sm">
+          {error}
+        </div>
+      )}
+
+      {!edicionActiva && !error && !loading && (
+        <Card className="text-center p-6">
+          <div className="flex flex-col items-center gap-3 text-muted-foreground">
+            <div
+              style={{
+                width: "60px",
+                height: "60px",
+              }}
+              className="rounded-full bg-muted flex items-center justify-center"
+            >
+              <AdminUsersIcon className="size-4" />
+            </div>
+            <p className="text-sm m-0">No hay edición activa</p>
+            <p
+              style={{
+                opacity: 0.7,
+              }}
+              className="text-sm m-0"
+            >
+              Activa una edición en la sección "Ediciones" para gestionar áreas
+            </p>
+          </div>
+        </Card>
+      )}
+
+      {edicionActiva && faseFilter === "fase3" && (
+        <>
+          {!loading && (
+            <div className="inline-flex gap-1 p-1 bg-muted border rounded-xl mb-4">
+              <Button
+                onClick={() => {
+                  setVista("principal");
+                  setAreaSeleccionada(null);
+                }}
+                type="button"
+                variant={vista === "principal" ? "default" : "outline"}
+              >
+                Primera Opción
+              </Button>
+              <Button
+                onClick={() => {
+                  setVista("secundaria");
+                  setAreaSecundariaSeleccionada(null);
+                }}
+                type="button"
+                variant={vista === "secundaria" ? "default" : "outline"}
+              >
+                Segunda Opción
+              </Button>
+            </div>
+          )}
+
+          {vista === "principal" && (
+            <>
+              {!loading && areas.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+                  {areas.map((area) => {
+                    const count = area.postulantes.length;
+                    const isSelected = areaSeleccionada === area.area;
+                    return (
+                      <Card
+                        key={area.area}
+                        onClick={() =>
+                          setAreaSeleccionada(isSelected ? null : area.area)
+                        }
+                        style={{
+                          transform: isSelected ? "scale(1.02)" : "scale(1)",
+                        }}
+                        className="text-center cursor-pointer p-6"
+                      >
+                        <p className="text-xs text-muted-foreground m-0">
+                          {getAreaNombre(area.area)}
+                        </p>
+                        <p className="text-lg font-semibold text-muted-foreground mt-1 mr-0 mb-1 ml-0">
+                          {count}
+                        </p>
+                        <p
+                          style={{
+                            opacity: 0.6,
+                          }}
+                          className="text-xs text-muted-foreground m-0"
+                        >
+                          postulantes
+                        </p>
+                      </Card>
+                    );
+                  })}
+                  <Card
+                    onClick={() => setAreaSeleccionada(null)}
+                    style={{
+                      transform:
+                        areaSeleccionada === null ? "scale(1.02)" : "scale(1)",
+                    }}
+                    className="text-center cursor-pointer p-6"
+                  >
+                    <p className="text-xs text-muted-foreground m-0">
+                      Sin área
+                    </p>
+                    <p className="text-lg font-semibold text-muted-foreground mt-1 mr-0 mb-1 ml-0">
+                      {postulantesSinArea.length}
+                    </p>
+                    <p
+                      style={{
+                        opacity: 0.6,
+                      }}
+                      className="text-xs text-muted-foreground m-0"
+                    >
+                      postulantes
+                    </p>
+                  </Card>
+                </div>
+              )}
+
+              {loading && (
+                <div className="text-center p-8 text-muted-foreground">
+                  Cargando postulantes...
+                </div>
+              )}
+
+              {!loading && areaSeleccionada !== null && (
+                <Card className="overflow-hidden mb-4 gap-0 py-0">
+                  {(() => {
+                    const area = areas.find((a) => a.area === areaSeleccionada);
+                    if (!area) return null;
+                    const postulantesFiltrados = area.postulantes.filter(
+                      (p) => {
+                        if (!busquedaPostulante.trim()) return true;
+                        const busqueda = busquedaPostulante
+                          .trim()
+                          .toLowerCase();
+                        return (
+                          p.codigoMatricula?.toLowerCase().includes(busqueda) ||
+                          p.nombres?.toLowerCase().includes(busqueda) ||
+                          p.apellidos?.toLowerCase().includes(busqueda) ||
+                          `${p.apellidos} ${p.nombres}`
+                            .toLowerCase()
+                            .includes(busqueda) ||
+                          p.correoElectronico
+                            ?.toLowerCase()
+                            .includes(busqueda) ||
+                          p.numeroCelular?.toLowerCase().includes(busqueda)
+                        );
+                      },
+                    );
+                    return (
+                      <>
+                        <div className="pt-3 pr-4 pb-3 pl-4 border-b bg-background flex justify-between items-center flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            <div>
+                              <p className="font-semibold text-sm text-foreground m-0">
+                                {getAreaNombre(area.area)}
+                              </p>
+                              <p className="text-sm text-muted-foreground m-0">
+                                {postulantesFiltrados.length} postulante
+                                {postulantesFiltrados.length !== 1 ? "s" : ""}
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            onClick={() => setAreaSeleccionada(null)}
+                            variant="outline"
+                            type="button"
+                          >
+                            Cerrar
+                          </Button>
+                        </div>
+                        {postulantesFiltrados.length === 0 ? (
+                          <div className="pt-8 pr-4 pb-8 pl-4 text-center text-muted-foreground">
+                            No hay postulantes en esta área
+                          </div>
+                        ) : (
+                          <div className="overflow-x-auto">
+                            <Table className="w-full">
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Código</TableHead>
+                                  <TableHead>Postulante</TableHead>
+                                  <TableHead>Correo</TableHead>
+                                  <TableHead>Celular</TableHead>
+                                  <TableHead>Fecha Elección</TableHead>
+                                  <TableHead>Acción</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {postulantesFiltrados.map((p, i) => {
+                                  const isEven = i % 2 === 1;
+                                  return (
+                                    <TableRow key={p.codigoMatricula}>
+                                      <TableCell>{p.codigoMatricula}</TableCell>
+                                      <TableCell>
+                                        {p.apellidos} {p.nombres}
+                                      </TableCell>
+                                      <TableCell>
+                                        {p.correoElectronico || "—"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {p.numeroCelular || "—"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {p.fechaEleccion
+                                          ? new Date(
+                                              p.fechaEleccion,
+                                            ).toLocaleString("es-PE")
+                                          : "—"}
+                                      </TableCell>
+                                      <TableCell>
+                                        <Button
+                                          onClick={() =>
+                                            handleQuitarArea(
+                                              p.codigoMatricula,
+                                              `${p.apellidos} ${p.nombres}`,
+                                            )
+                                          }
+                                          disabled={loadingAction}
+                                          type="button"
+                                          variant={
+                                            loadingAction
+                                              ? "default"
+                                              : "outline"
+                                          }
+                                          style={{
+                                            opacity: loadingAction ? 0.6 : 1,
+                                          }}
+                                        >
+                                          {loadingAction
+                                            ? "..."
+                                            : "Quitar área"}
+                                        </Button>
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </Card>
+              )}
+
+              {!loading && (
+                <Card className="overflow-hidden gap-0 py-0">
+                  <div className="pt-3 pr-4 pb-3 pl-4 border-b bg-background flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                      <p className="font-semibold text-sm text-foreground m-0">
+                        Postulantes sin área
+                      </p>
+                      <p className="text-sm text-muted-foreground m-0">
+                        {postulantesSinArea.length} postulante
+                        {postulantesSinArea.length !== 1 ? "s" : ""} en Fase 3
+                        que aún no han elegido área
+                      </p>
+                    </div>
+                    <div
+                      style={{
+                        minWidth: "200px",
+                      }}
+                      className="relative"
+                    >
+                      <span
+                        style={{
+                          left: "11px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          pointerEvents: "none",
+                        }}
+                        className="absolute text-muted-foreground"
+                      >
+                        <AdminSearchIcon className="size-4" />
+                      </span>
+                      <Input
+                        value={busquedaPostulante}
+                        onChange={(e) => setBusquedaPostulante(e.target.value)}
+                        placeholder="Buscar postulante..."
+                        className="w-full pl-9"
+                      />
+                    </div>
+                  </div>
+
+                  {postulantesSinAreaFiltrados.length === 0 ? (
+                    <div className="pt-12 pr-4 pb-12 pl-4 text-center text-muted-foreground">
+                      <div className="flex flex-col items-center gap-3">
+                        <div
+                          style={{
+                            width: "60px",
+                            height: "60px",
+                          }}
+                          className="rounded-full bg-muted flex items-center justify-center"
+                        >
+                          <AdminUsersIcon className="size-4" />
+                        </div>
+                        <p className="text-sm m-0">
+                          {busquedaPostulante
+                            ? "No hay postulantes que coincidan con la búsqueda"
+                            : "¡Excelente! Todos los postulantes ya tienen área asignada"}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table className="w-full">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Código</TableHead>
+                            <TableHead>Postulante</TableHead>
+                            <TableHead>Correo</TableHead>
+                            <TableHead>Celular</TableHead>
+                            <TableHead>Estado</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {postulantesSinAreaFiltrados.map((p, i) => {
+                            const isEven = i % 2 === 1;
+                            return (
+                              <TableRow key={p.codigoMatricula}>
+                                <TableCell>{p.codigoMatricula}</TableCell>
+                                <TableCell>
+                                  {p.apellidos} {p.nombres}
+                                </TableCell>
+                                <TableCell>
+                                  {p.correoElectronico || "—"}
+                                </TableCell>
+                                <TableCell>{p.numeroCelular || "—"}</TableCell>
+                                <TableCell>
+                                  <Badge variant="secondary" className="">
+                                    Sin área
+                                  </Badge>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                  {postulantesSinAreaFiltrados.length > 0 && (
+                    <div className="pt-2 pr-4 pb-2 pl-4 border-t">
+                      <p className="text-sm text-muted-foreground m-0">
+                        {postulantesSinAreaFiltrados.length} postulante
+                        {postulantesSinAreaFiltrados.length !== 1
+                          ? "s"
+                          : ""}{" "}
+                        sin área
+                        {postulantesSinAreaFiltrados.length !==
+                          postulantesSinArea.length &&
+                          ` (${postulantesSinArea.length - postulantesSinAreaFiltrados.length} ocultos por búsqueda)`}
+                      </p>
+                    </div>
+                  )}
+                </Card>
+              )}
+            </>
+          )}
+
+          {vista === "secundaria" && (
+            <>
+              {!loading && areasSecundaria.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+                  {areasSecundaria.map((area) => {
+                    const count = area.postulantes.length;
+                    const isSelected = areaSecundariaSeleccionada === area.area;
+                    return (
+                      <Card
+                        key={area.area}
+                        onClick={() =>
+                          setAreaSecundariaSeleccionada(
+                            isSelected ? null : area.area,
+                          )
+                        }
+                        style={{
+                          transform: isSelected ? "scale(1.02)" : "scale(1)",
+                        }}
+                        className="text-center cursor-pointer p-6"
+                      >
+                        <p className="text-xs text-muted-foreground m-0">
+                          {getAreaNombre(area.area)}
+                        </p>
+                        <p className="text-lg font-semibold text-muted-foreground mt-1 mr-0 mb-1 ml-0">
+                          {count}
+                        </p>
+                        <p
+                          style={{
+                            opacity: 0.6,
+                          }}
+                          className="text-xs text-muted-foreground m-0"
+                        >
+                          postulantes
+                        </p>
+                      </Card>
+                    );
+                  })}
+                  <Card
+                    onClick={() => setAreaSecundariaSeleccionada(null)}
+                    style={{
+                      transform:
+                        areaSecundariaSeleccionada === null
+                          ? "scale(1.02)"
+                          : "scale(1)",
+                    }}
+                    className="text-center cursor-pointer p-6"
+                  >
+                    <p className="text-xs text-muted-foreground m-0">
+                      Sin 2ª opción
+                    </p>
+                    <p className="text-lg font-semibold text-muted-foreground mt-1 mr-0 mb-1 ml-0">
+                      {postulantesSinSecundaria.length}
+                    </p>
+                    <p
+                      style={{
+                        opacity: 0.6,
+                      }}
+                      className="text-xs text-muted-foreground m-0"
+                    >
+                      postulantes
+                    </p>
+                  </Card>
+                </div>
+              )}
+
+              {loading && (
+                <div className="text-center p-8 text-muted-foreground">
+                  Cargando postulantes...
+                </div>
+              )}
+
+              {!loading && areaSecundariaSeleccionada !== null && (
+                <Card className="overflow-hidden mb-4 gap-0 py-0">
+                  {(() => {
+                    const area = areasSecundaria.find(
+                      (a) => a.area === areaSecundariaSeleccionada,
+                    );
+                    if (!area) return null;
+                    const postulantesFiltrados = area.postulantes.filter(
+                      (p) => {
+                        if (!busquedaPostulante.trim()) return true;
+                        const busqueda = busquedaPostulante
+                          .trim()
+                          .toLowerCase();
+                        return (
+                          p.codigoMatricula?.toLowerCase().includes(busqueda) ||
+                          p.nombres?.toLowerCase().includes(busqueda) ||
+                          p.apellidos?.toLowerCase().includes(busqueda) ||
+                          `${p.apellidos} ${p.nombres}`
+                            .toLowerCase()
+                            .includes(busqueda) ||
+                          p.correoElectronico
+                            ?.toLowerCase()
+                            .includes(busqueda) ||
+                          p.numeroCelular?.toLowerCase().includes(busqueda)
+                        );
+                      },
+                    );
+                    return (
+                      <>
+                        <div className="pt-3 pr-4 pb-3 pl-4 border-b bg-background flex justify-between items-center flex-wrap gap-2">
+                          <div>
+                            <p className="font-semibold text-sm text-foreground m-0">
+                              {getAreaNombre(area.area)}{" "}
+                              <span className="font-medium text-sm text-muted-foreground">
+                                (2ª opción)
+                              </span>
+                            </p>
+                            <p className="text-sm text-muted-foreground m-0">
+                              {postulantesFiltrados.length} postulante
+                              {postulantesFiltrados.length !== 1 ? "s" : ""}
+                            </p>
+                          </div>
+                          <Button
+                            onClick={() => setAreaSecundariaSeleccionada(null)}
+                            variant="outline"
+                            type="button"
+                          >
+                            Cerrar
+                          </Button>
+                        </div>
+                        {postulantesFiltrados.length === 0 ? (
+                          <div className="pt-8 pr-4 pb-8 pl-4 text-center text-muted-foreground">
+                            No hay postulantes en esta área como segunda opción
+                          </div>
+                        ) : (
+                          <div className="overflow-x-auto">
+                            <Table className="w-full">
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Código</TableHead>
+                                  <TableHead>Postulante</TableHead>
+                                  <TableHead>Área Principal</TableHead>
+                                  <TableHead>Correo</TableHead>
+                                  <TableHead>Fecha Elección</TableHead>
+                                  <TableHead>Acción</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {postulantesFiltrados.map((p, i) => {
+                                  const isEven = i % 2 === 1;
+                                  return (
+                                    <TableRow key={p.codigoMatricula}>
+                                      <TableCell>{p.codigoMatricula}</TableCell>
+                                      <TableCell>
+                                        {p.apellidos} {p.nombres}
+                                      </TableCell>
+                                      <TableCell>
+                                        <span className="pt-0.5 pr-2 pb-0.5 pl-2 rounded-xl text-xs font-semibold text-muted-foreground">
+                                          {p.nombreAreaPrincipal}
+                                        </span>
+                                      </TableCell>
+                                      <TableCell>
+                                        {p.correoElectronico || "—"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {p.fechaEleccion
+                                          ? new Date(
+                                              p.fechaEleccion,
+                                            ).toLocaleString("es-PE")
+                                          : "—"}
+                                      </TableCell>
+                                      <TableCell>
+                                        <Button
+                                          onClick={() =>
+                                            handleQuitarAreaSecundaria(
+                                              p.codigoMatricula,
+                                              `${p.apellidos} ${p.nombres}`,
+                                            )
+                                          }
+                                          disabled={loadingAction}
+                                          type="button"
+                                          variant={
+                                            loadingAction
+                                              ? "default"
+                                              : "outline"
+                                          }
+                                          style={{
+                                            opacity: loadingAction ? 0.6 : 1,
+                                          }}
+                                        >
+                                          {loadingAction
+                                            ? "..."
+                                            : "Quitar 2ª opción"}
+                                        </Button>
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </Card>
+              )}
+
+              {!loading && (
+                <Card className="overflow-hidden gap-0 py-0">
+                  <div className="pt-3 pr-4 pb-3 pl-4 border-b bg-background flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                      <p className="font-semibold text-sm text-foreground m-0">
+                        Postulantes sin segunda opción
+                      </p>
+                      <p className="text-sm text-muted-foreground m-0">
+                        {postulantesSinSecundaria.length} postulante
+                        {postulantesSinSecundaria.length !== 1 ? "s" : ""} con
+                        área principal que aún no eligieron segunda opción
+                      </p>
+                    </div>
+                    <div
+                      style={{
+                        minWidth: "200px",
+                      }}
+                      className="relative"
+                    >
+                      <span
+                        style={{
+                          left: "11px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          pointerEvents: "none",
+                        }}
+                        className="absolute text-muted-foreground"
+                      >
+                        <AdminSearchIcon className="size-4" />
+                      </span>
+                      <Input
+                        value={busquedaPostulante}
+                        onChange={(e) => setBusquedaPostulante(e.target.value)}
+                        placeholder="Buscar postulante..."
+                        className="w-full pl-9"
+                      />
+                    </div>
+                  </div>
+
+                  {postulantesSinSecundariaFiltrados.length === 0 ? (
+                    <div className="pt-12 pr-4 pb-12 pl-4 text-center text-muted-foreground">
+                      <div className="flex flex-col items-center gap-3">
+                        <div
+                          style={{
+                            width: "60px",
+                            height: "60px",
+                          }}
+                          className="rounded-full bg-muted flex items-center justify-center"
+                        >
+                          <AdminUsersIcon className="size-4" />
+                        </div>
+                        <p className="text-sm m-0">
+                          {busquedaPostulante
+                            ? "No hay postulantes que coincidan con la búsqueda"
+                            : "Todos los postulantes con área principal ya eligieron su segunda opción"}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table className="w-full">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Código</TableHead>
+                            <TableHead>Postulante</TableHead>
+                            <TableHead>Área Principal</TableHead>
+                            <TableHead>Correo</TableHead>
+                            <TableHead>Celular</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {postulantesSinSecundariaFiltrados.map((p, i) => {
+                            const isEven = i % 2 === 1;
+                            return (
+                              <TableRow key={p.codigoMatricula}>
+                                <TableCell>{p.codigoMatricula}</TableCell>
+                                <TableCell>
+                                  {p.apellidos} {p.nombres}
+                                </TableCell>
+                                <TableCell>
+                                  <span className="pt-0.5 pr-2 pb-0.5 pl-2 rounded-xl text-xs font-semibold text-muted-foreground">
+                                    {p.nombreAreaPrincipal}
+                                  </span>
+                                </TableCell>
+                                <TableCell>
+                                  {p.correoElectronico || "—"}
+                                </TableCell>
+                                <TableCell>{p.numeroCelular || "—"}</TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                  {postulantesSinSecundariaFiltrados.length > 0 && (
+                    <div className="pt-2 pr-4 pb-2 pl-4 border-t">
+                      <p className="text-sm text-muted-foreground m-0">
+                        {postulantesSinSecundariaFiltrados.length} postulante
+                        {postulantesSinSecundariaFiltrados.length !== 1
+                          ? "s"
+                          : ""}{" "}
+                        sin segunda opción
+                        {postulantesSinSecundariaFiltrados.length !==
+                          postulantesSinSecundaria.length &&
+                          ` (${postulantesSinSecundaria.length - postulantesSinSecundariaFiltrados.length} ocultos por búsqueda)`}
+                      </p>
+                    </div>
+                  )}
+                </Card>
+              )}
+            </>
+          )}
+        </>
+      )}
+
+      {edicionActiva && faseFilter === "fase4" && (
+        <>
+          {!loading && areasFase4.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+              {areasFase4.map((area) => {
+                const count = area.postulantes.length;
+                const isSelected = areaSeleccionada === area.area;
+                return (
+                  <Card
+                    key={area.area}
+                    onClick={() =>
+                      setAreaSeleccionada(isSelected ? null : area.area)
+                    }
+                    style={{
+                      transform: isSelected ? "scale(1.02)" : "scale(1)",
+                    }}
+                    className="text-center cursor-pointer p-6"
+                  >
+                    <p className="text-xs text-muted-foreground m-0">
+                      {getAreaNombre(area.area)}
+                    </p>
+                    <p className="text-lg font-semibold text-muted-foreground mt-1 mr-0 mb-1 ml-0">
+                      {count}
+                    </p>
+                    <p
+                      style={{
+                        opacity: 0.6,
+                      }}
+                      className="text-xs text-muted-foreground m-0"
+                    >
+                      postulantes
+                    </p>
+                  </Card>
+                );
+              })}
+              <Card
+                onClick={() => setAreaSeleccionada(null)}
+                style={{
+                  transform:
+                    areaSeleccionada === null ? "scale(1.02)" : "scale(1)",
+                }}
+                className="text-center cursor-pointer p-6"
+              >
+                <p className="text-xs text-muted-foreground m-0">Sin asignar</p>
+                <p className="text-lg font-semibold text-muted-foreground mt-1 mr-0 mb-1 ml-0">
+                  {postulantesFase4SinArea.length}
+                </p>
+                <p
+                  style={{
+                    opacity: 0.6,
+                  }}
+                  className="text-xs text-muted-foreground m-0"
+                >
+                  postulantes
+                </p>
+              </Card>
+            </div>
+          )}
+
+          {loading && (
+            <div className="text-center p-8 text-muted-foreground">
+              Cargando postulantes...
+            </div>
+          )}
+
+          {!loading && (
+            <Card className="overflow-hidden gap-0 py-0">
+              <div className="pt-3 pr-4 pb-3 pl-4 border-b bg-background flex justify-between items-center flex-wrap gap-2">
+                <div>
+                  <p className="font-semibold text-sm text-foreground m-0">
+                    Postulantes en Fase 4
+                  </p>
+                  <p className="text-sm text-muted-foreground m-0">
+                    {postulantesFase4.length} postulante
+                    {postulantesFase4.length !== 1 ? "s" : ""} en Fase 4
+                    {postulantesFase4SinArea.length > 0 &&
+                      ` • ${postulantesFase4SinArea.length} sin asignar`}
+                  </p>
+                </div>
+                <div
+                  style={{
+                    minWidth: "200px",
+                  }}
+                  className="relative"
+                >
+                  <span
+                    style={{
+                      left: "11px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      pointerEvents: "none",
+                    }}
+                    className="absolute text-muted-foreground"
+                  >
+                    <AdminSearchIcon className="size-4" />
+                  </span>
+                  <Input
+                    value={busquedaPostulante}
+                    onChange={(e) => setBusquedaPostulante(e.target.value)}
+                    placeholder="Buscar postulante..."
+                    className="w-full pl-9"
+                  />
+                </div>
+              </div>
+
+              {postulantesFase4Filtrados.length === 0 ? (
+                <div className="pt-12 pr-4 pb-12 pl-4 text-center text-muted-foreground">
+                  <div className="flex flex-col items-center gap-3">
+                    <div
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                      }}
+                      className="rounded-full bg-muted flex items-center justify-center"
+                    >
+                      <AdminUsersIcon className="size-4" />
+                    </div>
+                    <p className="text-sm m-0">
+                      {busquedaPostulante
+                        ? "No hay postulantes que coincidan con la búsqueda"
+                        : "No hay postulantes en Fase 4"}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table className="w-full">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Código</TableHead>
+                        <TableHead>Postulante</TableHead>
+                        <TableHead>Área Principal</TableHead>
+                        <TableHead>Área Secundaria</TableHead>
+                        <TableHead>Área Final</TableHead>
+                        <TableHead>Asignar</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {postulantesFase4Filtrados.map((p, i) => {
+                        const isEven = i % 2 === 1;
+                        const areaPrincipal = p.areaPrincipal || "—";
+                        const areaSecundaria = p.areaSecundaria || null;
+                        const areaFinal = p.areaFinal || null;
+                        const opciones = [];
+                        if (areaPrincipal)
+                          opciones.push({
+                            value: areaPrincipal,
+                            label: `${getAreaNombre(areaPrincipal)} (Principal)`,
+                          });
+                        if (areaSecundaria)
+                          opciones.push({
+                            value: areaSecundaria,
+                            label: `${getAreaNombre(areaSecundaria)} (Secundaria)`,
+                          });
+                        const valorActual = areaFinal || "";
+                        return (
+                          <TableRow key={p.codigoMatricula}>
+                            <TableCell>{p.codigoMatricula}</TableCell>
+                            <TableCell>
+                              {p.apellidos} {p.nombres}
+                            </TableCell>
+                            <TableCell>
+                              {areaPrincipal !== "—" ? (
+                                <Badge variant="secondary" className="">
+                                  {getAreaNombre(areaPrincipal)}
+                                </Badge>
+                              ) : (
+                                "—"
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {areaSecundaria ? (
+                                <Badge variant="secondary" className="">
+                                  {getAreaNombre(areaSecundaria)}
+                                </Badge>
+                              ) : (
+                                "—"
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {areaFinal ? (
+                                <Badge variant="secondary" className="">
+                                  ✓ {getAreaNombre(areaFinal)}
+                                </Badge>
+                              ) : (
+                                <Badge variant="secondary" className="">
+                                  Sin asignar
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-1.5 items-center justify-center flex-wrap">
+                                <AdminSelect
+                                  value={valorActual}
+                                  onChange={(e) => {
+                                    const selected = e.target.value;
+                                    if (selected && selected !== areaFinal) {
+                                      handleAsignarAreaFinal(
+                                        p.codigoMatricula,
+                                        selected,
+                                        `${p.apellidos} ${p.nombres}`,
+                                      );
+                                    }
+                                  }}
+                                  disabled={loadingAction}
+                                  style={{
+                                    minWidth: "120px",
+                                    opacity: loadingAction ? 0.6 : 1,
+                                  }}
+                                >
+                                  <option value="">Seleccionar...</option>
+                                  {opciones.map((opt) => (
+                                    <option key={opt.value} value={opt.value}>
+                                      {opt.label}
+                                    </option>
+                                  ))}
+                                </AdminSelect>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+              {postulantesFase4Filtrados.length > 0 && (
+                <div className="pt-2 pr-4 pb-2 pl-4 border-t">
+                  <p className="text-sm text-muted-foreground m-0">
+                    {postulantesFase4Filtrados.length} postulante
+                    {postulantesFase4Filtrados.length !== 1 ? "s" : ""} en Fase
+                    4
+                    {postulantesFase4Filtrados.length !==
+                      postulantesFase4.length &&
+                      ` (${postulantesFase4.length - postulantesFase4Filtrados.length} ocultos por búsqueda)`}
+                  </p>
+                </div>
+              )}
+            </Card>
+          )}
+        </>
+      )}
+    </div>
+  );
 }
