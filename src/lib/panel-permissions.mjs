@@ -19,8 +19,21 @@ export function panelPermissions(user) {
     isAdmin,
     canManage: isAdmin || role === "DIRECTIVA",
     canDelete: isAdmin,
-    canManageRoles: isSuperadmin,
+    canManageRoles: isAdmin,
   };
+}
+
+export function assignableRoles(user) {
+  switch (normalizeRole(user?.rol)) {
+    case "SUPERADMINISTRADOR":
+      return ["SEDIPRANO", "DIRECTIVA", "ADMINISTRADOR"];
+    case "ADMINISTRADOR":
+      return ["SEDIPRANO", "DIRECTIVA"];
+    case "DIRECTIVA":
+      return ["SEDIPRANO"];
+    default:
+      return [];
+  }
 }
 
 export function canOpenPanelPage(pathname, user, assignments = []) {

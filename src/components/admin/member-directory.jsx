@@ -52,7 +52,11 @@ import {
 import { ProfilePhoto } from "@/components/admin/profile-photo";
 import { usePanelSession } from "@/components/admin/panel-session";
 import { panelApi } from "@/lib/panel-api";
-import { ROLE_LABELS, normalizeRole } from "@/lib/panel-permissions.mjs";
+import {
+  ROLE_LABELS,
+  assignableRoles,
+  normalizeRole,
+} from "@/lib/panel-permissions.mjs";
 import { UNT_CAREERS, canonicalCareer } from "@/lib/unt-careers";
 
 const AREAS = ["TI", "PMO", "LTK Y FNZ", "GTH", "MKT"];
@@ -93,7 +97,7 @@ function accountRow(account) {
   };
 }
 
-function MemberEditor({ row, onClose, onSaved }) {
+function MemberEditor({ row, user, onClose, onSaved }) {
   const [record, setRecord] = useState(row || null);
   const [form, setForm] = useState({
     nombres: row?.nombres || "",
@@ -104,6 +108,7 @@ function MemberEditor({ row, onClose, onSaved }) {
     correoInstitucional: row?.correoInstitucional || "",
     carrera: canonicalCareer(row?.carrera),
     codigoMatricula: row?.codigoMatricula || "",
+    ...(!row ? { rol: "SEDIPRANO" } : {}),
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -153,7 +158,7 @@ function MemberEditor({ row, onClose, onSaved }) {
           <DialogDescription>
             {record
               ? "Administra su información personal y área."
-              : "Se creará también su cuenta de acceso con el rol Sediprano."}
+              : "Se creará también una cuenta de acceso. El usuario y la contraseña inicial serán su DNI."}
           </DialogDescription>
         </DialogHeader>
         {created && (
@@ -182,6 +187,25 @@ function MemberEditor({ row, onClose, onSaved }) {
         )}
         <form onSubmit={save} className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
+            {!record && (
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="member-role">Rol inicial de la cuenta</Label>
+                <AdminSelect
+                  id="member-role"
+                  value={form.rol}
+                  disabled={saving}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, rol: event.target.value }))
+                  }
+                >
+                  {assignableRoles(user).map((role) => (
+                    <option key={role} value={role}>
+                      {ROLE_LABELS[role]}
+                    </option>
+                  ))}
+                </AdminSelect>
+              </div>
+            )}
             {[
               ["nombres", "Nombres", true],
               ["apellidos", "Apellidos", true],
@@ -387,7 +411,7 @@ function MemberDetails({ row, onClose }) {
   );
 }
 
-function RoleDialog({ row, onClose, onSaved }) {
+function RoleDialog({ row, user, onClose, onSaved }) {
   const [role, setRole] = useState(row.rol);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -434,13 +458,11 @@ function RoleDialog({ row, onClose, onSaved }) {
               disabled={saving}
               onChange={(event) => setRole(event.target.value)}
             >
-              {Object.entries(ROLE_LABELS)
-                .filter(([key]) => key !== "SUPERADMINISTRADOR")
-                .map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
+              {assignableRoles(user).map((key) => (
+                <option key={key} value={key}>
+                  {ROLE_LABELS[key]}
+                </option>
+              ))}
             </AdminSelect>
           </div>
           <p className="text-sm text-muted-foreground">
@@ -572,6 +594,12 @@ export default function MemberDirectory({ mode = "members" }) {
 
   return (
     <div className="space-y-6">
+      {mode === "users" && (
+        <p className="text-sm text-muted-foreground">
+          Crea una cuenta con el botón “Crear cuenta” y elige su rol inicial.
+          Para cambiar el rol de una cuenta existente, usa “Cambiar rol” en su fila.
+        </p>
+      )}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
           ["Total", rows.length, Users],
@@ -608,7 +636,7 @@ export default function MemberDirectory({ mode = "members" }) {
             />
           </InputGroup>
           <Button onClick={() => setEditor({ row: null })}>
-            <Plus /> Nuevo sediprano
+            <Plus /> {mode === "users" ? "Crear cuenta" : "Nuevo sediprano"}
           </Button>
         </div>
         <div className="grid gap-3 border-b p-4 sm:grid-cols-3">
@@ -668,7 +696,7 @@ export default function MemberDirectory({ mode = "members" }) {
                 <TableHead className="w-44">Carrera / matrícula</TableHead>
                 <TableHead className="w-32">Cuenta creada</TableHead>
                 <TableHead className="w-28">Estado</TableHead>
-                <TableHead className="w-40 text-center">Acciones</TableHead>
+                <TableHead className="w-52 text-center">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -676,7 +704,8 @@ export default function MemberDirectory({ mode = "members" }) {
                 const protectedAccount =
                   row.userId === String(user?.id) ||
                   row.rol === "SUPERADMINISTRADOR" ||
-                  (!permissions.isAdmin && row.rol === "ADMINISTRADOR");
+                  (!permissions.isSuperadmin &&
+                    ["ADMINISTRADOR", "SUPERADMINISTRADOR"].includes(row.rol));
                 return (
                   <TableRow key={row.memberId || row.userId}>
                     <TableCell className="pl-4">
@@ -763,15 +792,20 @@ export default function MemberDirectory({ mode = "members" }) {
                         {permissions.canManageRoles &&
                           row.userId &&
                           row.memberId &&
-                          row.rol !== "SUPERADMINISTRADOR" && (
+                          row.userId !== String(user?.id) &&
+                          (permissions.isSuperadmin ||
+                            !["ADMINISTRADOR", "SUPERADMINISTRADOR"].includes(
+                              row.rol,
+                            )) && (
                             <Button
-                              size="icon-sm"
+                              size={mode === "users" ? "sm" : "icon-sm"}
                               variant="outline"
-                              title="Gestionar rol"
-                              aria-label={"Gestionar rol de " + fullName(row)}
+                              title="Cambiar rol"
+                              aria-label={"Cambiar rol de " + fullName(row)}
                               onClick={() => setRoleTarget(row)}
                             >
                               <Shield />
+                              {mode === "users" && <span>Cambiar rol</span>}
                             </Button>
                           )}
                       </div>
@@ -831,6 +865,7 @@ export default function MemberDirectory({ mode = "members" }) {
       {editor && (
         <MemberEditor
           row={editor.row}
+          user={user}
           onClose={() => setEditor(null)}
           onSaved={load}
         />
@@ -841,6 +876,7 @@ export default function MemberDirectory({ mode = "members" }) {
       {roleTarget && (
         <RoleDialog
           row={roleTarget}
+          user={user}
           onClose={() => setRoleTarget(null)}
           onSaved={load}
         />
