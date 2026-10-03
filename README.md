@@ -4,8 +4,11 @@ Sitio web para la **Sección Estudiantil de Dirección de Proyectos de la Univer
 
 Desde el **área de Tecnologías de la Información (TI)** desarrollamos y mantenemos este sitio web para conectar a nuestra comunidad y apoyar las iniciativas de SEDIPRO UNT.
 
+
+
 ## Contributors
 
 - [Yanxmarcos Chan Vasquez](https://github.com/Yanxmarcos)
+-  [Chipiran](https://github.com/JeffranEpst.)
 
 <!-- Espacio reservado para incorporar a los próximos colaboradores. -->
