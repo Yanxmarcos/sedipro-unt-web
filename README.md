@@ -6,6 +6,7 @@ Desde el **área de Tecnologías de la Información (TI)** desarrollamos y mante
 
 ## Contributors
 
-- [Yanxmarcos Chan Vasquez](https://github.com/Yanxmarcos)
+- [Yanxmarcos Chan Vasquez](https://github.com/Yanxmarcos) 
+Jeffran
 
 <!-- Espacio reservado para incorporar a los próximos colaboradores. -->
