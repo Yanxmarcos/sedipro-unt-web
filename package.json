@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start -p 7000",
     "lint": "eslint",
-    "test:panel": "playwright test"
+    "test:panel": "playwright test",
+    "test:hito": "playwright test --config playwright.hito.config.mjs",
+    "test:hito:timing": "node --test tests/mascot/hito-renderer.test.mjs",
+    "mascot:generate": "node scripts/generate-hito.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.6.0",

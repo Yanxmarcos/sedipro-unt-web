@@ -4,12 +4,17 @@
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { Nav } from "./nav";
 import { PageBackdrop } from "./page-backdrop";
 import LiquidEther from "@/components/shaders/LiquidEther";
 import { isLandingPath } from "@/lib/landing-paths";
 
 const MOBILE_BREAKPOINT = 768;
+const HitoPet = dynamic(
+  () => import("@/components/mascot/hito-pet").then((module) => module.HitoPet),
+  { ssr: false },
+);
 
 export function LandingOnly({ children }) {
   const pathname = usePathname();
@@ -213,6 +218,7 @@ export function LandingOnly({ children }) {
       <main id="main-content" className="relative flex-1" style={{ zIndex: 1 }}>
         {children}
       </main>
+      {!isLoading && <HitoPet key={pathname} pathname={pathname} />}
     </>
   );
 }

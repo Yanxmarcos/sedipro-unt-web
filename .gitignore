@@ -12,7 +12,8 @@
 
 # testing
 /coverage
-/tests/
+/tests/*
+!/tests/mascot/
 /playwright.config.mjs
 /test-results/
 /playwright-report/
@@ -45,4 +46,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/scripts
+/scripts/*
+!/scripts/generate-hito.mjs
+!/scripts/hito-source/
