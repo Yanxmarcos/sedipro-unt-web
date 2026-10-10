@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { AlarmClockCheck, AlarmClockMinus } from 'lucide-react'
+import { formatPersonName } from '@/lib/person-name'
 const Ico = {
   Check: () => (
     <svg
@@ -293,7 +294,10 @@ export default function RegistroAsistenciaPage() {
         setFeedback({
           type: 'warn',
           msg: data.message,
-          nombre: `${data.sediprano.nombres} ${data.sediprano.apellidos}`,
+          nombre: formatPersonName(
+            data.sediprano.nombres,
+            data.sediprano.apellidos,
+          ),
         })
         setAwaitingEstado(null)
         return
@@ -301,11 +305,17 @@ export default function RegistroAsistenciaPage() {
       setFeedback({
         type: 'success',
         msg: data.message,
-        nombre: `${data.sediprano.nombres} ${data.sediprano.apellidos}`,
+        nombre: formatPersonName(
+          data.sediprano.nombres,
+          data.sediprano.apellidos,
+        ),
       })
       setRegistrados((prev) => [
         {
-          nombre: `${data.sediprano.nombres} ${data.sediprano.apellidos}`,
+          nombre: formatPersonName(
+            data.sediprano.nombres,
+            data.sediprano.apellidos,
+          ),
           area: data.sediprano.area,
           hora: new Date().toLocaleTimeString('es-PE', {
             hour: '2-digit',
@@ -511,7 +521,7 @@ export default function RegistroAsistenciaPage() {
             <div>
               <p className="text-xs text-foreground m-0 font-semibold">Encargado de asistencia</p>
               <p className="font-semibold text-sm text-foreground m-0">
-                {encargado.nombres} {encargado.apellidos}
+                {formatPersonName(encargado.nombres, encargado.apellidos)}
               </p>
             </div>
           </div>

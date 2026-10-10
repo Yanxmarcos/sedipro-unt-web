@@ -16,13 +16,14 @@ import {
 import { usePanelSession } from "@/components/admin/panel-session";
 import { panelApi } from "@/lib/panel-api";
 import { ROLE_LABELS, normalizeRole } from "@/lib/panel-permissions.mjs";
+import { formatPersonName } from "@/lib/person-name";
 import { toast } from "sonner";
 
 export default function ProfileDropdown() {
   const router = useRouter();
   const { user } = usePanelSession();
   const name =
-    [user?.nombres, user?.apellidos].filter(Boolean).join(" ") ||
+    formatPersonName(user?.nombres, user?.apellidos) ||
     user?.user ||
     "Usuario";
   const initials = name

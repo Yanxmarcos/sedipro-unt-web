@@ -40,7 +40,9 @@ const Footer = () => (
         >
           Reportar un problema
         </TooltipTrigger>
-        <TooltipContent>Escríbenos a esta dirección de email</TooltipContent>
+        <TooltipContent>
+          Escríbenos a ti.sedipro@unitru.edu.pe
+        </TooltipContent>
       </Tooltip>
     </nav>
   </footer>

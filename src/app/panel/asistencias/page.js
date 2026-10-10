@@ -31,6 +31,7 @@ import { Input } from "@/components/ui/input";
 import { AdminModal } from "@/components/admin/form-controls";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatPersonName } from "@/lib/person-name";
 import { exportAttendanceToExcel } from "@/lib/export-attendance";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -90,7 +91,7 @@ function EncargadosCell({ encargados, dark, onOpen }) {
         {visible.map((enc, i) => (
           <Avatar
             key={enc._id}
-            title={`${enc.nombres} ${enc.apellidos}`}
+            title={formatPersonName(enc.nombres, enc.apellidos)}
             style={{
               width: "26px",
               height: "26px",
@@ -100,7 +101,7 @@ function EncargadosCell({ encargados, dark, onOpen }) {
           >
             <AvatarImage
               src={enc.fotoPerfil?.url || undefined}
-              alt={`${enc.nombres || ""} ${enc.apellidos || ""}`.trim()}
+              alt={formatPersonName(enc.nombres, enc.apellidos)}
             />
             <AvatarFallback className="bg-current/10 text-xs font-semibold text-current">
               {initials(enc.nombres, enc.apellidos)}
@@ -121,7 +122,7 @@ function EncargadosCell({ encargados, dark, onOpen }) {
       </div>
       <span className="text-sm font-semibold text-current whitespace-nowrap">
         {encargados.length === 1
-          ? encargados[0].nombres
+          ? formatPersonName(encargados[0].nombres)
           : `${encargados.length} enc.`}
       </span>
     </Button>
@@ -176,7 +177,7 @@ function ModalEncargados({
                 <Avatar className="size-10 shrink-0 border">
                   <AvatarImage
                     src={enc.fotoPerfil?.url || undefined}
-                    alt={`${enc.nombres || ""} ${enc.apellidos || ""}`.trim()}
+                    alt={formatPersonName(enc.nombres, enc.apellidos)}
                   />
                   <AvatarFallback className="bg-muted text-sm font-semibold text-foreground">
                     {initials(enc.nombres, enc.apellidos)}
@@ -184,7 +185,7 @@ function ModalEncargados({
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-foreground m-0 whitespace-nowrap overflow-hidden text-ellipsis">
-                    {enc.nombres} {enc.apellidos}
+                    {formatPersonName(enc.nombres, enc.apellidos)}
                   </p>
                   <p className="text-xs text-muted-foreground m-0">
                     DNI: {enc.dni} · Accede con su cuenta personal
@@ -379,7 +380,7 @@ function ModalAgregarEncargado({
                   <Avatar className="size-9 shrink-0 border border-current/15">
                     <AvatarImage
                       src={s.fotoPerfil?.url || undefined}
-                      alt={`${s.nombres || ""} ${s.apellidos || ""}`.trim()}
+                      alt={formatPersonName(s.nombres, s.apellidos)}
                     />
                     <AvatarFallback className="bg-current/10 text-sm font-semibold text-current">
                       {initials(s.nombres, s.apellidos)}
@@ -387,7 +388,7 @@ function ModalAgregarEncargado({
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-current m-0 whitespace-nowrap overflow-hidden text-ellipsis">
-                      {s.nombres} {s.apellidos}
+                      {formatPersonName(s.nombres, s.apellidos)}
                       {yaAsignado && (
                         <span className="text-xs ml-1.5 text-current font-semibold">
                           • ya asignado
@@ -459,7 +460,9 @@ function ModalAgregarEncargado({
             ) : (
               <>
                 <AdminUserPlusIcon className="size-4" />{" "}
-                {selected ? `Asignar a ${selected.nombres}` : "Selecciona uno"}
+                {selected
+                  ? `Asignar a ${formatPersonName(selected.nombres)}`
+                  : "Selecciona uno"}
               </>
             )}
           </Button>
@@ -632,7 +635,9 @@ export default function AsistenciasPage() {
     }
   }
   function handleEncargadoAgregado(asistenciaId, nuevoEncargado) {
-    showToast(`${nuevoEncargado.nombres} asignado como encargado`);
+    showToast(
+      `${formatPersonName(nuevoEncargado.nombres)} asignado como encargado`,
+    );
     setModalAgregar(null);
     setAsistencias((prev) =>
       prev.map((a) => {

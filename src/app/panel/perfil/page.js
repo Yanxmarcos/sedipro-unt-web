@@ -23,6 +23,7 @@ import { panelApi } from "@/lib/panel-api";
 import { ROLE_LABELS, normalizeRole } from "@/lib/panel-permissions.mjs";
 import { UNT_CAREERS, canonicalCareer } from "@/lib/unt-careers";
 import { AdminSelect } from "@/components/admin/form-controls";
+import { formatPersonName } from "@/lib/person-name";
 
 export default function PerfilPage() {
   const { user, refresh } = usePanelSession();
@@ -100,7 +101,7 @@ export default function PerfilPage() {
   if (loading) return <PageLoading />;
   if (error) return <PageError message={error} onRetry={load} />;
 
-  const name = [profile.nombres, profile.apellidos].filter(Boolean).join(" ");
+  const name = formatPersonName(profile.nombres, profile.apellidos);
   const accountDate = profile.accountCreatedAt
     ? new Date(profile.accountCreatedAt).toLocaleDateString("es-PE", {
         dateStyle: "long",
@@ -153,8 +154,8 @@ export default function PerfilPage() {
               <form onSubmit={save} noValidate className="space-y-6">
                 <div className="grid gap-6 sm:grid-cols-2">
                   {[
-                    ["nombres", "Nombres", profile.nombres],
-                    ["apellidos", "Apellidos", profile.apellidos],
+                    ["nombres", "Nombres", formatPersonName(profile.nombres)],
+                    ["apellidos", "Apellidos", formatPersonName(profile.apellidos)],
                     ["dni", "DNI / usuario", profile.dni],
                     ["area", "Área", profile.area || "Sin área asignada"],
                   ].map(([key, label, value]) => (
