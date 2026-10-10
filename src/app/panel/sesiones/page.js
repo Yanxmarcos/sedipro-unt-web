@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Activity, Clock3, RefreshCw, Search, UsersRound } from "lucide-react";
 import { ROLE_LABELS } from "@/lib/panel-permissions.mjs";
+import { formatPersonName } from "@/lib/person-name";
 import { panelApi } from "@/lib/panel-api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -162,7 +163,7 @@ export default function SessionsPage() {
                   <TableRow key={session.id}>
                     <TableCell className="pl-5">
                       <div className="font-medium">
-                        {session.nombres} {session.apellidos}
+                        {formatPersonName(session.nombres, session.apellidos)}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {session.user} · DNI {session.dni}

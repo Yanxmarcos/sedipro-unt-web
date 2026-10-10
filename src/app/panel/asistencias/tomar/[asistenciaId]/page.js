@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatPersonName } from "@/lib/person-name";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -207,7 +208,10 @@ export default function TomarAsistenciaPage() {
               >
                 <CheckCircle2 className="size-5" />
                 <p className="font-medium">
-                  {feedback.sediprano?.nombres} {feedback.sediprano?.apellidos}
+                  {formatPersonName(
+                    feedback.sediprano?.nombres,
+                    feedback.sediprano?.apellidos,
+                  )}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {feedback.message}
@@ -242,7 +246,10 @@ export default function TomarAsistenciaPage() {
                 {recent.map((entry) => (
                   <TableRow key={entry.sedipranoId}>
                     <TableCell className="pl-4">
-                      {entry.sediprano?.nombres} {entry.sediprano?.apellidos}
+                      {formatPersonName(
+                        entry.sediprano?.nombres,
+                        entry.sediprano?.apellidos,
+                      )}
                     </TableCell>
                     <TableCell>{entry.sediprano?.dni}</TableCell>
                     <TableCell>

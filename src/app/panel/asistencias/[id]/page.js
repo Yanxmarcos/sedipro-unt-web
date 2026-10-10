@@ -21,6 +21,7 @@ import {
   Table,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { formatPersonName } from "@/lib/person-name";
 import { exportAttendanceToExcel } from "@/lib/export-attendance";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
@@ -393,7 +394,7 @@ export default function AsistenciaDetallePage() {
                             <Avatar className="size-9 shrink-0 border">
                               <AvatarImage
                                 src={s.fotoPerfil?.url || undefined}
-                                alt={`${s.nombres || ""} ${s.apellidos || ""}`.trim()}
+                                alt={formatPersonName(s.nombres, s.apellidos)}
                               />
                               <AvatarFallback className="text-xs font-semibold">
                                 {initials(s.nombres, s.apellidos)}
@@ -401,7 +402,7 @@ export default function AsistenciaDetallePage() {
                             </Avatar>
                             <div className="min-w-0">
                               <p className="break-words font-medium">
-                                {s.nombres} {s.apellidos}
+                                {formatPersonName(s.nombres, s.apellidos)}
                               </p>
                               {s.area && (
                                 <Badge variant="secondary" className="mt-1">

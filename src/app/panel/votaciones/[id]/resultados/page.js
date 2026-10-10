@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import * as XLSX from 'xlsx'
+import { formatPersonName } from '@/lib/person-name'
 const ESTADOS = {
   presente: {
     label: 'Presente',
@@ -127,7 +128,7 @@ export default function ResultadosPage() {
       const votantesData = [
         ['Nombre Completo', 'DNI', 'Opción Elegida', 'Fecha de Voto'],
         ...(votos || []).map((v) => [
-          `${v.sediprano?.apellidos || ''} ${v.sediprano?.nombres || ''}`.trim(),
+          formatPersonName(v.sediprano?.apellidos, v.sediprano?.nombres),
           v.sediprano?.dni || '',
           v.opcionSeleccionada,
           fmtFechaHora(v.fechaVoto),
@@ -338,7 +339,7 @@ export default function ResultadosPage() {
                   votos.map((v) => (
                     <TableRow key={v._id}>
                       <TableCell>
-                        {`${v.sediprano?.apellidos || ''} ${v.sediprano?.nombres || ''}`.trim() || '—'}
+                        {formatPersonName(v.sediprano?.apellidos, v.sediprano?.nombres) || '—'}
                       </TableCell>
                       <TableCell>{v.sediprano?.dni || '—'}</TableCell>
                       <TableCell>
@@ -429,7 +430,7 @@ export default function ResultadosPage() {
                       const infoEstado = ESTADOS[estadoAsistencia] || ESTADOS.presente
                       return (
                         <TableRow key={p._id}>
-                          <TableCell>{`${p.nombres || ''} ${p.apellidos || ''}`.trim() || '—'}</TableCell>
+                          <TableCell>{formatPersonName(p.nombres, p.apellidos) || '—'}</TableCell>
                           <TableCell>
                             <Badge variant="secondary" className="inline-block">
                               {infoEstado.label}

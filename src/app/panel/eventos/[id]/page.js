@@ -10,6 +10,7 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { formatPersonName } from '@/lib/person-name'
 export default function GestionEventoPage() {
   const routeParams = useParams()
   const [id, setId] = useState(null)
@@ -336,7 +337,7 @@ export default function GestionEventoPage() {
               {regs.map((r) => (
                 <TableRow key={r._id}>
                   <TableCell>
-                    {r.personaId?.nombres} {r.personaId?.apellidos}
+                    {formatPersonName(r.personaId?.nombres, r.personaId?.apellidos)}
                   </TableCell>
                   <TableCell>{r.personaId?.correo}</TableCell>
                   <TableCell>{r.codigo}</TableCell>

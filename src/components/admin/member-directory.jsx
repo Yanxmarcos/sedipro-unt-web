@@ -14,6 +14,7 @@ import {
   Users,
   UserCheck,
   UserX,
+  Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -58,12 +59,19 @@ import {
   normalizeRole,
 } from "@/lib/panel-permissions.mjs";
 import { UNT_CAREERS, canonicalCareer } from "@/lib/unt-careers";
+import { formatPersonName } from "@/lib/person-name";
 
-const AREAS = ["TI", "PMO", "LTK Y FNZ", "GTH", "MKT"];
+const AREAS = ["TI", "PMO", "LTK Y FNZ", "GTH", "MKT", "DIRECTIVA"];
+const AREA_TEXT_CLASSES = {
+  TI: "text-orange-700 dark:text-orange-300",
+  PMO: "text-amber-800 dark:text-amber-300",
+  "LTK Y FNZ": "text-sky-700 dark:text-sky-300",
+  GTH: "text-green-700 dark:text-green-300",
+  MKT: "text-red-700 dark:text-red-300",
+};
 const date = (value) =>
   value ? new Date(value).toLocaleDateString("es-PE") : "—";
-const fullName = (row) =>
-  [row.nombres, row.apellidos].filter(Boolean).join(" ");
+const fullName = (row) => formatPersonName(row.nombres, row.apellidos);
 const initials = (row) =>
   [row.nombres?.[0], row.apellidos?.[0]].filter(Boolean).join("");
 
@@ -216,6 +224,7 @@ function MemberEditor({ row, user, onClose, onSaved }) {
                 <Input
                   id={"member-" + key}
                   value={form[key]}
+                  className={key === "dni" ? undefined : "uppercase"}
                   required={required}
                   maxLength={key === "dni" ? 8 : 120}
                   pattern={key === "dni" ? "[0-9]{8}" : undefined}
@@ -493,6 +502,68 @@ function RoleDialog({ row, user, onClose, onSaved }) {
   );
 }
 
+function DirectoryPagination({
+  placement,
+  filteredLength,
+  start,
+  pageSize,
+  currentPage,
+  pages,
+  onPageSizeChange,
+  onPageChange,
+}) {
+  return (
+    <div
+      className={
+        placement === "top"
+          ? "flex flex-wrap items-center justify-between gap-3 border-b p-4 text-sm"
+          : "flex flex-wrap items-center justify-between gap-3 border-t p-4 text-sm"
+      }
+    >
+      <p className="text-muted-foreground">
+        {filteredLength ? start + 1 : 0}–
+        {Math.min(start + pageSize, filteredLength)} de {filteredLength}{" "}
+        registros
+      </p>
+      <div className="flex items-center gap-2">
+        <AdminSelect
+          value={pageSize}
+          onChange={(event) => onPageSizeChange(Number(event.target.value))}
+          aria-label="Registros por página"
+          className="w-20"
+        >
+          {[10, 25, 50, 100].map((value) => (
+            <option key={value} value={value}>
+              {value}
+            </option>
+          ))}
+        </AdminSelect>
+        <Button
+          size="icon-sm"
+          variant="outline"
+          aria-label="Página anterior"
+          disabled={currentPage === 1}
+          onClick={() => onPageChange(currentPage - 1)}
+        >
+          <ChevronLeft />
+        </Button>
+        <span>
+          {currentPage} / {pages}
+        </span>
+        <Button
+          size="icon-sm"
+          variant="outline"
+          aria-label="Página siguiente"
+          disabled={currentPage === pages}
+          onClick={() => onPageChange(currentPage + 1)}
+        >
+          <ChevronRight />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function MemberDirectory({ mode = "members" }) {
   const { user, permissions } = usePanelSession();
   const [rows, setRows] = useState([]);
@@ -560,6 +631,15 @@ export default function MemberDirectory({ mode = "members" }) {
   const areas = [
     ...new Set([...AREAS, ...rows.map((row) => row.area).filter(Boolean)]),
   ];
+  const distributionCounts = useMemo(
+    () => [
+      ...AREAS.map((value) => ({
+        label: value,
+        count: rows.filter((row) => row.area === value).length,
+      })),
+    ],
+    [rows],
+  );
 
   function changeFilter(setter, value) {
     setter(value);
@@ -622,6 +702,28 @@ export default function MemberDirectory({ mode = "members" }) {
         ))}
       </div>
 
+      {mode !== "users" && (
+        <section aria-label="Cantidad de sedipranos por área">
+          <h2 className="mb-2 text-sm font-medium text-muted-foreground">
+            Integrantes por área
+          </h2>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
+            {distributionCounts.map(({ label, count }) => (
+              <Badge
+                key={label}
+                variant="outline"
+                className={`h-auto w-full justify-center gap-2 bg-card px-3 py-1 text-sm ${AREA_TEXT_CLASSES[label] || ""}`}
+              >
+                <span>{label}</span>
+                <span className="font-semibold tabular-nums">
+                  {loading || error ? "—" : count}
+                </span>
+              </Badge>
+            ))}
+          </div>
+        </section>
+      )}
+
       <Card className="gap-0 overflow-hidden py-0">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b p-4">
           <InputGroup className="w-full sm:max-w-sm">
@@ -674,6 +776,16 @@ export default function MemberDirectory({ mode = "members" }) {
             <option value="inactive">Inactivo</option>
           </AdminSelect>
         </div>
+        <DirectoryPagination
+          placement="top"
+          filteredLength={filtered.length}
+          start={start}
+          pageSize={pageSize}
+          currentPage={currentPage}
+          pages={pages}
+          onPageSizeChange={(value) => changeFilter(setPageSize, value)}
+          onPageChange={setPage}
+        />
         {error ? (
           <div className="p-4">
             <PageError message={error} onRetry={load} />
@@ -693,7 +805,7 @@ export default function MemberDirectory({ mode = "members" }) {
                 <TableHead className="w-28">DNI</TableHead>
                 <TableHead className="w-28">Área</TableHead>
                 <TableHead className="w-36">Rol</TableHead>
-                <TableHead className="w-44">Carrera / matrícula</TableHead>
+                <TableHead className="w-44">Carrera</TableHead>
                 <TableHead className="w-32">Cuenta creada</TableHead>
                 <TableHead className="w-28">Estado</TableHead>
                 <TableHead className="w-52 text-center">Acciones</TableHead>
@@ -721,8 +833,11 @@ export default function MemberDirectory({ mode = "members" }) {
                           <p className="break-words font-medium">
                             {fullName(row)}
                           </p>
-                          <p className="mt-0.5 text-xs text-muted-foreground">
-                            {row.telefono || "Sin teléfono"}
+                          <p
+                            className="mt-0.5 truncate text-xs text-muted-foreground"
+                            title={row.correoInstitucional || undefined}
+                          >
+                            {row.correoInstitucional || "—"}
                           </p>
                         </div>
                       </div>
@@ -731,15 +846,23 @@ export default function MemberDirectory({ mode = "members" }) {
                     <TableCell>{row.area || "—"}</TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="whitespace-normal">
-                        {ROLE_LABELS[row.rol] || row.rol}
+                        {row.rol === "SUPERADMINISTRADOR" ? (
+                          <span
+                            className="inline-flex items-center gap-1"
+                            aria-label="Superadministrador"
+                          >
+                            <span aria-hidden="true">Administrador</span>
+                            <Star
+                              className="size-3 fill-white text-white"
+                              aria-hidden="true"
+                            />
+                          </span>
+                        ) : (
+                          ROLE_LABELS[row.rol] || row.rol
+                        )}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      <p>{row.carrera || "—"}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {row.codigoMatricula || "Sin matrícula"}
-                      </p>
-                    </TableCell>
+                    <TableCell>{row.carrera || "—"}</TableCell>
                     <TableCell>{date(row.accountCreatedAt)}</TableCell>
                     <TableCell>
                       <Badge variant={row.active ? "secondary" : "outline"}>
@@ -816,50 +939,16 @@ export default function MemberDirectory({ mode = "members" }) {
             </TableBody>
           </Table>
         )}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t p-4 text-sm">
-          <p className="text-muted-foreground">
-            {filtered.length ? start + 1 : 0}–
-            {Math.min(start + pageSize, filtered.length)} de {filtered.length}{" "}
-            registros
-          </p>
-          <div className="flex items-center gap-2">
-            <AdminSelect
-              value={pageSize}
-              onChange={(event) =>
-                changeFilter(setPageSize, Number(event.target.value))
-              }
-              aria-label="Registros por página"
-              className="w-20"
-            >
-              {[10, 25, 50, 100].map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </AdminSelect>
-            <Button
-              size="icon-sm"
-              variant="outline"
-              aria-label="Página anterior"
-              disabled={currentPage === 1}
-              onClick={() => setPage(currentPage - 1)}
-            >
-              <ChevronLeft />
-            </Button>
-            <span>
-              {currentPage} / {pages}
-            </span>
-            <Button
-              size="icon-sm"
-              variant="outline"
-              aria-label="Página siguiente"
-              disabled={currentPage === pages}
-              onClick={() => setPage(currentPage + 1)}
-            >
-              <ChevronRight />
-            </Button>
-          </div>
-        </div>
+        <DirectoryPagination
+          placement="bottom"
+          filteredLength={filtered.length}
+          start={start}
+          pageSize={pageSize}
+          currentPage={currentPage}
+          pages={pages}
+          onPageSizeChange={(value) => changeFilter(setPageSize, value)}
+          onPageChange={setPage}
+        />
       </Card>
 
       {editor && (
