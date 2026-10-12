@@ -122,6 +122,9 @@ test("arrastre táctil mantiene mascota y controles visibles en los bordes y des
   expect(bubble.y).toBeGreaterThan(108);
   expect(bubble.y + bubble.height).toBeLessThanOrEqual(832);
   await page.setViewportSize({ width: 320, height: 500 });
+  // Chromium delivers viewport resize/observer work on a rendering frame;
+  // allow that frame while the test's animation clock is paused.
+  await page.clock.runFor(100);
   const resized = await actor(page).boundingBox();
   const panel = await page.locator("#hito-controls").boundingBox();
   expect(resized.y).toBeGreaterThanOrEqual(12 - 0.0001);

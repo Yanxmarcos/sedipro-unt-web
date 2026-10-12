@@ -166,8 +166,9 @@ for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
 }
 const restHeight = restBottom - restTop + 1;
 
-// Five authentic textures: body, two arms and two complete short owl legs.
-// The purple thighs, short yellow ankles and feet have rigid bone lengths.
+// Body and arms retain their three-quarter artwork. Legs are cut from the
+// actual idle silhouette, at its native size: the old isolated leg artwork
+// had much deeper, rounder thighs than the resting character.
 const parts = await extractPoses(`${source}/rig-v4.png`, 5);
 const rigCells = [];
 const legs = [];
@@ -176,11 +177,68 @@ let bodyEyes;
 const bodyHeight = restHeight - 25;
 for (let index = 0; index < parts.length; index++) {
   const part = parts[index];
-  const height = index === 0 ? bodyHeight : index < 3 ? (index === 1 ? 46 : 44) : 40;
-  const width = Math.min(index >= 3 ? 32 : W, Math.round(part.width * height / part.height));
+  const height = index === 0 ? bodyHeight : index < 3 ? (index === 1 ? 46 : 44) : restBottom - 146 + 1;
+  const width = index >= 3 ? 36 : Math.round(part.width * height / part.height);
   const left = index === 0 ? Math.round(W / 2 - part.anchor * height / part.height) : Math.round(W / 2 - width / 2);
   const top = index === 0 ? restTop : 0;
-  const buffer = await sharp(part.pixels, { raw: { width: part.width, height: part.height, channels: 4 } }).resize(width, height).png().toBuffer();
+  let buffer;
+  const reference = index === 3 ? { x: 45, y: 146, center: 67 } : { x: 81, y: 146, center: 92 };
+  if (index >= 3) {
+    const pixels = Buffer.alloc(width * height * 4);
+    for (let y = 0; y < height; y++) {
+      // The first two rows belong to the belly, not to an exposed leg.
+      // Their attachment remains hidden behind the body's natural contour.
+      if (reference.y + y < 148) continue;
+      if (reference.y + y >= 163) {
+        // Below the pant cuff, preserve every toe and claw. Their tips form
+        // separate spans; selecting just the ankle's span would cut them off.
+        const offset = ((reference.y + y) * W + reference.x) * 4;
+        resting.copy(pixels, y * width * 4, offset, offset + width * 4);
+        continue;
+      }
+      // Select the ankle's connected row span. This excludes the other leg,
+      // hand and separate tail pixels without replacing the natural matte.
+      const spans = [];
+      let start = -1;
+      for (let x = 0; x <= width; x++) {
+        const opaque = x < width && resting[((reference.y + y) * W + reference.x + x) * 4 + 3] > 96;
+        if (opaque && start < 0) start = x;
+        if (!opaque && start >= 0) { spans.push([start, x - 1]); start = -1; }
+      }
+      const distance = ([a, b]) => Math.max(reference.x + a - reference.center, reference.center - reference.x - b, 0);
+      spans.sort((a, b) => distance(a) - distance(b));
+      if (!spans.length) continue;
+      const [a, b] = spans[0];
+      for (let x = Math.max(0, a - 1); x <= Math.min(width - 1, b + 1); x++) {
+        const offset = ((reference.y + y) * W + reference.x + x) * 4;
+        resting.copy(pixels, (y * width + x) * 4, offset, offset + 4);
+        {
+          // Row 158 is the first exposed, separate leg contour below the
+          // belly. Carry that real alpha upwards through the hidden root:
+          // neither the belly bridge nor the joined tail is part of a leg.
+          const sourceX = index === 3 ? reference.x + x : 67.5 - (reference.x + x - 92);
+          const x0 = Math.floor(sourceX), blend = sourceX - x0;
+          const row = Math.max(reference.y + y, 158) * W;
+          const alpha = resting[(row + x0) * 4 + 3] * (1 - blend) + resting[(row + x0 + 1) * 4 + 3] * blend;
+          pixels[(y * width + x) * 4 + 3] = Math.min(pixels[(y * width + x) * 4 + 3], Math.round(alpha));
+        }
+        // This attachment is covered by the waist. Fade the short hidden
+        // root rather than leaving a rectangular edge that becomes a point
+        // when the whole rounded leg rotates.
+        const root = Math.min(1, y / 6);
+        const coverage = root * root * (3 - 2 * root);
+        pixels[(y * width + x) * 4 + 3] = Math.round(pixels[(y * width + x) * 4 + 3] * coverage);
+      }
+    }
+    // Idle feet point outwards. Normalize the left-facing cutout once so
+    // both toes face right; the renderer mirrors the entire rig for leftward
+    // travel. Register ankle/knee pivots from this oriented texture below.
+    const texture = sharp(pixels, { raw: { width, height, channels: 4 } });
+    if (index === 3) texture.flop();
+    buffer = await texture.png().toBuffer();
+  } else {
+    buffer = await sharp(part.pixels, { raw: { width: part.width, height: part.height, channels: 4 } }).resize(width, height).png().toBuffer();
+  }
   const cell = await sharp({ create: { width: W, height: H, channels: 4, background: "#00000000" } }).composite([{ input: buffer, left, top }]).png().toBuffer();
   const raw = await sharp(cell).ensureAlpha().raw().toBuffer();
   if (index === 0) {
@@ -212,41 +270,46 @@ for (let index = 0; index < parts.length; index++) {
     const footTop = rows.findIndex((row, y) => y > yellowTop + 2 && row.length >= stem.length * 1.45);
     if (footTop < 0) throw new Error("Small bird foot could not be registered.");
     const ankleY = footTop + 2;
-    // Put the knee inside the purple thigh, above the yellow ankle. The lower
-    // bone carries the pant cuff too, giving it room to bend without long legs.
-    const kneeY = yellowTop - 5;
-    const upperLength = kneeY - 3;
+    // Keep the whole rounded purple leg on one rigid piece. The hinge is at
+    // the yellow ankle, so no second pant fragment can rotate into a spike.
+    const kneeY = yellowTop;
+    const upperLength = kneeY;
     const lowerLength = ankleY - kneeY;
-    const thighPivotX = width * 0.48;
+    const thighPivotX = ankleX - left;
+    const stemLeft = Math.floor(ankleX - stem.length / 2 - 1);
+    const stemRight = Math.ceil(ankleX + stem.length / 2 + 1);
     legs.push({
-      hip: [index === 3 ? 83 : 77, 0],
-      thigh: { rect: [index * W + left, 0, width, kneeY + 2], pivot: [thighPivotX, 3], length: upperLength },
+      hip: [index === 3 ? 89 : 70, reference.y + 2.5],
+      reference: { rect: [reference.x, reference.y, width, height], mirrored: index === 3 },
+      thigh: { rect: [index * W + left, 0, width, kneeY + 1], pivot: [thighPivotX, 0], length: upperLength },
       shin: {
-        rect: [index * W + left, kneeY - 1, width, lowerLength + 2], pivot: [ankleX - left, 1], length: lowerLength,
-        mask: [[0, 0], [width, 0], [width, 6], [ankleX - left + stem.length / 2 + 1, 6], [ankleX - left + stem.length / 2 + 1, lowerLength + 2], [ankleX - left - stem.length / 2 - 1, lowerLength + 2], [ankleX - left - stem.length / 2 - 1, 6], [0, 6]],
+        rect: [index * W + stemLeft, kneeY, stemRight - stemLeft + 1, lowerLength + 2], pivot: [ankleX - stemLeft, 0], length: lowerLength,
       },
-      foot: { rect: [index * W + left, footTop, width, height - footTop], pivot: [ankleX - left, ankleY - footTop], ground: height - ankleY },
+      foot: { rect: [index * W + left, footTop, width, height - footTop], pivot: [ankleX - left, ankleY - footTop], ground: height - ankleY, roll: 0.5 },
     });
   }
   rigCells.push({ input: cell, left: index * W, top: 0 });
 }
-const stride = 26;
-const bob = 0.6;
-let lift = 10;
+const stride = 14;
+const lift = 2;
 for (const leg of legs) {
   const upper = leg.thigh.length, lower = leg.shin.length;
-  const reach = upper + lower - 1.8;
-  const vertical = Math.sqrt(reach ** 2 - (stride / 2) ** 2) - bob * 2;
-  leg.hip[1] = BASELINE - leg.foot.ground - vertical;
-  lift = Math.min(lift, vertical - Math.abs(upper - lower) - 1);
-  if (!Number.isFinite(vertical) || lift < 3) throw new Error("Owl leg proportions do not support the gait without stretching.");
+  const vertical = BASELINE - leg.foot.ground - leg.hip[1];
+  if (Math.hypot(vertical, stride / 2) >= upper + lower) throw new Error("Owl leg proportions do not support the gait without stretching.");
 }
-await sharp({ create: { width: W * 5, height: H, channels: 4, background: "#00000000" } }).composite(rigCells).webp({ lossless: true, effort: 6 }).toFile(`${output}/hito-rig-v4.webp`);
+await sharp({ create: { width: W * 5, height: H, channels: 4, background: "#00000000" } }).composite(rigCells).webp({ lossless: true, effort: 6 }).toFile(`${output}/hito-rig-v9.webp`);
 const gait = {
-  image: "/img/hito-pet/hito-rig-v4.webp", stride, lift, support: 0.6, ground: BASELINE, bob,
+  image: "/img/hito-pet/hito-rig-v9.webp", stride, lift, support: 0.6, ground: BASELINE,
+  weight: { sway: 0.6, drop: 0.3, roll: 0.025, yaw: 0.4 },
   reference: { top: restTop, height: restHeight, bodyHeight },
-  body: { rect: [0, 0, W, H], pivot: [80, 150], eyes: bodyEyes },
+  body: {
+    rect: [0, 0, W, H], pivot: [80, 150], eyes: bodyEyes,
+    waist: [80, 143], neck: [82, 101],
+    // Preserve the original rounded waist contour. It occludes each leg's
+    // upper cut instead of exposing a straight horizontal crop across Hito.
+    regions: { head: [0, 0, W, 105], torso: [0, 99, W, 48], pelvis: [0, 141, W, H - 141] },
+  },
   legs: [legs[1], legs[0]], arms: [arms[1], arms[0]],
 };
-await writeFile(`${output}/hito.json`, JSON.stringify({ name: "Hito", version: 4, image: "/img/hito-pet/hito-sprites-v2.webp", frame: { width: W, height: H }, palette: { purple: "#8b65ad", shade: "#563c75", white: "#f2eff5" }, animations, gait }, null, 2) + "\n");
-console.log(`Hito v4: resting height ${restHeight}px; walking body ${bodyHeight}px; fixed thigh/ankle bones, two counter-swinging arms. Lift ${lift.toFixed(1)}px.`);
+await writeFile(`${output}/hito.json`, JSON.stringify({ name: "Hito", version: 9, image: "/img/hito-pet/hito-sprites-v2.webp", frame: { width: W, height: H }, palette: { purple: "#8b65ad", shade: "#563c75", white: "#f2eff5" }, animations, gait }, null, 2) + "\n");
+console.log(`Hito v9: resting height ${restHeight}px; native exposed-leg alpha excludes belly/tail, intact rounded cuffs and upright stance. Lift ${lift.toFixed(1)}px.`);

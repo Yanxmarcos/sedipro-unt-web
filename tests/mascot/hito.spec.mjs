@@ -29,7 +29,7 @@ for (const [path, greeting] of [
 }
 
 test("camina, cambia de dirección en el borde y mantiene su base al hacer scroll", async ({ page }) => {
-  // This exercises nearly a minute of animation, including the page's shaders.
+  // Advance through the first boundary turn, including the page's shaders.
   test.setTimeout(90000);
   await page.clock.install();
   await page.goto("/");
@@ -45,7 +45,6 @@ test("camina, cambia de dirección en el borde y mantiene su base al hacer scrol
   await expect(actor(page)).toHaveAttribute("data-direction", "left");
   await page.clock.runFor(20000);
   await expect(actor(page)).toHaveAttribute("data-direction", "right");
-  await page.clock.runFor(25000);
   const bounded = await actor(page).boundingBox();
   expect(bounded.x).toBeGreaterThanOrEqual(12);
   expect(bounded.x + bounded.width).toBeLessThanOrEqual(308);

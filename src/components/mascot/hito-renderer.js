@@ -1,4 +1,4 @@
-import { getHitoStep, getHitoArmSwing, solveHitoLeg } from "./hito-motion.js";
+import { getHitoStep, getHitoArmSwing, solveHitoLeg, getHitoBodyPose, getHitoFootPose } from "./hito-motion.js";
 
 // Gesture/fallback sprites support unequal frame durations.
 export function getHitoFrame(animation, age) {
@@ -40,20 +40,25 @@ function drawWalk(context, image, gait, manifest, state, direction, look, blink,
   // CSS pixels -> texture pixels. Synchronizing phase to distance prevents
   // skating, and also stops the feet as soon as a dragged Hito stops moving.
   const phase = distance / (gait.stride / 2 / gait.support);
-  const cycle = phase % 1;
-  const bob = -gait.bob * (1 - Math.cos(cycle * Math.PI * 4));
-  const bodyPivot = gait.body.pivot;
-  const tilt = (state === "run" ? 0.018 : 0.006) + Math.sin(cycle * Math.PI * 2) * 0.006;
-  function bodyTransform() {
-    context.translate(bodyPivot[0], bodyPivot[1] + bob);
-    context.rotate(tilt);
-    context.translate(-bodyPivot[0], -bodyPivot[1]);
+  const body = getHitoBodyPose(phase, gait, state === "run");
+  function applyPose(pose) {
+    context.translate(...pose.position);
+    context.rotate(pose.angle);
+    context.translate(-pose.bind[0], -pose.bind[1]);
+  }
+  function drawRegion(region, pose) {
+    context.save();
+    applyPose(pose);
+    const [x, y, w, h] = gait.body.regions[region];
+    context.drawImage(image, x, y, w, h, x, y, w, h);
+    if (region === "head") drawEyes(context, image, gait.body.eyes, 0, 0, manifest.palette, look, blink, direction);
+    context.restore();
   }
   function drawArm(index) {
     const arm = gait.arms[index];
     const phaseOffset = index === 0 ? 0.5 : 0;
     context.save();
-    bodyTransform();
+    applyPose(body.torso);
     context.translate(...arm.shoulder);
     context.rotate(getHitoArmSwing(phase + phaseOffset, arm.amplitude));
     const [x, y, w, h] = arm.rect;
@@ -62,13 +67,18 @@ function drawWalk(context, image, gait, manifest, state, direction, look, blink,
   }
   // The far arm passes behind the torso; the near hand crosses its front.
   drawArm(0);
-  for (const [index, leg] of gait.legs.entries()) {
+  const legs = gait.legs.map((leg, index) => {
     const step = getHitoStep(phase + (index === 0 ? 0.5 : 0), gait.stride, gait.lift, gait.support);
-    const [hipX, hipY] = leg.hip;
-    const ankleX = hipX + step.x;
-    const ankleY = gait.ground - leg.foot.ground - step.lift;
-    const hip = [hipX, hipY + bob];
-    const ankle = [ankleX, ankleY];
+    return { leg, index, step };
+  });
+  // Draw the leading leg last, with its ankle and foot as one layer group.
+  // Compare travel from each bind hip, not their different screen positions.
+  // Leftward motion already mirrors the whole character, including this order.
+  legs.sort((a, b) => a.step.x - b.step.x || a.index - b.index);
+  for (const { leg, index, step } of legs) {
+    const hip = body.hips[index];
+    const foot = getHitoFootPose(step, leg, gait.ground);
+    const ankle = foot.ankle;
     const pose = solveHitoLeg(hip, ankle, leg.thigh.length, leg.shin.length);
     context.save();
     context.translate(...hip);
@@ -80,31 +90,24 @@ function drawWalk(context, image, gait, manifest, state, direction, look, blink,
     context.translate(...pose.knee);
     context.rotate(pose.lowerAngle);
     const [sx, sy, sw, sh] = leg.shin.rect;
-    // Keep the pant cuff's width but exclude the original sideways toes from
-    // the ankle texture. The foot is a separate, flat contact surface.
-    context.beginPath();
-    for (const [point, [x, y]] of leg.shin.mask.entries()) {
-      const px = x - leg.shin.pivot[0], py = y - leg.shin.pivot[1];
-      if (point === 0) context.moveTo(px, py); else context.lineTo(px, py);
-    }
-    context.closePath();
-    context.clip();
+    // The lower texture contains only the yellow ankle. The entire rounded
+    // purple cuff stays on the upper piece, preserving its continuous edge.
     context.drawImage(image, sx, sy, sw, sh, -leg.shin.pivot[0], -leg.shin.pivot[1], sw, sh);
     context.restore();
     context.save();
-    context.translate(ankleX, ankleY);
-    context.rotate(step.angle);
+    context.translate(...foot.origin);
+    context.translate(...foot.pivot);
+    context.rotate(foot.angle);
+    context.translate(-foot.pivot[0], -foot.pivot[1]);
     const [fx, fy, fw, fh] = leg.foot.rect;
     context.drawImage(image, fx, fy, fw, fh, -leg.foot.pivot[0], -leg.foot.pivot[1], fw, fh);
     context.restore();
   }
-  // The body overlaps the leg attachment, preserving the purple thigh shape.
-  context.save();
-  bodyTransform();
-  const [sx, sy, sw, sh] = gait.body.rect;
-  context.drawImage(image, sx, sy, sw, sh, 0, 0, sw, sh);
-  drawEyes(context, image, gait.body.eyes, sx, sy, manifest.palette, look, blink, direction);
-  context.restore();
+  // Reuse the exact same artwork at unit scale. Overlapping neck/waist bands
+  // join pelvis, counter-rotating chest and stable head without visible cuts.
+  drawRegion("pelvis", body.pelvis);
+  drawRegion("torso", body.torso);
+  drawRegion("head", body.head);
   drawArm(1);
 }
 
