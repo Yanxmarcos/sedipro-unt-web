@@ -12,10 +12,12 @@
 
 # testing
 /coverage
-/tests/
+/tests/*
+!/tests/mascot/
 /playwright.config.mjs
 /test-results/
 /playwright-report/
+/.impeccable/review/
 
 # next.js
 /.next/
@@ -45,4 +47,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/scripts
+/scripts/*
+!/scripts/audit-seo.mjs
+!/scripts/generate-hito.mjs
+!/scripts/hito-source/

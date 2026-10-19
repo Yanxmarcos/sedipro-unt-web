@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-17T00:00:00Z",
+  "title": "Design System: SEDIPRO UNT — terminal TI",
+  "extensions": {
+    "scope": {
+      "routes": ["/tecnologias-de-la-informacion"],
+      "designDocument": "../DESIGN.md",
+      "surfaceBrief": "../../../../.impeccable/surfaces/ti-terminal.md",
+      "sources": ["../terminal.module.css", "../terminal.jsx", "../code-stream.mjs", "../members.js", "../../../app/tecnologias-de-la-informacion/page.jsx"],
+      "authority": "Explicit user-pinned HackerTyper black/orange Cascadia world, scoped to TI. Root public DESIGN.md and sidecar explicitly exclude this route and are preserved."
+    },
+    "colorMeta": {
+      "terminal-orange": { "role": "primary", "displayName": "Naranja terminal", "tonalRamp": ["oklch(15% .06 55)", "oklch(26% .06 55)", "oklch(38% .06 55)", "oklch(49% .06 55)", "oklch(61% .06 55)", "oklch(72% .06 55)", "oklch(84% .06 55)", "oklch(95% .06 55)"] },
+      "terminal-bright": { "role": "primary", "displayName": "Naranja iluminado", "tonalRamp": ["oklch(15% .06 60)", "oklch(26% .06 60)", "oklch(38% .06 60)", "oklch(49% .06 60)", "oklch(61% .06 60)", "oklch(72% .06 60)", "oklch(84% .06 60)", "oklch(95% .06 60)"] },
+      "terminal-muted": { "role": "primary", "displayName": "Naranja atenuado", "tonalRamp": ["oklch(15% .06 60)", "oklch(26% .06 60)", "oklch(38% .06 60)", "oklch(49% .06 60)", "oklch(61% .06 60)", "oklch(72% .06 60)", "oklch(84% .06 60)", "oklch(95% .06 60)"] },
+      "terminal-line": { "role": "primary", "displayName": "Naranja de estructura", "tonalRamp": ["oklch(15% .06 50)", "oklch(26% .06 50)", "oklch(38% .06 50)", "oklch(49% .06 50)", "oklch(61% .06 50)", "oklch(72% .06 50)", "oklch(84% .06 50)", "oklch(95% .06 50)"] },
+      "detail-line": { "role": "primary", "displayName": "Línea de detalle", "tonalRamp": ["oklch(15% .04 55)", "oklch(26% .04 55)", "oklch(38% .04 55)", "oklch(49% .04 55)", "oklch(61% .04 55)", "oklch(72% .04 55)", "oklch(84% .04 55)", "oklch(95% .04 55)"] },
+      "terminal-black": { "role": "neutral", "displayName": "Negro terminal", "tonalRamp": ["oklch(15% 0 0)", "oklch(26% 0 0)", "oklch(38% 0 0)", "oklch(49% 0 0)", "oklch(61% 0 0)", "oklch(72% 0 0)", "oklch(84% 0 0)", "oklch(95% 0 0)"] },
+      "frame-black": { "role": "neutral", "displayName": "Negro cálido de marco", "tonalRamp": ["oklch(15% .01 60)", "oklch(26% .01 60)", "oklch(38% .01 60)", "oklch(49% .01 60)", "oklch(61% .01 60)", "oklch(72% .01 60)", "oklch(84% .01 60)", "oklch(95% .01 60)"] },
+      "portrait-black": { "role": "neutral", "displayName": "Negro de retrato", "tonalRamp": ["oklch(15% .01 50)", "oklch(26% .01 50)", "oklch(38% .01 50)", "oklch(49% .01 50)", "oklch(61% .01 50)", "oklch(72% .01 50)", "oklch(84% .01 50)", "oklch(95% .01 50)"] }
+    },
+    "tonalRampNotes": "Synthesized dark-to-light same-hue/same-chroma panel previews only. The implementation has no tonal scales; these ramps are not application tokens. Exact implemented colors remain normative in DESIGN.md frontmatter.",
+    "typographyMeta": {
+      "body": { "displayName": "Terminal body", "purpose": "Base Cascadia Code voice; the route loads weights 400, 500 and 600 with next/font/google." },
+      "code": { "displayName": "JavaScript stream", "purpose": "Responsive source display with line wrapping; mobile is 12px/1.6." },
+      "dialog-title": { "displayName": "Window title", "purpose": "Information-dialog headings; mobile is 17px." },
+      "profile-name": { "displayName": "Member name", "purpose": "Ready member names; desktop directory uses 13px." },
+      "navigation": { "displayName": "Footer menu", "purpose": "Persistent menu controls; mobile is 11px." },
+      "frame-label": { "displayName": "Profile state", "purpose": "PROFILE number and BUILDING/READY labels." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "caret-blink", "value": "cursor 1.1s steps(2, end) infinite", "purpose": "Caret blinks at rest; animation is disabled with prefers-reduced-motion." },
+      { "name": "manual-queue", "value": "Keyboard: 3 characters immediately per permitted key; wheel/touch/Codificar: 1 character/setTimeout tick, 30ms, maximum 160 pending", "purpose": "Keyboard cancels the pending timed queue and synchronizes state immediately; faster typing produces faster code and stopping keyboard input stops keyboard output. Wheel queues 12–90 characters, touch up to 60 and Codificar 120, including reduced motion; the timed 160-character bound represents about 4.8 seconds. Queue clears on cycle completion; clearTimeout cancels the timer on unmount." }
+    ],
+    "breakpoints": [
+      { "name": "compact-desktop", "value": "1000px" },
+      { "name": "mobile", "value": "600px" }
+    ],
+    "snippetNotes": "TI tokens live on a route-scoped CSS module container, not :root. Snippets therefore resolve tokens to literal CSS and use a self-contained black canvas. They illustrate component appearance without the React queue, native showModal lifecycle, member database or image loading. No command input or chip component exists in this surface."
+  },
+  "components": [
+    {
+      "name": "Codificar",
+      "kind": "button",
+      "refersTo": "terminal-action",
+      "description": "Textual manual-input action; the application adds source and returns focus to the canvas.",
+      "html": "<div class=\"ds-action-canvas\"><button class=\"ds-action\" type=\"button\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m16 18 6-6-6-6M8 6l-6 6 6 6m6-16-4 20\"/></svg>Codificar</button></div>",
+      "css": ".ds-action-canvas{background:#000;padding:18px}.ds-action{display:inline-flex;align-items:center;gap:8px;padding:5px 0;border:0;border-radius:0;background:transparent;color:#ff9a45;font:400 12px \"Cascadia Code\",\"Cascadia Mono\",monospace;cursor:pointer}.ds-action:hover{color:#ffb675;text-decoration:underline;text-underline-offset:4px}.ds-action:focus-visible{outline:2px solid #ffb675;outline-offset:4px}"
+    },
+    {
+      "name": "Menú TI",
+      "kind": "nav",
+      "refersTo": "terminal-action",
+      "description": "Persistent footer with information controls and a link back to HOME.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Menú del área de TI\"><a href=\"/\">Inicio</a><button type=\"button\">Área TI</button><button type=\"button\">Funciones</button><button type=\"button\">Subáreas</button><button type=\"button\">Equipo <span>16</span></button><button type=\"button\">Ayuda</button></nav>",
+      "css": ".ds-nav{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(15px,2.2vw,38px);background:#000;border-top:1px solid #8e4c22;padding:10px 18px}.ds-nav a,.ds-nav button{display:inline-flex;align-items:center;gap:8px;padding:5px 0;border:0;border-radius:0;background:transparent;color:#ff9a45;font:400 12px \"Cascadia Code\",\"Cascadia Mono\",monospace;text-decoration:none;white-space:nowrap;cursor:pointer}.ds-nav span{font-size:9px;color:#c88650}.ds-nav a:hover,.ds-nav button:hover{color:#ffb675;text-decoration:underline;text-underline-offset:4px}.ds-nav a:focus-visible,.ds-nav button:focus-visible{outline:2px solid #ffb675;outline-offset:4px}@media(max-width:600px){.ds-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px 9px;padding:8px 12px}.ds-nav a,.ds-nav button{justify-content:center;min-height:28px;font-size:11px;gap:5px}}"
+    },
+    {
+      "name": "Enlace de red social",
+      "kind": "button",
+      "refersTo": "social-link",
+      "description": "One of eight existing LinkedIn/GitHub links across four members, visible and keyboard-accessible when that profile is ready. A render allowlist excludes Instagram, including future data.",
+      "html": "<div class=\"ds-social-canvas\"><a class=\"ds-social\" href=\"https://github.com/Elder9DC\" target=\"_blank\" rel=\"noopener noreferrer\" aria-label=\"GitHub de De La Cruz Calderón, Elder Eli\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M9 19c-4.3 1.3-4.3-2.2-6-2.7m12 5v-3.9a3.4 3.4 0 0 0-.9-2.7c3-.3 6.2-1.5 6.2-6.9a5.4 5.4 0 0 0-1.5-3.8 5 5 0 0 0-.1-3.7S17.5.9 15 2.7a13.3 13.3 0 0 0-7 0C5.5.9 4.3 1.3 4.3 1.3a5 5 0 0 0-.1 3.7 5.4 5.4 0 0 0-1.5 3.8c0 5.4 3.2 6.6 6.2 6.9A3.4 3.4 0 0 0 8 18.4v3.9\"/></svg><svg width=\"10\" height=\"10\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M7 17 17 7M7 7h10v10\"/></svg></a></div>",
+      "css": ".ds-social-canvas{background:#080502;padding:18px}.ds-social{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-width:28px;min-height:28px;border:1px solid #59331b;color:#ff9a45}.ds-social:hover{background:#ff9a45;color:#000}.ds-social:focus-visible{outline:2px solid #ffb675;outline-offset:4px}"
+    },
+    {
+      "name": "Marco de integrante",
+      "kind": "card",
+      "refersTo": "profile-frame",
+      "description": "Angular member frame, visible from first input: scan progress is completed lines plus current-line fraction, divided by four and capped at one. Full photo, name and allowed links appear within four lines; original photo colors and orange borders remain. This snippet shows the title and career without embedding a replacement portrait.",
+      "html": "<div class=\"ds-profile-canvas\"><article class=\"ds-profile\"><div class=\"ds-frame-label\"><span>PROFILE_01</span><span>READY</span></div><div class=\"ds-portrait\" aria-label=\"El componente de aplicación carga el retrato real\"></div><div class=\"ds-profile-info\"><h3>De La Cruz Calderón, Elder Eli</h3><p>Informática · Director</p></div></article></div>",
+      "css": ".ds-profile-canvas{background:#000;padding:18px}.ds-profile{position:relative;max-width:240px;min-width:0;border:1px solid #c57434;background:#080502;padding:8px;color:#ff9a45;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));font:400 14px \"Cascadia Code\",monospace}.ds-profile:before{content:'';position:absolute;left:0;top:0;width:25px;height:2px;background:#ff9a45}.ds-frame-label{display:flex;justify-content:space-between;gap:5px;font-size:9px;letter-spacing:.03em;padding:2px 0 8px;color:#c88650}.ds-portrait{width:100%;aspect-ratio:4/5;background:#050302}.ds-profile-info{padding:10px 2px 4px}.ds-profile h3{font:500 12px/1.5 \"Cascadia Code\",monospace;margin:0;color:#ffb675;overflow-wrap:anywhere}.ds-profile p{font-size:11px;line-height:1.45;margin:5px 0 0;color:#c88650}@media(max-width:600px){.ds-portrait{aspect-ratio:1.05}}"
+    },
+    {
+      "name": "Ventana informativa",
+      "kind": "custom",
+      "refersTo": "dialog",
+      "description": "Flat black information window; native modal lifecycle and Escape handling live in the application.",
+      "html": "<section class=\"ds-dialog\" aria-labelledby=\"ds-dialog-title\"><div class=\"ds-dialog-heading\"><h2 id=\"ds-dialog-title\">Nuestras subáreas</h2><button type=\"button\" aria-label=\"Cerrar ventana\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m18 6-12 12M6 6l12 12\"/></svg></button></div><div class=\"ds-dialog-content\"><p>Tres subáreas conectadas por el mismo propósito.</p><ol><li>Interfaces</li><li>Sistemas y backend</li><li>Datos</li></ol></div><button class=\"ds-close-text\" type=\"button\">Cerrar [ESC]</button></section>",
+      "css": ".ds-dialog{max-width:570px;padding:25px;border:1px solid #ff9a45;border-radius:0;background:#000;color:#ff9a45;font:400 14px/1.65 \"Cascadia Code\",monospace}.ds-dialog-heading{display:flex;align-items:start;justify-content:space-between;gap:25px;padding-bottom:20px;border-bottom:1px solid #59331b}.ds-dialog h2{margin:0;font:600 19px/1.4 \"Cascadia Code\",monospace;color:#ffb675}.ds-dialog button{color:inherit;border:0;background:transparent;cursor:pointer}.ds-dialog-heading button{display:inline-flex;flex-shrink:0;padding:3px}.ds-dialog-content{padding-top:18px}.ds-dialog p{margin:0 0 19px}.ds-dialog ol{padding-left:24px}.ds-dialog li{padding-left:8px;margin-top:23px;color:#ffb675}.ds-close-text{display:block;margin-left:auto;padding:8px 0 0;font:inherit}.ds-close-text:hover{text-decoration:underline}.ds-dialog button:focus-visible{outline:2px solid #ffb675;outline-offset:4px}@media(max-width:600px){.ds-dialog{padding:18px;font-size:13px}.ds-dialog h2{font-size:17px}}"
+    },
+    {
+      "name": "Flujo de código",
+      "kind": "custom",
+      "description": "Unhighlighted orange JavaScript with a stepped caret; source text progresses only through visitor input in the application.",
+      "html": "<div class=\"ds-code\"><pre>// SEDIPRO UNT | Information Technology\nconst profiles = new Map();\n<span class=\"ds-caret\" aria-hidden=\"true\">▋</span></pre></div>",
+      "css": ".ds-code{background:#000;color:#ff9a45;padding:12px 15px 24px;font:400 14px \"Cascadia Code\",\"Cascadia Mono\",monospace}.ds-code pre{font:inherit;font-size:clamp(12px,1vw,16px);line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;tab-size:2}.ds-caret{display:inline-block;color:#ffb675;animation:ds-cursor 1.1s steps(2,end) infinite}@keyframes ds-cursor{50%{opacity:0}}@media(max-width:600px){.ds-code{padding:10px 12px}.ds-code pre{font-size:12px;line-height:1.6}}@media(prefers-reduced-motion:reduce){.ds-caret{animation:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "HackerTyper: construir el equipo con código",
+    "overview": "Una terminal negra y naranja donde cada acción del visitante escribe JavaScript y revela personas reales del área de TI. El usuario fijó expresamente HackerTyper, Cascadia Code, el lienzo inicial vacío y los marcos angulares de retrato. La densidad, el monoespaciado y la geometría tecnológica forman parte de esa elección; no se suavizan para imitar el sitio editorial público.\n\nEste mundo se limita a `/tecnologias-de-la-informacion` y a `src/components/ti-terminal`. La documentación raíz de diseño excluye TI de forma explícita y permanece vigente para sus propias rutas. La paleta y tipografía públicas conservan su alcance; estos tokens no se declaran en `:root`. La estrategia, los hechos y la evidencia de esta superficie están en [su ficha](../../../.impeccable/surfaces/ti-terminal.md).",
+    "keyCharacteristics": [
+      "Negro continuo, código naranja y jerarquía por intensidad del mismo acento.",
+      "Cascadia Code en código, navegación, perfiles y ventanas.",
+      "Retratos reales con recorte angular y revelado ligado a la entrada del visitante.",
+      "Menú español permanente y directorio completo accesible sin completar la interacción."
+    ],
+    "rules": [
+      { "name": "The TI Boundary Rule", "body": "Aplicar este mundo únicamente a la ruta TI y a sus componentes; no trasladar sus tokens a la raíz global ni a otras rutas.", "section": "colors" },
+      { "name": "The Input Owns Progress Rule", "body": "El código y los perfiles avanzan solo al consumir entrada del visitante; nunca añadir escritura de demostración por tiempo o inactividad.", "section": "components" }
+    ],
+    "dos": [
+      "Do mantener esta identidad y sus variables dentro de la ruta TI.",
+      "Do conservar Cascadia Code, negro y naranja como elección explícita del usuario para TI.",
+      "Do mantener el menú español y el directorio completo disponibles desde el inicio.",
+      "Do vincular la escritura y el revelado de perfiles a la misma entrada manual.",
+      "Do conservar retratos reales, nombres, carreras y enlaces de la fuente de integrantes."
+    ],
+    "donts": [
+      "Don't aplicar estos tokens a HOME, proyectos, nosotros, login, panel o eventos.",
+      "Don't añadir escritura automática, shader o un campo de comandos ficticio.",
+      "Don't ocultar integrantes del directorio Equipo por no haber completado la ronda.",
+      "Don't sustituir los marcos angulares ni el monoespaciado por advertencias genéricas contra esos recursos: aquí son decisiones fijadas por el usuario."
+    ]
+  }
+}

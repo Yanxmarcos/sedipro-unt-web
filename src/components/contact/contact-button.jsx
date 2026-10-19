@@ -4,6 +4,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { Check, Copy, Mail } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { copyToClipboard } from "@/lib/copy-to-clipboard";
 
 const EMAIL = "sedipro@unitru.edu.pe";
 const EASE = [0.22, 1, 0.36, 1];
@@ -24,23 +25,9 @@ export function ContactButton() {
   }, []);
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(EMAIL);
+    if (await copyToClipboard(EMAIL)) {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1600);
-    } catch {
-      const ta = document.createElement("textarea");
-      ta.value = EMAIL;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        document.execCommand("copy");
-        setCopied(true);
-        window.setTimeout(() => setCopied(false), 1600);
-      } catch {}
-      document.body.removeChild(ta);
     }
   };
 

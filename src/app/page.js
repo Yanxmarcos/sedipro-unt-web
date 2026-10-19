@@ -1,51 +1,27 @@
-// src/app/page.jsx
+import { PublicHero } from "@/components/public-site/hero";
+import { ScrollStory } from "@/components/public-site/motion";
+import { EditorialBands } from "@/components/public-site/sequences";
+import { HomeGoals, HomeFooterFrame } from "@/components/public-site/home-institutional";
+import { HomeApproach } from "@/components/public-site/home-approach";
+import { ProjectJourney } from "@/components/public-site/project-journey";
+import { PublicFooter } from "@/components/public-site/footer";
+import { ElasticSection } from "@/components/public-site/elastic-section";
+import { pageMetadata } from "@/lib/seo.mjs";
+import { StructuredData } from "@/components/seo/structured-data";
 
-import { ContactCard } from "@/components/contact/contact-card";
-import { Hero } from "@/components/hero/hero";
-import { Projects } from "@/components/projects/projects";
-import { Heart } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-
-export const metadata = {
-  title:
-    "SEDIPRO UNT | Sección Estudiantil de Dirección de Proyectos de la UNT",
-  description:
-    "Sección Estudiantil de Dirección de Proyectos de la Universidad Nacional de Trujillo",
-};
+export const metadata = pageMetadata("/");
 
 export default function HomePage() {
   return (
-    <main id="main-content" className="flex flex-1 flex-col gap-20 sm:gap-10">
-      <Hero />
-      <Projects withHeadline viewMoreVisible />
-
-      <ContactCard />
-
-      <div className="h-12 sm:h-16">
-        <div className="flex items-center justify-center gap-1.5 text-xs text-foreground">
-          <span>Hecho con</span>
-          <Heart className="h-3 w-3 text-orange-500 fill-orange-500 animate-pulse" />
-          <span>por</span>
-          <Link
-            href="/tecnologias-de-la-informacion"
-            className="focus-ring group inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 transition-colors hover:bg-foreground/5"
-          >
-            <span className="font-semibold text-orange-400 transition-colors group-hover:text-orange-300">
-              Área de TI
-            </span>
-            <span className="relative h-5 w-5 overflow-hidden">
-              <Image
-                alt="Logo Área de TI SEDIPRO"
-                width={20}
-                height={20}
-                className="object-cover transition-transform duration-300 group-hover:scale-110"
-                src="/img/area-ti.png"
-              />
-            </span>
-          </Link>
-        </div>
-      </div>
+    <main id="main-content">
+      <StructuredData path="/" />
+      <PublicHero />
+      <div id="historia"><ElasticSection surface="#29295d" previous="#fbfaf7" revealBackground pronounced><ScrollStory /></ElasticSection></div>
+      <ElasticSection surface="#304d90" previous="#29295d" revealBackground pronounced clearPrevious><ProjectJourney /></ElasticSection>
+      <ElasticSection surface="#304d90" previous="#f6f1fa" joined revealBackground><HomeApproach /></ElasticSection>
+      <ElasticSection surface="#f6f1fa" previous="#141020" paper joined><HomeGoals /></ElasticSection>
+      <ElasticSection surface="#f6f1fa" previous="#f6f1fa" paper><EditorialBands closing /></ElasticSection>
+      <ElasticSection surface="#141020" previous="#f6f1fa" revealBackground pronounced><HomeFooterFrame><PublicFooter socialShowcase /></HomeFooterFrame></ElasticSection>
     </main>
   );
 }

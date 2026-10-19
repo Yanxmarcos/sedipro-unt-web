@@ -1,0 +1,426 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-14T22:14:00Z",
+  "developmentOnly": true,
+  "scope": [
+    "/",
+    "/proyectos",
+    "/nosotros",
+    "/login"
+  ],
+  "pathBase": "frontend/",
+  "statement": "Original raster assets retained; user-supplied local JPG copied unchanged. HOME preserves institutional cover and ScrollStory before the added ProjectJourney photo/video collage. CSS windows, transforms and masks preserve source image pixels.",
+  "originAndLicensing": "Original creation, creator and licensing details are not asserted by this inventory.",
+  "referenceEvidence": {
+    "liveReference": "https://www.newformcap.com/",
+    "extraction": "C:/Users/Marcos/Downloads/DESIGN.md",
+    "status": "Composition and motion reference evidence only; neither source supplies shipping raster assets or SEDIPRO brand instructions."
+  },
+  "assets": [
+    {
+      "path": "public/logo_blanco.png",
+      "publicUrl": "/logo_blanco.png",
+      "role": "brand",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/360pm/acerca-de.webp",
+      "publicUrl": "/360pm/acerca-de.webp",
+      "role": "documentary-photo",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/crown-night/todos1.webp",
+      "publicUrl": "/crown-night/todos1.webp",
+      "role": "documentary-photo",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/360pm/impacto.webp",
+      "publicUrl": "/360pm/impacto.webp",
+      "role": "documentary-photo",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/proyectos/sedichampions.webp",
+      "publicUrl": "/proyectos/sedichampions.webp",
+      "role": "project-poster",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/proyectos/crown-night.webp",
+      "publicUrl": "/proyectos/crown-night.webp",
+      "role": "project-poster",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/proyectos/sedinvita1.webp",
+      "publicUrl": "/proyectos/sedinvita1.webp",
+      "role": "project-poster",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/proyectos/proyectando_v.webp",
+      "publicUrl": "/proyectos/proyectando_v.webp",
+      "role": "project-poster",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/proyectos/proyectando2.webp",
+      "publicUrl": "/proyectos/proyectando2.webp",
+      "role": "project-poster",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/proyectos/proyectando.webp",
+      "publicUrl": "/proyectos/proyectando.webp",
+      "role": "project-poster",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/directiva/mafer.webp",
+      "publicUrl": "/img/directiva/mafer.webp",
+      "role": "team-portrait",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/directiva/celine.webp",
+      "publicUrl": "/img/directiva/celine.webp",
+      "role": "team-portrait",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/directiva/jose.webp",
+      "publicUrl": "/img/directiva/jose.webp",
+      "role": "team-portrait",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/directiva/caspito.webp",
+      "publicUrl": "/img/directiva/caspito.webp",
+      "role": "team-portrait",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/directiva/abel.webp",
+      "publicUrl": "/img/directiva/abel.webp",
+      "role": "team-portrait",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/directiva/elder.webp",
+      "publicUrl": "/img/directiva/elder.webp",
+      "role": "team-portrait",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/directiva/cielo.webp",
+      "publicUrl": "/img/directiva/cielo.webp",
+      "role": "team-portrait",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/areas/logo-gth.webp",
+      "publicUrl": "/img/areas/logo-gth.webp",
+      "role": "area-logo",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/areas/logo-pmo.webp",
+      "publicUrl": "/img/areas/logo-pmo.webp",
+      "role": "area-logo",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/areas/logo-mkt.webp",
+      "publicUrl": "/img/areas/logo-mkt.webp",
+      "role": "area-logo",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/areas/logo-ltk.webp",
+      "publicUrl": "/img/areas/logo-ltk.webp",
+      "role": "area-logo",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/areas/logo-ti.webp",
+      "publicUrl": "/img/areas/logo-ti.webp",
+      "role": "area-logo",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/hito-pet/hito-sprites-v2.webp",
+      "publicUrl": "/img/hito-pet/hito-sprites-v2.webp",
+      "role": "preserved-hito-animation",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/hito-pet/hito-rig-v9.webp",
+      "publicUrl": "/img/hito-pet/hito-rig-v9.webp",
+      "role": "preserved-hito-animation",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/hito6.webp",
+      "publicUrl": "/img/hito6.webp",
+      "role": "preserved-login-illustration",
+      "provenance": "pre-existing repository asset, reused without alteration"
+    },
+    {
+      "path": "public/img/institutional/portada.jpg",
+      "publicUrl": "/img/institutional/portada.jpg",
+      "role": "home-institutional-cover",
+      "provenance": "Institutional cover edited and supplied by the user as portada.jpg. Creator and licensing not asserted.",
+      "currentUsage": "Current HOME opening in PublicHero, before ScrollStory and ProjectJourney."
+    },
+    {
+      "path": "public/img/institutional/brochure/ejes-ods.webp",
+      "publicUrl": "/img/institutional/brochure/ejes-ods.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/encuentro-pmi-2023.webp",
+      "publicUrl": "/img/institutional/brochure/encuentro-pmi-2023.webp",
+      "role": "historical-documentary-photo",
+      "provenance": "Cropped from page 10 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-1.webp",
+      "publicUrl": "/img/institutional/brochure/ods-1.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-10.webp",
+      "publicUrl": "/img/institutional/brochure/ods-10.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-11.webp",
+      "publicUrl": "/img/institutional/brochure/ods-11.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-13.webp",
+      "publicUrl": "/img/institutional/brochure/ods-13.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-14.webp",
+      "publicUrl": "/img/institutional/brochure/ods-14.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-15.webp",
+      "publicUrl": "/img/institutional/brochure/ods-15.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-16.webp",
+      "publicUrl": "/img/institutional/brochure/ods-16.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-17.webp",
+      "publicUrl": "/img/institutional/brochure/ods-17.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-2.webp",
+      "publicUrl": "/img/institutional/brochure/ods-2.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-3.webp",
+      "publicUrl": "/img/institutional/brochure/ods-3.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-4.webp",
+      "publicUrl": "/img/institutional/brochure/ods-4.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-5.webp",
+      "publicUrl": "/img/institutional/brochure/ods-5.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-7.webp",
+      "publicUrl": "/img/institutional/brochure/ods-7.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-8.webp",
+      "publicUrl": "/img/institutional/brochure/ods-8.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/brochure/ods-9.webp",
+      "publicUrl": "/img/institutional/brochure/ods-9.webp",
+      "role": "institutional-sdg-artwork",
+      "provenance": "Cropped from page 11 of the user-supplied BROUCHURE SEDIPRO 2024.pdf; no generated pixels.",
+      "source": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/img/institutional/collage/gala-2026.webp",
+      "publicUrl": "/img/institutional/collage/gala-2026.webp",
+      "role": "home-polaroid",
+      "provenance": "Public Instagram album photograph downloaded unchanged through browser media control; CSS window shows photo region only.",
+      "origin": "https://www.instagram.com/p/Dc2HcAxlfJX/?img_index=3",
+      "width": 1080,
+      "height": 1350,
+      "displayCrop": [
+        92,
+        581,
+        449,
+        586
+      ],
+      "dateNote": "Current application caption says 2026; inventory does not independently assert photograph capture date."
+    },
+    {
+      "path": "public/img/institutional/collage/reunion-general-2025.jpg",
+      "publicUrl": "/img/institutional/collage/reunion-general-2025.jpg",
+      "role": "home-polaroid-main",
+      "provenance": "User-supplied photograph copied unchanged; entire 4:3 photograph displayed using Next Image.",
+      "origin": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/FOTOS/GALERÍA DE FOTOS_SEDIPRO_10.05.2025/REUNIÓN GENERAL 10-05/IMG_0188 2.JPG",
+      "width": 5712,
+      "height": 4284
+    },
+    {
+      "path": "public/img/institutional/collage/reunion-general-2025.mp4",
+      "publicUrl": "/img/institutional/collage/reunion-general-2025.mp4",
+      "role": "home-video-polaroid",
+      "provenance": "User-supplied MOV transcoded locally using existing ffmpeg 7.1, H264 CRF24 1280x720 AAC96k faststart, container metadata removed, full clip retained.",
+      "origin": "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/FOTOS/GALERÍA DE FOTOS_SEDIPRO_10.05.2025/REUNIÓN GENERAL 10-05/IMG_0417 2.MOV",
+      "width": 1280,
+      "height": 720,
+      "durationSeconds": 6.453,
+      "bytes": 1997206,
+      "sourceDurationSeconds": 6.435
+    },
+    {
+      "path": "public/img/institutional/collage/reunion-general-2025-poster.jpg",
+      "publicUrl": "/img/institutional/collage/reunion-general-2025-poster.jpg",
+      "role": "video-poster",
+      "provenance": "Frame extracted locally at second 1 from the user-supplied meeting video, not generated artwork.",
+      "origin": "IMG_0417 2.MOV, user-supplied local video",
+      "width": 1280,
+      "height": 720
+    }
+  ],
+  "instagramRecognitions": [
+    {
+      "path": "public/img/institutional/recognitions/voluntariado-2024.webp",
+      "source": "https://www.instagram.com/p/DD-NlilPET9/",
+      "width": 1080,
+      "height": 1080,
+      "bytes": 147684
+    },
+    {
+      "path": "public/img/institutional/recognitions/concepmi-2025.webp",
+      "source": "https://www.instagram.com/p/DRVluTljUpT/",
+      "width": 864,
+      "height": 1080,
+      "bytes": 163764
+    },
+    {
+      "path": "public/img/institutional/recognitions/ipmc-2025.webp",
+      "source": "https://www.instagram.com/p/DVj7gglk3OH/",
+      "width": 1080,
+      "height": 1350,
+      "bytes": 248016
+    }
+  ],
+  "instagramRecognitionsNote": "Original public institutional artworks downloaded from three user-supplied posts. Original files retained without pixel edits. Current ScrollStory uses full object-fit contain artwork; current ProjectJourney uses CSS photo-region windows for CONCEPMI [122,248,620,317] and IPMC [210,286,650,385]. Creation and licensing not asserted. IPMC artwork published in March 2026 documents the 2025 event.",
+  "projectJourneyArtwork": [
+    {
+      "path": "public/img/hito4.webp",
+      "width": 911,
+      "height": 944,
+      "hasAlpha": true,
+      "role": "presenting"
+    },
+    {
+      "path": "public/img/hito5.webp",
+      "width": 1000,
+      "height": 1080,
+      "hasAlpha": true,
+      "role": "thinking"
+    },
+    {
+      "path": "public/img/hito2.webp",
+      "width": 1080,
+      "height": 1080,
+      "hasAlpha": true,
+      "role": "celebrating"
+    },
+    {
+      "path": "public/img/hito6.webp",
+      "width": 1080,
+      "height": 1080,
+      "hasAlpha": true,
+      "role": "welcoming"
+    }
+  ],
+  "projectJourneyArtworkNote": "Historical ProjectJourney used pre-existing user-supplied Hito images byte-for-byte; metadata verified with sharp. These large Hito images remain reusable but are no longer mounted in the current local collage section. The small roaming Hito mascot is unchanged. MindMarket supplies composition/motion reference, not shipping raster artwork.",
+  "preservedNonRaster": [
+    "public/favicon.svg",
+    "public/img/hito-pet/hito.json",
+    "src/assets/svg/logo.tsx"
+  ],
+  "nonRasterNote": "Listed separately for context; raster provenance status does not assert their original creation or licensing.",
+  "collageNonRaster": {
+    "wind": "Original geometric SVG paths in project-journey.jsx, inspired by user wind/linework reference.",
+    "plane": "Lucide Send, strokeWidth 1; no external Hairline runtime copied.",
+    "originalLicensing": "No raster creation or external licensing inferred by this inventory."
+  }
+}

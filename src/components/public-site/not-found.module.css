@@ -1,0 +1,25 @@
+.hero { position: relative; isolation: isolate; display: flex; flex-direction: column; min-height: 100svh; padding: 150px 4vw 70px; background: #29295d; color: #f6f1fa; overflow: hidden; }
+.wordmark { position: absolute; inset: -6% -2% 0; z-index: -1; display: flex; flex-direction: column; justify-content: space-between; color: #f6f1fa; opacity: .055; pointer-events: none; user-select: none; }
+.wordmark span:first-child { font-family: var(--font-story-sans), sans-serif; font-size: 28vw; font-weight: 700; line-height: .95; letter-spacing: -.03em; }
+.wordmark span:last-child { align-self: flex-end; font-family: var(--font-story-sans), sans-serif; font-size: 35vw; font-weight: 700; line-height: .8; }
+.center { display: flex; flex: 1; min-height: 380px; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px 0 65px; }
+.center h1 { margin: 0; font-family: var(--font-story-sans), sans-serif; font-size: clamp(160px,20vw,340px); line-height: .95; font-weight: 650; letter-spacing: -.035em; }
+.center p { margin: 28px 0 0; font-family: var(--font-story-sans), sans-serif; font-size: clamp(24px,2.6vw,42px); font-weight: 550; line-height: 1.2; letter-spacing: -.025em; }
+.bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 36px; }
+.bottom h2 { margin: 0 0 20px; font-size: clamp(19px,1.4vw,25px); line-height: 1.3; font-weight: 650; }
+.bottom p { margin: 0; font-size: 16px; line-height: 1.6; }
+.returnLink { display: inline-flex; align-items: center; justify-content: space-between; flex-shrink: 0; min-height: 62px; min-width: 230px; gap: 30px; padding: 18px 26px; border-radius: 5px; background: #e2bcf1; color: #141020; text-transform: uppercase; font-size: 12px; font-weight: 750; }
+.returnLink:hover { background: #efdbf7; }
+@media(max-width:767px) {
+  .hero { padding: 115px 24px 65px; }
+  .wordmark { inset: 14% -4% 5%; }
+  .wordmark span:first-child { font-size: 30vw; }
+  .wordmark span:last-child { font-size: 65vw; }
+  .center { min-height: 330px; padding: 35px 0 60px; }
+  .center h1 { font-size: clamp(140px,40vw,230px); }
+  .center p { margin-top: 20px; font-size: clamp(23px,6vw,32px); }
+  .bottom { align-items: flex-start; flex-direction: column; gap: 26px; }
+  .bottom h2 { margin-bottom: 12px; }
+  .bottom p { font-size: 14px; }
+  .returnLink { min-height: 54px; min-width: 215px; }
+}

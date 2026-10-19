@@ -1,0 +1,70 @@
+.section { position: relative; padding: 110px 6vw 180px; background: #f6f1fa; color: #29295d; }
+.heading { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; max-width: 1500px; margin: 0 auto 80px; }
+.heading h2 { font-size: clamp(50px,6vw,94px); }
+.heading h2 span { color: #662065; }
+.years { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: 300px; }
+.years button { min-width: 70px; min-height: 44px; border: 1px solid #c3b5d0; border-radius: 6px; color: #304d90; background: transparent; font-size: 14px; }
+.years button:hover, .years button[aria-pressed="true"] { background: #304d90; border-color: #304d90; color: #fff; }
+.section :focus-visible { outline: 3px solid #662065; outline-offset: 5px; }
+.map { position: relative; max-width: 1500px; margin: auto; isolation: isolate; }
+.road { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: visible; }
+.summit { position: absolute; right: -6.8%; bottom: -80px; width: 47%; height: 94%; z-index: -2; pointer-events: none; }
+.mountains { width: 100%; height: 100%; }
+.flagPole { position: absolute; left: 66%; top: -35px; height: 150px; width: 4px; background: #29295d; border-radius: 4px; }
+.flagPole::before { content: ''; position: absolute; top: -5px; left: -3px; width: 10px; height: 10px; border-radius: 50%; background: #29295d; }
+.flag { width: 145px; height: 80px; padding: 18px 16px; background: #304d90; transform-origin: left center; animation: flagWave 3.4s ease-in-out infinite; }
+.flag img { width: 100%; height: 100%; object-fit: contain; filter: brightness(0) invert(1); }
+@keyframes flagWave { 0%,100% { transform: perspective(400px) rotateY(-13deg) skewY(-3deg); clip-path: polygon(0 0,35% 6%,70% 0,100% 8%,100% 100%,65% 92%,30% 100%,0 94%); } 50% { transform: perspective(400px) rotateY(12deg) skewY(3deg); clip-path: polygon(0 4%,30% 0,65% 7%,100% 0,100% 93%,70% 100%,35% 93%,0 100%); } }
+.timeline { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(500px,auto) minmax(290px,auto) minmax(330px,auto); column-gap: 13%; row-gap: 140px; list-style: none; padding: 35px 11% 100px 3%; margin: 0; }
+.year { position: relative; grid-column: var(--year-column); grid-row: var(--year-row); padding-bottom: 90px; scroll-margin: 120px; }
+.yearHeading { display: flex; align-items: center; gap: 22px; width: max-content; max-width: 100%; margin-bottom: 22px; background: #f6f1fa; }
+.yearHeading h3 { font: 550 clamp(36px,3.5vw,54px)/1 var(--font-story-sans),sans-serif; letter-spacing: -.025em; color: #304d90; }
+.pin { position: absolute; bottom: 0; left: 0; width: 60px; height: 60px; flex: 0 0 60px; display: flex; align-items: center; justify-content: center; border: 7px solid #304d90; border-radius: 50% 50% 50% 5px; background: #f6f1fa; color: #304d90; transform: rotate(-45deg); cursor: pointer; transition: background .2s, border-color .2s; }
+.pin svg { transform: rotate(45deg); }
+.pin:hover, .pin[aria-pressed="true"] { border-color: #662065; color: #662065; background: #efdbf7; }
+.achievements { position: relative; list-style: none; padding: 0 0 8px; margin: 0; background: #f6f1fa; }
+.achievements > li { display: grid; grid-template-columns: 18px 1fr; gap: 12px; padding: 0 0 20px; }
+.achievements > li:last-child { padding-bottom: 0; }
+.achievements svg { margin-top: 3px; color: #662065; }
+.achievements h4 { margin: 0; font: 550 clamp(14px,1.25vw,19px)/1.4 var(--font-public-sans),sans-serif; text-wrap: pretty; }
+.achievements p { margin-top: 6px !important; color: #5a567a; font-size: 11px; line-height: 1.4; }
+.year[data-selected] .yearHeading h3 { color: #662065; }
+.mobileRoad { display: none; }
+@media(min-width:900px) {
+  .section { padding: 95px 0 48px; }
+  .heading { display: block; max-width: none; margin: 0 auto 42px; padding: 0 8vw; text-align: left; }
+  .heading h2 { font-size: clamp(48px,5.3vw,94px); }
+  .heading h2 br { display: none; }
+  .years, .map { display: none; }
+}
+@media(min-width:1600px) { .timeline { row-gap: 140px; } }
+@media(max-width:899px) {
+  .section { padding: 90px 24px 40px; }
+  .heading { display: block; margin-bottom: 65px; }
+  .heading h2 { font-size: clamp(42px,7.3vw,64px); overflow-wrap: anywhere; }
+  .years { margin-top: 30px; justify-content: flex-start; max-width: none; gap: 8px; }
+  .years button { min-width: 68px; }
+  .timeline { display: block; padding: 0; }
+  .map { padding-bottom: 340px; }
+  .year { padding: 0 0 70px 80px; }
+  .year:last-child { padding-bottom: 30px; }
+  .yearHeading { min-height: 64px; margin-bottom: 17px; }
+  .yearHeading h3 { font-size: 43px; }
+  .pin { position: absolute; top: 2px; bottom: auto; left: 0; width: 53px; height: 53px; border-width: 6px; }
+  .road { display: none; }
+  .mobileRoad { display: block; position: absolute; top: 40px; left: -8px; width: 68px; height: calc(100% + 2px); pointer-events: none; z-index: -1; }
+  .year:last-child .mobileRoad { display: none; }
+  .achievements h4 { font-size: 15px; line-height: 1.5; }
+  .achievements p { font-size: 11px; }
+  .achievements > li { gap: 9px; padding-bottom: 25px; }
+  .summit { right: 0; bottom: -20px; height: 330px; width: 230px; }
+  .flagPole { height: 90px; width: 3px; top: -20px; }
+  .flag { width: 76px; height: 46px; padding: 8px; }
+}
+@media(max-width:360px) {
+  .section { padding-left: 20px; padding-right: 20px; }
+  .year { padding-left: 66px; }
+  .achievements > li { grid-template-columns: 1fr; gap: 5px; }
+  .achievements h4 { font-size: 14px; }
+}
+@media(prefers-reduced-motion:reduce) { .flag { animation: none; } .pin { transition: none; } }

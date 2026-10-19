@@ -6,7 +6,7 @@
     "scope": "/",
     "display": "standalone",
     "orientation": "portrait-primary",
-    "theme_color": "#1a365d",
+    "theme_color": "#29295d",
     "background_color": "#ffffff",
     "icons": [
         {
@@ -55,16 +55,10 @@
     "categories": ["education", "productivity"],
     "screenshots": [
         {
-            "src": "/og-image.webp",
-            "sizes": "1200x630",
-            "type": "image/webp",
+            "src": "/social/sedipro-unt-seo.jpg",
+            "sizes": "1672x941",
+            "type": "image/jpeg",
             "form_factor": "wide"
-        },
-        {
-            "src": "/og-image.webp",
-            "sizes": "540x720",
-            "type": "image/webp",
-            "form_factor": "narrow"
         }
     ]
 }

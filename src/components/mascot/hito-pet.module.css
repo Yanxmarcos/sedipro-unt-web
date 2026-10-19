@@ -1,0 +1,177 @@
+.root {
+  position: fixed;
+  inset: auto 0 0;
+  height: 0;
+  z-index: 51;
+  pointer-events: none;
+}
+.visuallyHidden { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.actor {
+  position: absolute;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  left: 0;
+  width: 80px;
+  height: 96px;
+  transform: translate3d(72vw, 0, 0);
+}
+
+.pet {
+  position: relative;
+  display: block;
+  width: 80px;
+  height: 96px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 8px;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.actor[data-dragging="true"] .pet { cursor: grabbing; }
+.actor[data-dragging="true"] .bubble,
+.actor[data-dragging="true"]::after,
+.actor[data-floating="true"] .shadow { display: none; }
+
+.pet canvas {
+  display: block;
+  width: 80px;
+  height: 96px;
+  image-rendering: auto;
+}
+
+.pet:focus-visible,
+.bubble button:focus-visible,
+.restore:focus-visible {
+  outline: 2px solid #f3c653;
+  outline-offset: 4px;
+}
+
+.shadow {
+  position: absolute;
+  bottom: 0;
+  left: 22px;
+  width: 38px;
+  height: 4px;
+  background: #080d1c70;
+  clip-path: polygon(10% 0, 90% 0, 90% 25%, 100% 25%, 100% 75%, 90% 75%, 90% 100%, 10% 100%, 10% 75%, 0 75%, 0 25%, 10% 25%);
+}
+
+.bubble {
+  position: absolute;
+  bottom: 108px;
+  left: var(--bubble-left, -92px);
+  width: 264px;
+  box-sizing: border-box;
+  max-height: var(--bubble-max-height, calc(100dvh - 132px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #a58bc8 #1c1830;
+  padding: 14px 16px;
+  color: #faf4ff;
+  background: #1c1830;
+  box-shadow: 0 6px 20px #080c1b55;
+  border: 2px solid #a58bc8;
+  /* A stepped chat bubble belongs to Hito's pixel world. */
+  clip-path: polygon(6px 0, calc(100% - 6px) 0, calc(100% - 6px) 3px, calc(100% - 3px) 3px, calc(100% - 3px) 6px, 100% 6px, 100% calc(100% - 6px), calc(100% - 3px) calc(100% - 6px), calc(100% - 3px) calc(100% - 3px), calc(100% - 6px) calc(100% - 3px), calc(100% - 6px) 100%, 6px 100%, 6px calc(100% - 3px), 3px calc(100% - 3px), 3px calc(100% - 6px), 0 calc(100% - 6px), 0 6px, 3px 6px, 3px 3px, 6px 3px);
+  pointer-events: auto;
+  font-family: var(--font-geist-mono), monospace;
+  animation: appear 160ms steps(3, end);
+}
+
+.actor::after {
+  content: "";
+  position: absolute;
+  bottom: 96px;
+  left: calc(var(--bubble-left, -92px) + var(--bubble-tail, 128px));
+  width: 12px;
+  height: 14px;
+  background: #a58bc8;
+  clip-path: polygon(0 0, 100% 0, 100% 40%, 65% 40%, 65% 70%, 35% 70%, 35% 100%, 0 100%);
+}
+
+.actor:not(:has(.bubble))::after { display: none; }
+.actor[data-bubble-placement="below"] .bubble { bottom: auto; top: 108px; }
+.actor[data-bubble-placement="below"]::after { bottom: auto; top: 96px; transform: scaleY(-1); }
+
+.bubbleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 20px;
+  margin-bottom: 7px;
+}
+
+.name { color: #ffe29a; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.name span { color: #c8b7e0; font-size: 9px; font-weight: 400; }
+.bubble p { margin: 0; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+
+.bubble button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 32px;
+  padding: 5px 7px;
+  color: #faf4ff;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.bubble button:hover { background: #49345f; }
+.bubble button:disabled { opacity: 0.65; cursor: default; }
+.bubbleHeader button { margin: -8px -8px -8px 0; min-width: 32px; }
+.controls { margin-top: 12px; }
+.actions { display: flex; flex-wrap: wrap; gap: 5px; }
+.actions button { background: #332744; padding-inline: 9px; }
+.actions button:hover { background: #574071; }
+.settings { display: flex; justify-content: space-between; border-top: 1px solid #5b4775; margin-top: 12px; padding-top: 8px; }
+.settings button { color: #daccf0; }
+.bubble .returnToBase { width: 100%; margin-top: 5px; color: #ffe29a; }
+.bubble .dragHint { margin-top: 7px; color: #c8b7e0; font-size: 10px; line-height: 1.5; }
+
+.restore {
+  position: fixed;
+  right: 16px;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid #8067a2;
+  border-radius: 5px;
+  background: #1c1830;
+  color: #e8dbf6;
+  font: 11px var(--font-geist-mono), monospace;
+  cursor: pointer;
+}
+
+.restore:hover { background: #332744; }
+.miniEyes { display: inline-flex; gap: 3px; }
+.miniEyes i { display: block; width: 6px; height: 7px; border: 2px solid #faf4ff; background: #8561b3; }
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (pointer: coarse) {
+  .bubble button { min-height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble { animation: none; }
+}
