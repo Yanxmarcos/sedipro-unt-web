@@ -98,7 +98,9 @@ export function HomeGoals() {
       <motion.div ref={track} className={styles.goalsTrack} style={reduced ? undefined : {x}}>
         <article className={styles.goalSlide}>
           <div><h2 id="goals-heading" className={styles.display}>Nuestros ejes<br />temáticos.</h2><p>Una mirada al desarrollo sostenible desde la comunidad universitaria.</p><p>Los Objetivos de Desarrollo Sostenible reúnen desafíos para las personas, el planeta y un futuro compartido. Estos son los objetivos presentes en nuestros ejes temáticos.</p><a href="https://www.un.org/sustainabledevelopment/es/sustainable-development-goals/" target="_blank" rel="noopener noreferrer" className={styles.textLink}>Conoce los ODS <ArrowUpRight size={18} aria-hidden="true" /></a></div>
-          <Image className={styles.goalOverview} src="/img/institutional/brochure/ejes-ods.webp" alt="Ejes temáticos de SEDIPRO UNT: ODS 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16 y 17." width={1064} height={627} sizes="(max-width:767px) 90vw, 47vw" />
+          <div className={styles.goalOverview} role="img" aria-label="Ejes temáticos de SEDIPRO UNT: ODS 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16 y 17.">
+            {HOME_GOALS.map(goal=><Image key={goal.number} src={`/img/institutional/brochure/ods-${goal.number}.webp`} alt="" width={182} height={174} sizes="(max-width:767px) 18vw, 9vw" />)}
+          </div>
         </article>
         {goalGroups.map(group=><article key={group.title} className={styles.goalSlide}><h3 className={styles.display}>{group.title.split('\n').map((line,index)=><span key={line}>{index>0&&<br/>}{line}</span>)}</h3><ul className={styles.goalList}>{group.goals.map(goal=><li key={goal.number}><Image src={`/img/institutional/brochure/ods-${goal.number}.webp`} alt="" width={76} height={76}/><span>{goal.name}</span></li>)}</ul></article>)}
       </motion.div>

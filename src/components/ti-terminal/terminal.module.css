@@ -2,9 +2,9 @@
 .terminal ::selection { background: var(--orange); color: #000; }
 .terminal :focus-visible { outline: 2px solid var(--orange-bright); outline-offset: 4px; }
 .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.canvas { position: relative; display: grid; grid-template-columns: 1fr; min-height: 0; flex: 1; outline: none; overflow: hidden; touch-action: none; }
+.canvas { position: relative; display: grid; grid-template-columns: 1fr; min-height: 0; flex: 1; outline: none; overflow: hidden; }
 .canvas[data-has-profiles] { grid-template-columns: 1.05fr 1fr; }
-.codeViewport { min-height: 0; overflow: hidden; padding: 12px 15px 24px; }
+.codeViewport { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 12px 15px 24px; scrollbar-width: thin; scrollbar-color: var(--orange-line) #000; }
 .codeViewport pre { font: inherit; font-size: clamp(12px, 1vw, 16px); line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; tab-size: 2; }
 .caret { display: inline-block; color: var(--orange-bright); animation: cursor 1.1s steps(2, end) infinite; }
 @keyframes cursor { 50% { opacity: 0; } }

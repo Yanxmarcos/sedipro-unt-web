@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start -p 7000",
     "lint": "eslint",
+    "seo:audit": "node scripts/audit-seo.mjs",
     "test:panel": "playwright test",
     "test:hito": "playwright test --config playwright.hito.config.mjs",
     "test:hito:timing": "node --test tests/mascot/hito-renderer.test.mjs",

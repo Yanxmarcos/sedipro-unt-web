@@ -5,6 +5,7 @@ import { LandingOnly } from "@/components/layout/landing-only";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { PublicPageTransition } from "@/components/page-transition/public-page-transition";
 import "./globals.css";
+import { pageMetadata, SITE_URL } from "@/lib/seo.mjs";
 
 const geist = Geist({
   variable: "--font-geist-sans",
@@ -31,17 +32,17 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title:
-    "SEDIPRO UNT | Sección Estudiantil de Dirección de Proyectos de la UNT",
-  description:
-    "SEDIPRO UNT - Sección Estudiantil de Dirección de Proyectos de la Universidad Nacional de Trujillo (UNT), un equipo multidisciplinario de estudiantes comprometidos con el desarrollo y progreso de la sociedad.",
-  keywords:
-    "SEDIPRO, UNT, Dirección de Proyectos, Universidad Nacional de Trujillo, estudiantes, gestión de proyectos",
+  metadataBase: new URL(SITE_URL),
+  applicationName: "SEDIPRO UNT",
+  ...pageMetadata("/"),
+  // Canonicals belong to each public page, never inherited from the home page.
+  alternates: {},
   authors: [{ name: "SEDIPRO UNT" }],
   creator: "SEDIPRO UNT",
-  robots:
-    "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
-
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION } : undefined,
+  },
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -52,50 +53,8 @@ export const metadata = {
     apple: "/apple-touch-icon.png",
     shortcut: "/favicon.ico",
   },
-
   manifest: "/site.webmanifest",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "SEDIPRO UNT",
-  },
-
-  openGraph: {
-    title: "SEDIPRO UNT",
-    description:
-      "Sección Estudiantil de Dirección de Proyectos de la Universidad Nacional de Trujillo",
-    url: "https://sediprount.org",
-    siteName: "SEDIPRO UNT",
-    images: [
-      {
-        url: "https://sediprount.org/og-image.webp",
-        width: 1200,
-        height: 630,
-        alt: "SEDIPRO UNT - Portada",
-        type: "image/webp",
-      },
-    ],
-    type: "website",
-    locale: "es_PE",
-  },
-
-  twitter: {
-    card: "summary_large_image",
-    title: "SEDIPRO UNT",
-    description: "Sección Estudiantil de Dirección de Proyectos de la UNT",
-    images: ["https://sediprount.org/og-image.webp"],
-    creator: "@SediproUNT",
-    site: "@SediproUNT",
-  },
-
-  metadataBase: new URL("https://sediprount.org"),
-
-  alternates: {
-    canonical: "https://sediprount.org",
-    languages: {
-      "es-PE": "https://sediprount.org",
-    },
-  },
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "SEDIPRO UNT" },
 };
 
 export default function RootLayout({ children }) {

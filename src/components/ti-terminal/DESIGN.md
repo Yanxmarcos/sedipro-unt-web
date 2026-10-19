@@ -81,7 +81,7 @@ components:
 
 **Creative North Star: "HackerTyper: construir el equipo con código"**
 
-Una terminal negra y naranja donde cada acción del visitante escribe JavaScript y revela personas reales del área de TI. El usuario fijó expresamente HackerTyper, Cascadia Code, el lienzo inicial vacío y los marcos angulares de retrato. La densidad, el monoespaciado y la geometría tecnológica forman parte de esa elección; no se suavizan para imitar el sitio editorial público.
+Una terminal negra y naranja escribe JavaScript y revela personas reales del área de TI. El usuario fijó expresamente HackerTyper, Cascadia Code, un inicio con `// Press any key`, la alternancia entre escritura manual y automática, y los marcos angulares de retrato. La densidad, el monoespaciado y la geometría tecnológica forman parte de esa elección; no se suavizan para imitar el sitio editorial público.
 
 Este mundo se limita a `/tecnologias-de-la-informacion` y a `src/components/ti-terminal`. La documentación raíz de diseño excluye TI de forma explícita y permanece vigente para sus propias rutas. La paleta y tipografía públicas conservan su alcance; estos tokens no se declaran en `:root`. La estrategia, los hechos y la evidencia de esta superficie están en [su ficha](../../../.impeccable/surfaces/ti-terminal.md).
 
@@ -142,7 +142,7 @@ Las ventanas corrientes miden hasta (570px), con margen lateral de (20px) y alto
 
 No hay sombras ni shader. El contorno naranja y el negro cálido separan los perfiles. Las ventanas nativas se elevan mediante la capa superior de `dialog` y un backdrop negro translúcido (`#000b`); mantienen el mismo negro y no incorporan vidrio ni desenfoque.
 
-El caret parpadea en pasos (1.1s) y queda estático con movimiento reducido. Cada tecla permitida escribe (3) caracteres de inmediato, cancela la cola temporizada pendiente y se detiene cuando cesa la entrada de teclado; escribir más rápido produce código más rápido, como HackerTyper. Rueda, arrastre táctil y Codificar conservan un carácter por tick de `setTimeout`, con intervalo de (30ms), también con movimiento reducido. Esa cola admite hasta (160) caracteres, aproximadamente (4.8s) pendientes; al desmontar se cancela con `clearTimeout`. No existe escritura por inactividad.
+El caret parpadea en pasos (1.1s) y queda estático con movimiento reducido. Cada tecla permitida escribe (3) caracteres de inmediato y se detiene cuando cesa la entrada de teclado; escribir más rápido produce código más rápido, como HackerTyper. `Codificar` activa una escritura automática rápida de (24) caracteres cada (18ms) y cambia su etiqueta a `Codificar manual`. Cualquier tecla permitida pausa el automático y escribe sus tres caracteres. La rueda, el trackpad y el gesto táctil desplazan los visores de código y perfiles; nunca generan código. Al desmontar o cambiar de modo se cancela el temporizador.
 
 ## Shapes
 
@@ -160,7 +160,7 @@ Los marcos representan integrantes, no categorías de navegación. Aparecen desd
 
 ### Navigation
 
-Menú persistente: Inicio, Área TI, Funciones, Subáreas, Equipo, Ayuda y Codificar. Inicio vuelve a `/`; los cinco botones informativos abren ventanas nativas. La pista inicial de escritorio dice `SCROLL OR PRESS ANY KEY`; después cambia a `TI / SEDIPRO UNT`. A (1000px) o menos la pista se oculta.
+Menú persistente: Inicio, Área TI, Funciones, Subáreas, Equipo, Ayuda y Codificar. Inicio vuelve a `/`; los cinco botones informativos abren ventanas nativas. La pista comunica `PRESS ANY KEY`, el modo manual o el modo automático. A (1000px) o menos la pista se oculta.
 
 ### Dialogs
 
@@ -168,11 +168,11 @@ Ventanas negras con contorno naranja, título iluminado y separación fina. Abre
 
 ### Terminal stream
 
-El lienzo empieza con un caret y sin texto ni perfiles. Las teclas permitidas avanzan directamente tres caracteres; rueda, arrastre táctil y Codificar alimentan la cola temporizada. El código visible es JavaScript significativo en inglés; no ejecuta lo escrito. El estado accesible informa ronda y perfiles construidos sin leer todo el código. La finalización conserva los 16 perfiles hasta la siguiente entrada física; entonces empieza otra ronda y continúa el historial, limitado a (14000) caracteres. El algoritmo recorta por salto de línea cuando puede.
+El lienzo empieza con `// Press any key`, un salto de línea y el caret, sin perfiles. Las teclas permitidas avanzan directamente tres caracteres. Codificar alterna el modo automático; este se detiene al completar los 16 perfiles o al recibir una tecla, y una nueva acción inicia la siguiente ronda. El código visible es JavaScript significativo en inglés; no ejecuta lo escrito. El estado accesible informa ronda, modo y perfiles construidos sin leer todo el código. El historial queda limitado a (14000) caracteres y el algoritmo recorta por salto de línea cuando puede.
 
 ### Named Rules
 
-**The Input Owns Progress Rule.** El código y los perfiles avanzan solo al consumir entrada del visitante; nunca añadir escritura de demostración por tiempo o inactividad.
+**The Chosen Mode Owns Progress Rule.** El código avanza por teclas en manual o por el temporizador explícitamente activado mediante Codificar; nunca comienza automáticamente por tiempo o inactividad.
 
 ## Do's and Don'ts
 
@@ -181,12 +181,12 @@ El lienzo empieza con un caret y sin texto ni perfiles. Las teclas permitidas av
 - **Do** mantener esta identidad y sus variables dentro de la ruta TI.
 - **Do** conservar Cascadia Code, negro y naranja como elección explícita del usuario para TI.
 - **Do** mantener el menú español y el directorio completo disponibles desde el inicio.
-- **Do** vincular la escritura y el revelado de perfiles a la misma entrada manual.
+- **Do** vincular la escritura y el revelado de perfiles al modo elegido por el visitante.
 - **Do** conservar retratos reales, nombres, carreras y enlaces de la fuente de integrantes.
 
 ### Don't:
 
 - **Don't** aplicar estos tokens a HOME, proyectos, nosotros, login, panel o eventos.
-- **Don't** añadir escritura automática, shader o un campo de comandos ficticio.
+- **Don't** iniciar escritura automática sin que el visitante pulse Codificar ni usar el scroll como entrada de código.
 - **Don't** ocultar integrantes del directorio Equipo por no haber completado la ronda.
 - **Don't** sustituir los marcos angulares ni el monoespaciado por advertencias genéricas contra esos recursos: aquí son decisiones fijadas por el usuario.

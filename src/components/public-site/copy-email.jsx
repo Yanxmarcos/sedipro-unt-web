@@ -2,6 +2,7 @@
 
 import { Check, Copy } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import { copyToClipboard } from "@/lib/copy-to-clipboard";
 import { EMAIL } from "./content";
 import styles from "./hero-connections.module.css";
 
@@ -13,12 +14,8 @@ export function CopyEmail() {
 
   async function copy() {
     window.clearTimeout(timer.current);
-    try {
-      await navigator.clipboard.writeText(EMAIL);
-      setStatus("copied");
-    } catch {
-      setStatus("error");
-    }
+    const copied = await copyToClipboard(EMAIL);
+    setStatus(copied ? "copied" : "error");
     timer.current = window.setTimeout(() => setStatus("idle"), 2200);
   }
 

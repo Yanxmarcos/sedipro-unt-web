@@ -53,7 +53,7 @@ const report_${id} = buildProjectReport([
 }
 
 export function initialTerminal() {
-  return { text: "", cycle: 0, index: 0, cursor: 0, total: 0, complete: false };
+  return { text: "// Press any key\n", cycle: 0, index: 0, cursor: 0, total: 0, complete: false };
 }
 
 export function advanceTerminal(previous, amount, members) {
