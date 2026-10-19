@@ -1,0 +1,62 @@
+.focus { position: relative; height: 500svh; color: #f6f1fa; background: #304d90; }
+.stage { position: sticky; top: 0; height: 100svh; overflow: clip; isolation: isolate; }
+.visual { position: absolute; inset: 0; }
+.diagramFrame { position: absolute; width: min(51vw, calc((100svh - 140px) * 800 / 760)); aspect-ratio: 800 / 760; left: 7vw; top: 50%; transform: translateY(-50%); }
+.diagram { width: 100%; transform-origin: 50% 43.4737%; }
+.diagram svg { display: block; width: 100%; height: auto; overflow: visible; }
+.circle { stroke: #f6f1fa30; stroke-width: 1; }
+.circle0 { fill: #29295de8; }
+.circle1 { fill: #304d90eb; }
+.circle2 { fill: #662065e8; }
+.labels { fill: #f6f1fa; font-family: var(--font-public-serif), serif; }
+.label { font-size: 44px; }
+.detail { font-size: 38px; }
+.mergedLabel { fill: #f6f1fa; font-family: var(--font-public-serif), serif; font-size: 40px; }
+.copy { position: absolute; left: 61%; right: 8%; top: 50%; transform: translateY(-50%); }
+.copy h2 { margin: 0; font: 550 clamp(44px, 5vw, 88px)/1.04 var(--font-story-sans), sans-serif; letter-spacing: -.025em; }
+.copy p { max-width: 38ch; margin-top: 32px; font-size: clamp(15px, 1.1vw, 20px); line-height: 1.6; }
+.watchLink { display: inline-flex; align-items: center; gap: 20px; padding: 14px 0; margin-top: 28px; border: 0; border-bottom: 1px solid #f6f1fa80; color: inherit; background: transparent; cursor: pointer; font-size: 14px; }
+.watchLink svg { flex-shrink: 0; }
+.focus a:focus-visible, .focus button:focus-visible, .focus video:focus-visible { outline: 2px solid #fff; outline-offset: 6px; }
+.filmIntro { position: absolute; z-index: 1; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; pointer-events: none; font-size: 14px; letter-spacing: .02em; }
+.filmIntro svg { width: 48px; height: 48px; stroke-width: 1.3; }
+.filmSurface { position: absolute; z-index: 2; inset: 0; pointer-events: none; }
+.film { position: absolute; inset: 0; background: #141020; }
+.film:not([inert]) { pointer-events: auto; }
+.film video { display: block; width: 100%; height: 100%; object-fit: contain; background: #141020; }
+.filmCaption { position: absolute; top: 110px; left: 4vw; display: flex; align-items: center; gap: 18px; font-size: 13px; text-shadow: 0 2px 8px #000; pointer-events: none; }
+.filmCaption > span { padding-left: 18px; border-left: 1px solid #f6f1fa80; }
+.filmLoading, .filmPlay, .filmError { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+.filmLoading { pointer-events: none; padding: 22px 30px; border-radius: 12px; background: #141020d9; font-size: 14px; }
+.filmLoading svg { width: 32px; height: 32px; animation: loading 1s linear infinite; }
+.filmPlay { min-width: 150px; min-height: 110px; padding: 24px; border: 1px solid #f6f1fa80; border-radius: 16px; background: #141020cc; color: #fff; font-size: 14px; cursor: pointer; }
+.filmPlay svg { width: 34px; height: 34px; stroke-width: 1.5; }
+.soundButton { position: absolute; right: 4vw; top: 105px; display: inline-flex; align-items: center; gap: 12px; min-height: 48px; padding: 12px 18px; border: 1px solid #f6f1fa80; border-radius: 12px; background: #141020d9; color: #fff; font-size: 14px; cursor: pointer; }
+.filmContinue { position: absolute; left: 50%; bottom: 76px; transform: translateX(-50%); display: inline-flex; align-items: center; justify-content: center; gap: 16px; min-height: 44px; padding: 10px 18px; border-radius: 12px; background: #141020d9; color: #fff; font-size: 13px; white-space: nowrap; }
+.filmError { width: min(360px, 85%); padding: 28px; border-radius: 16px; background: #141020e8; }
+.filmError button, .filmError a { min-height: 44px; padding: 10px 18px; border: 1px solid #f6f1fa80; border-radius: 8px; background: transparent; color: #fff; }
+@keyframes loading { to { transform: rotate(360deg); } }
+@media (max-width: 767px) {
+  .focus { height: 480svh; }
+  .diagramFrame { width: min(85vw, 45svh); left: 50%; top: 11svh; transform: translateX(-50%); }
+  .copy { left: 24px; right: 24px; top: 60svh; transform: none; }
+  .copy h2 { font-size: clamp(32px, 8vw, 44px); }
+  .copy h2 br { display: none; }
+  .copy p { max-width: 46ch; margin-top: 16px; font-size: 14px; line-height: 1.5; }
+  .watchLink { margin-top: 12px; font-size: 13px; }
+  .filmCaption { left: 24px; right: 24px; top: 100px; font-size: 12px; }
+  .soundButton { top: 145px; right: 24px; font-size: 13px; }
+  .filmContinue { bottom: 72px; font-size: 12px; padding-inline: 14px; }
+}
+@media (max-height: 600px) and (min-width: 768px) {
+  .copy p { margin-top: 18px; font-size: 14px; }
+  .watchLink { margin-top: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .focus { height: auto; }
+  .stage { position: relative; height: auto; overflow: clip; }
+  .visual { position: relative; min-height: 100svh; }
+  .filmSurface { position: relative; height: 100svh; }
+  .filmIntro { display: none; }
+  .filmLoading svg { animation: none; }
+}

@@ -17,6 +17,7 @@
 /playwright.config.mjs
 /test-results/
 /playwright-report/
+/.impeccable/review/
 
 # next.js
 /.next/

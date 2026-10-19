@@ -14,6 +14,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { LoginAccess } from "@/components/public-site/login-access";
 
 const settings = {
   admin: {
@@ -96,6 +97,8 @@ export default function Login({ kind = "admin" }) {
       setLoading(false);
     }
   }
+
+  if (kind === "admin") return <LoginAccess username={username} setUsername={setUsername} password={password} setPassword={setPassword} showPassword={showPassword} setShowPassword={setShowPassword} error={error} loading={loading} onSubmit={handleSubmit} />;
 
   return (
     <div

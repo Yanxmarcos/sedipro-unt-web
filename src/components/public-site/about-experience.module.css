@@ -1,0 +1,157 @@
+.about { color: var(--public-paper); background: var(--public-secondary); }
+.about h1, .about h2, .about h3, .about p { margin: 0; }
+.about h2 { font: 550 clamp(52px, 6.5vw, 104px)/1.02 var(--font-story-sans), sans-serif; letter-spacing: -.035em; }
+.about h2 span { color: var(--public-action); }
+.hero { min-height: 100svh; position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 24px; padding: 130px 12vw; background: var(--public-secondary); }
+.hero h1 { font: 550 clamp(86px, 12.5vw, 210px)/.98 var(--font-story-sans), sans-serif; letter-spacing: -.04em; }
+.hero p { max-width: 42ch; font-size: 16px; line-height: 1.55; }
+.heroButton { display: inline-flex; align-items: center; justify-content: center; gap: 16px; min-height: 48px; padding: 12px 22px; border-radius: 4px; background: #662065; color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+.heroButton:hover { background: #7b2a7a; }
+.storyEntrance { position: absolute; inset: -110px 0 auto; height: 111px; z-index: 2; }
+.storyEntrance > svg { display: block; width: 100%; height: 100%; fill: var(--public-blue); }
+.storyEntrance > a { position: absolute; left: 50%; top: 34px; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; min-height: 76px; min-width: 80px; font-size: 11px; }
+.storyEntrance > a svg { color: var(--public-action); }
+.flight { position: absolute; pointer-events: none; }
+.flight img { display: block; width: 100%; height: auto; }
+.horizontal { position: relative; }
+.sticky { overflow: clip; }
+.track { display: flex; flex-direction: column; }
+.horizontal[data-horizontal] .sticky { position: sticky; top: 0; height: 100svh; }
+.horizontal[data-horizontal] .track { flex-direction: row; width: max-content; height: 100%; }
+.story { background: var(--public-blue); }
+.storyPanel { min-height: 100svh; position: relative; display: grid; grid-template-columns: .85fr 1.2fr; gap: 7vw; align-items: center; padding: 120px 8vw 100px; }
+.chapterCurve { position: absolute; left: 0; top: -80px; width: 100%; height: 160px; pointer-events: none; z-index: 2; }
+.chapterCurve svg { width: 100%; height: 100%; display: block; }
+.horizontal[data-horizontal] .chapterCurve { left: -80px; top: 0; width: 160px; height: 100%; }
+.horizontal[data-horizontal] .chapterCurve svg { position: absolute; left: 0; top: 100%; width: 100svh; height: 160px; transform: rotate(-90deg); transform-origin: 0 0; }
+.horizontal[data-horizontal] .storyPanel { flex: 0 0 auto; width: calc(100vw - 15px); height: 100%; }
+.storyPanel h2 { position: relative; z-index: 1; }
+.storyCopy { position: relative; z-index: 1; font-size: clamp(20px, 1.9vw, 30px); line-height: 1.5; }
+.storyCopy strong { font-weight: 600; color: #fff; }
+.quote { position: relative; z-index: 1; font: 500 clamp(32px, 3.8vw, 60px)/1.18 var(--font-story-sans), sans-serif; letter-spacing: -.02em; }
+.mission { background: var(--public-primary); }
+.mission h2 span { color: #efdbf7; }
+.vision { background: var(--public-secondary); }
+.orbit { position: absolute; width: 340px; height: 340px; border: 1px solid #e2bcf155; border-radius: 50%; left: -200px; bottom: -180px; }
+.orbit::before { content: ''; position: absolute; inset: -24px; border: inherit; border-radius: inherit; }
+.orbit::after { content: ''; position: absolute; inset: -48px; border: inherit; border-radius: inherit; }
+.storyPlane { position: absolute; width: 230px; height: auto; left: 4vw; bottom: 4%; opacity: .9; }
+.visionShape { position: absolute; width: 170px; height: 170px; left: 11vw; bottom: 5%; transform: rotate(-20deg); }
+.visionShape i { position: absolute; width: 110px; height: 110px; border: 1px solid #e2bcf177; border-radius: 18px; transform: rotate(15deg); }
+.visionShape i:nth-child(2) { transform: rotate(40deg); }
+.visionShape i:nth-child(3) { transform: rotate(65deg); }
+.sceneGuide { position: absolute; inset: auto 8vw 28px; display: flex; justify-content: space-between; font-size: 12px; color: #efe4f5; pointer-events: none; }
+.sceneGuide > span:last-of-type { display: inline-flex; align-items: center; gap: 18px; }
+.sceneGuide i { position: absolute; height: 2px; top: -15px; left: 0; width: 100%; background: var(--public-action); transform-origin: left; }
+.team { background: #211c3d; }
+.peopleTrack { padding: 110px 7vw 100px; gap: 32px; }
+.teamIntro { margin-bottom: 30px; }
+.teamIntro h2 { font-size: clamp(52px, 5vw, 80px); }
+.teamIntro p { margin-top: 25px; font-size: 14px; color: var(--public-muted); }
+.teamIntro > svg { margin-top: 45px; color: var(--public-action); }
+.person { width: 300px; flex: 0 0 300px; }
+.portrait { position: relative; height: clamp(240px, 48svh, 430px); overflow: hidden; background: #f6f1fa; border-radius: 14px; }
+.portrait img { object-fit: cover; object-position: center top; transition: transform .45s cubic-bezier(.16,1,.3,1); }
+.person:hover img { transform: scale(1.04); }
+.person h3 { font: 550 25px/1.12 var(--font-story-sans), sans-serif; margin-top: 22px; min-height: 2.24em; max-width: 21ch; letter-spacing: -.02em; }
+.person p { font-size: 13px; color: var(--public-muted); margin-top: 10px; }
+.personDetails { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; }
+.personDetails p { color: var(--public-paper); margin: 0; }
+.personDetails a { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #70b9ee; }
+.personDetails a:hover { color: #fff; }
+.horizontal[data-horizontal] .peopleTrack { align-items: center; }
+.horizontal[data-horizontal] .teamIntro { width: 330px; flex: 0 0 330px; padding-right: 10px; }
+.areas { background: var(--public-paper); color: var(--public-ink); padding: 115px 8vw; }
+.areas :focus-visible { outline-color: var(--public-primary); }
+.areas h2 span { color: var(--public-primary); }
+.playgroundWrap { margin-top: 0; }
+.playControls { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 16px; }
+.playControls h2 { font-size: clamp(52px, 6.5vw, 104px); }
+.playControls > div { display: flex; gap: 10px; flex-shrink: 0; }
+.playControls button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 16px; background: transparent; color: var(--public-secondary); border: 1px solid #9b87ad; border-radius: 8px; font-size: 12px; }
+.playControls button:hover { background: #e7daef; }
+.playControls button:disabled { opacity: .5; cursor: default; }
+.playground { min-height: 470px; height: 470px; position: relative; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 20px; overflow: hidden; border-bottom: 1px solid #9b87ad; background: #e8ddef; border-radius: 16px 16px 0 0; }
+.cube { width: 144px; height: 144px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; border: 2px solid color-mix(in srgb, var(--cube-ink) 24%, transparent); border-radius: 14px; background: var(--cube-color); color: var(--cube-ink); touch-action: none; user-select: none; cursor: grab; z-index: 1; }
+.cube[aria-expanded="true"] { border-color: var(--cube-ink); box-shadow: 0 10px 22px color-mix(in srgb, var(--cube-ink) 22%, transparent); }
+.cube:active { cursor: grabbing; }
+.cube .cubeLogo { position: relative; display: block; width: 88px; height: 88px; border-radius: 50%; overflow: hidden; background: #fff; box-shadow: inset 0 0 0 1px #ffffffb8; }
+.cubeLogo img { position: absolute; width: 310px; height: 155px; max-width: none; left: 50%; top: 50%; transform: translate(-50%,-50%); pointer-events: none; }
+.cubeName { font-size: 15px; line-height: 1; font-weight: 800; letter-spacing: .02em; pointer-events: none; }
+.playground[data-physics] .cube { position: absolute; left: 0; top: 0; }
+.areasList { list-style: none; padding: 35px 0 0; margin: 0; }
+.areasList li { border-bottom: 1px solid #c6b8d1; }
+.areasList h3 { margin: 0; }
+.areasList button { display: grid; width: 100%; grid-template-columns: 44px 90px 1fr 20px; align-items: center; gap: 16px; padding: 21px 0; border: 0; background: transparent; color: inherit; text-align: left; font: 500 18px/1.35 var(--font-public-sans), sans-serif; cursor: pointer; }
+.areasList button:hover { color: var(--public-primary); }
+.areasList button[aria-expanded="true"] > svg { transform: rotate(45deg); }
+.areaShort { font-size: 12px; font-weight: 700; color: var(--public-primary); }
+.areaDetail { padding: 0 36px 26px 166px; }
+.areaDetail[hidden] { display: none; }
+.areaDetail p { max-width: 72ch; font-size: 16px; line-height: 1.65; color: #473951; }
+.areaLogo { position: relative; display: block; width: 44px; height: 44px; overflow: hidden; border-radius: 50%; }
+.areaLogo img { position: absolute; width: 180px; height: 90px; max-width: none; left: 50%; top: 50%; transform: translate(-50%,-50%); }
+.impact { position: relative; overflow: hidden; padding: 110px 8vw 64px; background: var(--public-primary); }
+.impactTitle { display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; }
+.impactTitle h2 { font-size: clamp(50px, 6vw, 94px); }
+.impactTitle h2, .playControls h2 { scroll-margin-top: 120px; }
+.impactWindow { --impact-width: clamp(260px,27vw,440px); position: relative; z-index: 1; overflow: hidden; margin-top: 78px; cursor: grab; touch-action: pan-y; user-select: none; }
+.impactWindow:active { cursor: grabbing; }
+.impactBelt { display: flex; width: max-content; animation: impactLoop 34s linear infinite; will-change: transform; }
+.impactBelt[data-held] { animation-play-state: paused; }
+.impactGroup { display: flex; gap: 24px; padding-right: 24px; }
+.impactFact { flex: 0 0 var(--impact-width); width: var(--impact-width); padding: 24px 10px 28px; border-top: 1px solid #e2bcf180; }
+@keyframes impactLoop { to { transform: translateX(-50%); } }
+.impactFact strong { display: block; font: 550 clamp(58px, 7vw, 104px)/1 var(--font-story-sans), sans-serif; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
+.impactFact span { display: block; max-width: 18ch; font-size: 16px; line-height: 1.35; margin-top: 19px; }
+.impactFlight { width: 220px; right: 10px; top: 15px; opacity: .8; }
+@media (max-width: 899px) {
+  .storyPanel { min-height: 85svh; grid-template-columns: 1fr; align-content: center; gap: 40px; padding: 100px 7vw; }
+  .storyCopy { max-width: 65ch; font-size: 22px; }
+  .quote { max-width: 28ch; font-size: 36px; }
+  .storyPlane, .visionShape { left: auto; right: 3%; width: 140px; opacity: .35; }
+  .peopleTrack { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); padding: 95px 7vw; gap: 45px 24px; }
+  .teamIntro { grid-column: 1/-1; }
+  .teamIntro > svg { display: none; }
+  .person { width: auto; }
+  .portrait { height: 42vw; }
+  .impactWindow { margin-top: 55px; }
+}
+@media (max-width: 767px) {
+  .hero { padding: 110px 24px 145px; align-items: center; text-align: center; }
+  .hero h1 { font-size: clamp(54px, 15vw, 110px); }
+  .hero p { max-width: 34ch; font-size: 14px; }
+}
+@media (max-width: 600px) {
+  .about h2 { font-size: 52px; }
+  .storyPanel { padding: 85px 24px; min-height: 90svh; }
+  .storyCopy { font-size: 18px; line-height: 1.6; }
+  .quote { font-size: 30px; }
+  .peopleTrack { padding: 85px 24px; grid-template-columns: 1fr; gap: 44px; }
+  .portrait { height: 100vw; max-height: 480px; }
+  .person h3 { font-size: 26px; }
+  .person p { font-size: 14px; }
+  .areas, .impact { padding: 85px 24px; }
+  .impact { padding-bottom: 36px; }
+  .playControls { align-items: center; gap: 12px; }
+  .playControls h2 { font-size: 43px; }
+  .playControls button { width: 42px; height: 42px; justify-content: center; padding: 0; }
+  .playControls button span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  .playground { height: 420px; min-height: 420px; }
+  .cube { width: 108px; height: 108px; gap: 5px; }
+  .cube .cubeLogo { width: 68px; height: 68px; }
+  .cubeLogo img { width: 240px; height: 120px; }
+  .cubeName { font-size: 12px; }
+  .areasList button { grid-template-columns: 36px 62px 1fr 18px; gap: 10px; font-size: 14px; }
+  .areaDetail { padding: 0 0 24px; }
+  .areaDetail p { font-size: 15px; }
+  .areaLogo { width: 36px; height: 36px; }
+  .areaLogo img { width: 144px; height: 72px; }
+  .impactTitle { align-items: flex-end; gap: 20px; }
+  .impactTitle { flex-wrap: wrap; }
+  .impactTitle h2 { width: 100%; font-size: 48px; }
+  .impactWindow { --impact-width: 270px; margin-top: 48px; }
+  .impactFact strong { font-size: 76px; }
+  .impactFlight { width: 130px; right: -20px; }
+}
+@media (prefers-reduced-motion: reduce) { .person:hover img { transform: none; } .portrait img { transition: none; } .impactBelt { animation: none; will-change: auto; } .impactWindow { overflow-x: auto; } .impactGroup[aria-hidden] { display: none; } }

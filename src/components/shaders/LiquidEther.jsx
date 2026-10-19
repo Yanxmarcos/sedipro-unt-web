@@ -81,7 +81,7 @@ export default function LiquidEther({
         this.delta = 0;
         this.container = null;
         this.renderer = null;
-        this.clock = null;
+        this.timer = null;
       }
       init(container) {
         this.container = container;
@@ -95,8 +95,8 @@ export default function LiquidEther({
         this.renderer.domElement.style.width = '100%';
         this.renderer.domElement.style.height = '100%';
         this.renderer.domElement.style.display = 'block';
-        this.clock = new THREE.Clock();
-        this.clock.start();
+        this.timer = new THREE.Timer();
+        this.timer.connect(container.ownerDocument);
       }
       resize() {
         if (!this.container) return;
@@ -107,7 +107,8 @@ export default function LiquidEther({
         if (this.renderer) this.renderer.setSize(this.width, this.height, false);
       }
       update() {
-        this.delta = this.clock.getDelta();
+        this.timer.update();
+        this.delta = this.timer.getDelta();
         this.time += this.delta;
       }
     }
@@ -992,6 +993,7 @@ export default function LiquidEther({
           window.removeEventListener('resize', this._resize);
           document.removeEventListener('visibilitychange', this._onVisibility);
           Mouse.dispose();
+          Common.timer?.dispose();
           if (Common.renderer) {
             const canvas = Common.renderer.domElement;
             if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);

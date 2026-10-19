@@ -17,11 +17,15 @@ for (const [path, greeting] of [
   ["/", "Soy Hito"], ["/proyectos", "ideas se convierten"],
   ["/nosotros", "Te presento a mi equipo"], ["/tecnologias-de-la-informacion", "Bienvenido a TI"],
 ]) {
-  test(`Hito aparece con su comentario en ${path}`, async ({ page }) => {
+  test(`Hito aparece y permite leer su saludo en ${path}`, async ({ page }) => {
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     await page.goto(path);
     await expect(pet(page)).toBeVisible();
+    if (path !== "/tecnologias-de-la-informacion") {
+      await expect(page.locator("#hito-controls")).toHaveCount(0);
+      await pet(page).click();
+    }
     await expect(page.getByTestId("hito-pet")).toContainText(greeting);
     await expect(page.locator('[data-testid="hito-pet"] canvas')).toHaveCSS("image-rendering", "auto");
     expect(errors).toEqual([]);

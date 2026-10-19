@@ -2,6 +2,10 @@
 const nextConfig = {
   allowedDevOrigins: ['192.168.1.*'],
   productionBrowserSourceMaps: false,
+  experimental: {
+    // Avoid reusing the persistent dev cache after Turbopack storage failures.
+    turbopackFileSystemCacheForDev: false,
+  },
     images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

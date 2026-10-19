@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Montserrat, Poppins } from "next/font/google";
 import { Providers } from "@/components/layout/providers";
 import { LandingOnly } from "@/components/layout/landing-only";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { PublicPageTransition } from "@/components/page-transition/public-page-transition";
 import "./globals.css";
 
 const geist = Geist({
@@ -107,7 +108,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col font-poppins">
         <ThemeProvider>
           <Providers>
-            <LandingOnly>{children}</LandingOnly>
+            <PublicPageTransition><LandingOnly>{children}</LandingOnly></PublicPageTransition>
           </Providers>
         </ThemeProvider>
       </body>

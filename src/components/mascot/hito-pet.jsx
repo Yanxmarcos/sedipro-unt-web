@@ -27,7 +27,7 @@ function savePreferences(value) {
   window.dispatchEvent(new Event(PREFERENCE_EVENT));
 }
 
-export function HitoPet({ pathname = "/" }) {
+export function HitoPet({ pathname = "/", greetOnMount = true }) {
   const preference = useSyncExternalStore(subscribePreferences, getPreferences, () => "active");
   const reducedMotion = useReducedMotion();
   const hidden = preference.startsWith("hidden");
@@ -218,7 +218,7 @@ export function HitoPet({ pathname = "/" }) {
     image.onload = () => {
       if (disposed) return;
       position(); draw();
-      if (!engine.greeted && !paused && !reducedMotion) {
+      if (greetOnMount && !engine.greeted && !paused && !reducedMotion) {
         setMessage(messages.greeting);
         engine.greeted = true;
       }
@@ -248,7 +248,7 @@ export function HitoPet({ pathname = "/" }) {
       document.removeEventListener("pointerleave", resetLook);
       document.removeEventListener("visibilitychange", visibility);
     };
-  }, [hidden, paused, reducedMotion, messages]);
+  }, [hidden, paused, reducedMotion, messages, greetOnMount]);
 
   useEffect(() => {
     if (!open) return;
