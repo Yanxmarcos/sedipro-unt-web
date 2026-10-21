@@ -1,0 +1,15 @@
+.brandIcon { width: 17px; height: 17px; flex-shrink: 0; margin-right: 3px; }
+.tiktok { color: #25f4ee; filter: drop-shadow(1px 1px 0 #fe2c55); }
+.emailGroup { display: inline-flex; align-items: center; gap: 3px; }
+.copyWrap { position: relative; display: inline-flex; }
+.copyButton { display: inline-flex; align-items: center; justify-content: center; width: 25px; height: 25px; padding: 4px; border: 0; background: transparent; color: inherit; cursor: pointer; border-radius: 4px; }
+.copyButton:hover { background: #304d9010; }
+.copyButton:focus-visible { outline: 2px solid #304d90; outline-offset: 2px; }
+.tooltip { position: absolute; bottom: calc(100% + 5px); left: 0; z-index: 5; width: max-content; max-width: 235px; padding: 8px 11px; border-radius: 6px; background: #29295d; color: #fff; font-size: 12px; line-height: 1.4; font-weight: 500; pointer-events: none; visibility: hidden; }
+.copyWrap:hover .tooltip, .copyWrap:focus-within .tooltip, .copyWrap[data-feedback="true"] .tooltip { visibility: visible; }
+@media (max-width: 767px) {
+  .emailGroup { display: flex; width: 100%; gap: 4px; padding-top: 12px; border-top: 1px solid #29295d24; }
+  .copyWrap { flex-shrink: 0; }
+  .copyButton { width: 44px; height: 44px; padding: 0; }
+  .brandIcon { margin-right: 0; }
+}

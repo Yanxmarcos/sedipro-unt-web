@@ -40,7 +40,12 @@ export function canOpenPanelPage(pathname, user, assignments = []) {
   if (pathname === "/panel") return true;
   if (pathname === "/panel/perfil" || pathname === "/panel/cambiar-contrasena")
     return true;
-  if (pathname === "/panel/sesiones")
+  if (pathname === "/panel/usuarios" || pathname.startsWith("/panel/usuarios/"))
+    return panelPermissions(user).isAdmin;
+  if (
+    pathname === "/panel/sesiones" ||
+    pathname.startsWith("/panel/sesiones/")
+  )
     return panelPermissions(user).isSuperadmin;
   if (pathname === "/panel/votaciones/votar") return true;
   if (pathname === "/panel/asistencias/tomar") return true;

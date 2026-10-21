@@ -88,6 +88,21 @@ export const navItems: NavItem[] = [
     ],
   },
   {
+    groupLabel: "HERRAMIENTAS",
+    items: [
+      {
+        icon: "Award",
+        label: "Certificados",
+        childItems: [
+          {
+            label: "Generador de certificados",
+            href: "/panel/certificados",
+          },
+        ],
+      },
+    ],
+  },
+  {
     groupLabel: "ADMINISTRACIÓN",
     items: [
       { icon: "ShieldUser", label: "Usuarios", href: "/panel/usuarios" },

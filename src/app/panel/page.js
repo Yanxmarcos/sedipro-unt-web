@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatPersonName } from "@/lib/person-name";
 
 export default function PanelHomePage() {
   const { user, assignments, permissions } = usePanelSession();
@@ -21,7 +22,7 @@ export default function PanelHomePage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
-          Hola, {user?.nombres?.split(" ")[0]}
+          Hola, {formatPersonName(user?.nombres?.split(" ")[0])}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Bienvenido a tu cuenta de SEDIPRO UNT.

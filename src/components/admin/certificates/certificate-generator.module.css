@@ -1,0 +1,818 @@
+.generator {
+  width: 100%;
+  min-width: 0;
+}
+.generator svg {
+  flex-shrink: 0;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+.breadcrumb svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0.6;
+}
+.breadcrumb span:last-child {
+  color: var(--foreground);
+}
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+.pageHeader h1 {
+  margin: 0;
+  font-size: clamp(24px, 2.3vw, 32px);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+.pageHeader p {
+  color: var(--muted-foreground);
+  font-size: 14px;
+  margin: 9px 0 0;
+  line-height: 1.5;
+}
+.projectBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 12px;
+  white-space: nowrap;
+  background: var(--card);
+}
+.projectBadge svg {
+  width: 16px;
+  height: 16px;
+  color: var(--muted-foreground);
+}
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 356px;
+  align-items: start;
+  gap: 24px;
+}
+.previewCard,
+.editorCard,
+.recordsCard {
+  min-width: 0;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+.cardHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.headingLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.headingLabel > svg {
+  width: 17px;
+  height: 17px;
+  color: var(--muted-foreground);
+}
+.headingLabel h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 550;
+  letter-spacing: -0.015em;
+}
+.liveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  white-space: nowrap;
+}
+.liveBadge > span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--foreground);
+  opacity: 0.75;
+}
+.previewStage {
+  padding: clamp(16px, 2.5vw, 38px);
+  background-color: var(--muted);
+  background-image: radial-gradient(var(--border) 0.8px, transparent 0.8px);
+  background-size: 12px 12px;
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.certificate {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1138 / 802;
+  box-shadow:
+    0 8px 24px #0002,
+    0 0 0 1px #0001;
+  background: white;
+}
+.emptyState {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted-foreground);
+  max-width: 32ch;
+}
+.emptyState > svg {
+  width: 24px;
+  height: 24px;
+}
+.previewFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+}
+.previewFooter > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.previewFooter strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.previewFooter div > span {
+  color: var(--muted-foreground);
+  font-size: 11px;
+}
+.formatBadge {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 7px;
+}
+.previewHint {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  border-top: 1px solid var(--border);
+  padding: 16px 22px;
+  color: var(--muted-foreground);
+}
+.previewHint svg {
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+}
+.previewHint p {
+  font-size: 11px;
+  line-height: 1.65;
+  margin: 0;
+}
+.previewPagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 4px 20px 18px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.previewPagination strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.modeTabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+  padding: 7px;
+  gap: 4px;
+}
+.modeTabs button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  padding: 12px 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  transition: background-color 0.15s;
+}
+.modeTabs svg {
+  width: 15px;
+  height: 15px;
+}
+.modeTabs button[aria-selected="true"] {
+  background: var(--accent);
+  color: var(--foreground);
+}
+.modeTabs button:hover:not(:disabled) {
+  color: var(--foreground);
+  background: var(--accent);
+}
+.modeTabs button:disabled {
+  opacity: 0.65;
+}
+.editorBody {
+  padding: 24px;
+}
+.editorTitle {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.editorTitle h2 {
+  font-size: 15px;
+  font-weight: 550;
+  margin: 0;
+  letter-spacing: -0.015em;
+}
+.editorTitle p {
+  color: var(--muted-foreground);
+  font-size: 11px;
+  margin: 6px 0 0;
+  line-height: 1.6;
+}
+.editorTitle > span {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+  background: var(--muted);
+  padding: 3px 7px;
+  border-radius: 4px;
+}
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fieldLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.fieldLabel label {
+  font-size: 12px;
+  font-weight: 500;
+}
+.fieldLabel label span {
+  color: var(--muted-foreground);
+  margin-left: 2px;
+}
+.fieldLabel button {
+  background: none;
+  padding: 0;
+  font-size: 10px;
+  color: var(--muted-foreground);
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.field input {
+  height: 40px;
+  font-size: 12px;
+  background: var(--background);
+  border-color: var(--input);
+  padding-inline: 11px;
+  border-radius: 6px;
+}
+.field input::placeholder {
+  font-size: 11px;
+}
+.fieldError {
+  color: var(--destructive);
+  font-size: 11px;
+  margin: 0;
+  line-height: 1.4;
+}
+.downloadActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  margin-top: 24px;
+  padding-top: 20px;
+}
+.downloadActions button {
+  width: 100%;
+  font-size: 12px;
+}
+.smallNote {
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.7;
+  margin: 16px 0 0;
+}
+.privacyNote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 13px 16px;
+  background: var(--muted);
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
+}
+.privacyNote svg {
+  width: 13px;
+  height: 13px;
+}
+.privacyNote p {
+  font-size: 10px;
+  margin: 0;
+  line-height: 1.5;
+}
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+.notice > svg {
+  width: 17px;
+  height: 17px;
+  margin-top: 1px;
+}
+.notice p {
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+.notice button,
+.loadedFile button {
+  display: flex;
+  padding: 2px;
+  color: var(--muted-foreground);
+  background: none;
+  border: 0;
+}
+.notice button svg,
+.loadedFile button svg {
+  width: 15px;
+  height: 15px;
+}
+.notice.error {
+  border-color: var(--destructive);
+}
+.notice.error > svg {
+  color: var(--destructive);
+}
+.notice.info > svg {
+  color: var(--muted-foreground);
+}
+.notice.success > svg {
+  color: var(--foreground);
+}
+.excelStep {
+  display: flex;
+  gap: 10px;
+  margin: 22px 0 12px;
+}
+.excelStep:first-of-type {
+  margin-top: 0;
+}
+.excelStep > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.excelStep strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  padding-top: 2px;
+}
+.excelStep p {
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 1.6;
+  margin: 5px 0 0;
+}
+.fullWidth {
+  width: 100%;
+  font-size: 12px;
+}
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 9px;
+  border: 1px dashed var(--input);
+  border-radius: 8px;
+  padding: 22px 12px;
+  background: var(--background);
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+.dropZone.dragging {
+  border-color: var(--foreground);
+  background: var(--accent);
+}
+.dropZone > svg {
+  width: 23px;
+  height: 23px;
+  color: var(--muted-foreground);
+  margin-bottom: 3px;
+}
+.dropZone strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.dropZone > span {
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.dropZone button {
+  margin-top: 5px;
+  font-size: 11px;
+}
+.loadedFile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0 0;
+}
+.loadedFile > svg {
+  width: 20px;
+  height: 20px;
+  color: var(--muted-foreground);
+}
+.loadedFile div {
+  min-width: 0;
+  flex: 1;
+}
+.loadedFile strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 500;
+}
+.loadedFile span {
+  display: block;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  margin-top: 3px;
+}
+.progressBlock {
+  margin: 15px 0;
+  font-size: 10px;
+}
+.progressBlock > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.progressBlock progress {
+  display: block;
+  width: 100%;
+  height: 5px;
+  border: 0;
+  border-radius: 9px;
+  overflow: hidden;
+  accent-color: var(--foreground);
+  background: var(--muted);
+}
+.progressBlock progress::-webkit-progress-bar {
+  background: var(--muted);
+}
+.progressBlock progress::-webkit-progress-value {
+  background: var(--foreground);
+}
+.progressBlock progress::-moz-progress-bar {
+  background: var(--foreground);
+}
+.progressBlock > span {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted-foreground);
+}
+.recordsCard {
+  margin-top: 24px;
+}
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--muted);
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.tableStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.tableStatus svg {
+  width: 13px;
+  height: 13px;
+}
+.tableScroll {
+  overflow: auto;
+}
+.tableScroll table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: left;
+  font-size: 11px;
+}
+.tableScroll th {
+  background: var(--muted);
+  font-weight: 500;
+  color: var(--muted-foreground);
+  padding: 11px 18px;
+  white-space: nowrap;
+}
+.tableScroll td {
+  padding: 14px 18px;
+  border-top: 1px solid var(--border);
+  min-width: 140px;
+  max-width: 360px;
+  overflow-wrap: anywhere;
+}
+.tableScroll th:first-child,
+.tableScroll td:first-child {
+  width: 50px;
+  min-width: 50px;
+}
+.tableScroll tr[data-selected="true"] {
+  background: var(--accent);
+}
+.tableScroll td > small {
+  display: block;
+  color: var(--muted-foreground);
+  margin-top: 4px;
+  font-size: 10px;
+}
+.rowNumber {
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+.participantButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  text-align: left;
+  width: 100%;
+  min-width: 180px;
+}
+.participantButton strong {
+  font-weight: 500;
+  min-width: 100px;
+}
+.participantButton > svg {
+  width: 13px;
+  height: 13px;
+  margin-left: auto;
+  color: var(--muted-foreground);
+}
+.avatar {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 10px;
+}
+.rowErrors,
+.validRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 10px;
+  line-height: 1.6;
+}
+.rowErrors {
+  color: var(--destructive);
+  min-width: 180px;
+}
+.validRow {
+  color: var(--muted-foreground);
+}
+.rowErrors svg,
+.validRow svg {
+  width: 13px;
+  height: 13px;
+  margin-top: 1px;
+}
+.tableFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+.tableFooter > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.moduleFooter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: var(--muted-foreground);
+  margin-top: 26px;
+  font-size: 10px;
+}
+.moduleFooter svg {
+  width: 12px;
+  height: 12px;
+}
+.generator button:focus-visible,
+.tableScroll:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (min-width: 1500px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr) 380px;
+  }
+}
+@media (max-width: 1150px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .editorBody {
+    max-width: none;
+  }
+  .previewStage {
+    padding: 28px;
+  }
+  .fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .downloadActions {
+    flex-direction: row;
+  }
+  .downloadActions button {
+    width: auto;
+    flex: 1;
+  }
+}
+@media (max-width: 600px) {
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .projectBadge {
+    padding: 6px 9px;
+    font-size: 9px;
+  }
+  .breadcrumb {
+    margin-bottom: 12px;
+  }
+  .workspace {
+    gap: 18px;
+  }
+  .cardHeading {
+    padding: 16px;
+    flex-wrap: wrap;
+  }
+  .headingLabel h2 {
+    font-size: 12px;
+  }
+  .liveBadge {
+    font-size: 9px;
+  }
+  .previewStage {
+    padding: 14px;
+    min-height: 180px;
+  }
+  .previewFooter {
+    padding: 16px;
+  }
+  .previewFooter strong {
+    font-size: 11px;
+  }
+  .previewFooter div > span {
+    font-size: 9px;
+  }
+  .formatBadge {
+    font-size: 8px;
+    padding: 3px 5px;
+  }
+  .previewHint {
+    padding: 14px 16px;
+  }
+  .editorBody {
+    padding: 20px 16px;
+  }
+  .fields {
+    display: flex;
+  }
+  .field input {
+    font-size: 16px;
+  }
+  .downloadActions {
+    flex-direction: column;
+  }
+  .downloadActions button {
+    width: 100%;
+    flex: none;
+    min-height: 40px;
+  }
+  .tableFooter {
+    padding-inline: 14px;
+  }
+  .moduleFooter {
+    font-size: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .generator *,
+  .generator *::before,
+  .generator *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

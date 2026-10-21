@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import * as XLSX from 'xlsx'
+import { formatPersonName } from '@/lib/person-name'
 function Toast(props) {
   return <AdminToast {...props} />
 }
@@ -332,7 +333,7 @@ export default function VotacionesPage() {
       const votantesData = [
         ['Nombre Completo', 'DNI', 'Opción Elegida', 'Fecha de Voto'],
         ...(votos || []).map((voto) => [
-          `${voto.sediprano?.apellidos || ''} ${voto.sediprano?.nombres || ''}`.trim(),
+          formatPersonName(voto.sediprano?.apellidos, voto.sediprano?.nombres),
           voto.sediprano?.dni || '',
           voto.opcionSeleccionada,
           fmtFechaHoraUTC(voto.fechaVoto),

@@ -4,12 +4,20 @@
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { Nav } from "./nav";
 import { PageBackdrop } from "./page-backdrop";
 import LiquidEther from "@/components/shaders/LiquidEther";
 import { isLandingPath } from "@/lib/landing-paths";
+import { PublicShell } from "@/components/public-site/public-shell";
+import { PUBLIC_REDESIGN_PATHS } from "@/components/public-site/content";
+import { PUBLIC_SHADERS_ENABLED } from "@/lib/public-effects";
 
 const MOBILE_BREAKPOINT = 768;
+const HitoPet = dynamic(
+  () => import("@/components/mascot/hito-pet").then((module) => module.HitoPet),
+  { ssr: false },
+);
 
 export function LandingOnly({ children }) {
   const pathname = usePathname();
@@ -19,7 +27,9 @@ export function LandingOnly({ children }) {
   const [resourcesLoaded, setResourcesLoaded] = useState(false);
   const [canRenderHeavyBg, setCanRenderHeavyBg] = useState(false);
 
-  const isLanding = isLandingPath(pathname);
+  const isRedesigned = PUBLIC_REDESIGN_PATHS.includes(pathname);
+  const isTerminal = pathname === "/tecnologias-de-la-informacion";
+  const isLanding = isLandingPath(pathname) && !isRedesigned && !isTerminal;
 
   // IMPORTANTE: el valor por defecto es "false" (no renderizar) y recién
   // se activa cuando confirmamos que el dispositivo es capaz. Es al revés
@@ -99,6 +109,9 @@ export function LandingOnly({ children }) {
     }
   }, [minTimePassed, resourcesLoaded, isLanding]);
 
+  if (isRedesigned) return <PublicShell pathname={pathname}>{children}</PublicShell>;
+  if (isTerminal) return <>{children}</>;
+
   // Si no estamos en landing, renderizar normal
   if (!isLanding) {
     return <>{children}</>;
@@ -164,7 +177,7 @@ export function LandingOnly({ children }) {
         className={`transition-opacity duration-700 ${isLoading ? "opacity-0" : "opacity-100"}`}
       >
         {/* Fondo líquido (solo se activa tras confirmar que el dispositivo lo soporta: ver comentario arriba) */}
-        {canRenderHeavyBg && (
+        {PUBLIC_SHADERS_ENABLED && canRenderHeavyBg && (
           <div
             className="fixed inset-0 h-screen w-full overflow-hidden"
             style={{
@@ -203,7 +216,7 @@ export function LandingOnly({ children }) {
         )}
 
         {/* Shader de luz */}
-        <PageBackdrop />
+        {PUBLIC_SHADERS_ENABLED && <PageBackdrop />}
 
         {/* Navegación */}
         <Nav />
@@ -213,6 +226,7 @@ export function LandingOnly({ children }) {
       <main id="main-content" className="relative flex-1" style={{ zIndex: 1 }}>
         {children}
       </main>
+      {!isLoading && <HitoPet key={pathname} pathname={pathname} />}
     </>
   );
 }

@@ -5,14 +5,16 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { isLandingPath } from "@/lib/landing-paths";
+import { useReducedMotion } from "@/lib/motion";
 
 export function SmoothScroll({ children }) {
   const pathname = usePathname();
   const lenisRef = useRef(null);
   const rafRef = useRef(null);
+  const reducedMotion = useReducedMotion();
 
   // Verificar si estamos en el landing
-  const isLanding = isLandingPath(pathname);
+  const isLanding = isLandingPath(pathname) && pathname !== "/tecnologias-de-la-informacion";
 
   useEffect(() => {
     // Si NO estamos en landing, NO activar Lenis
@@ -40,7 +42,7 @@ export function SmoothScroll({ children }) {
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion || reducedMotion) return;
 
     // Destruir instancia anterior si existe
     if (lenisRef.current) {
@@ -66,6 +68,7 @@ export function SmoothScroll({ children }) {
 
     // Manejar clicks en anclas
     function handleAnchorClick(e) {
+      if (!(e.target instanceof Element) || e.defaultPrevented) return;
       const target = e.target;
       const anchor = target.closest('a[href^="#"]');
       if (!anchor) return;
@@ -102,7 +105,7 @@ export function SmoothScroll({ children }) {
       document.body.style.overflow = "";
       document.body.style.height = "";
     };
-  }, [isLanding, pathname]);
+  }, [isLanding, pathname, reducedMotion]);
 
   // Si NO estamos en landing, renderizar sin wrapper
   if (!isLanding) {

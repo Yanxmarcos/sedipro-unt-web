@@ -13,6 +13,7 @@ import { AdminModal } from '@/components/admin/form-controls'
 import { Button } from '@/components/ui/button'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { formatPersonName } from '@/lib/person-name'
 const Ico = {
   Check: () => (
     <svg
@@ -481,7 +482,7 @@ export default function RegistroTurnoPage() {
               }}
               className="text-xs m-0"
             >
-              {encargado?.nombres} {encargado?.apellidos}
+              {formatPersonName(encargado?.nombres, encargado?.apellidos)}
             </p>
           </div>
         </div>

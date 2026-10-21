@@ -654,12 +654,16 @@ const SidebarLayout = () => {
     const isManager = isAdmin || role === "DIRECTIVA";
 
     const visibleItems = isManager
-      ? navItems.map((group) => ({
-          ...group,
-          items: group.items.filter(
-            (item) => item.href !== "/panel/sesiones" || isSuperadmin,
-          ),
-        }))
+      ? navItems
+          .filter(
+            (group) => group.groupLabel !== "ADMINISTRACIÓN" || isAdmin,
+          )
+          .map((group) => ({
+            ...group,
+            items: group.items.filter(
+              (item) => item.href !== "/panel/sesiones" || isSuperadmin,
+            ),
+          }))
       : isMember
         ? [
             ...(hasAttendanceAssignments

@@ -1,0 +1,158 @@
+.journey { color: #29295d; background: #29295d; }
+.chapter { position: relative; isolation: isolate; }
+.hero { position: sticky; top: 0; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 120px 24px 140px; color: #fff; background: #304D90; text-align: center; }
+.hero h1, .hero h2 { margin: 0; max-width: 19ch; text-wrap: balance; font: 500 clamp(44px, 6.5vw, 94px)/1.04 var(--font-story-sans), sans-serif; letter-spacing: -.04em; }
+.hero > p { max-width: 64ch; margin: 30px 0 22px; font-size: clamp(18px, 1.7vw, 23px); line-height: 1.5; letter-spacing: -.025em; }
+.scrollLink { display: inline-flex; align-items: center; gap: 16px; min-height: 48px; font-size: 15px; }
+.sheet { position: relative; z-index: 1; background: #f6f1fa; border-radius: 52px 52px 0 0; scroll-margin-top: 0; }
+.canvas { position: relative; max-width: 1440px; min-height: calc(min(100vw, 1440px) * 3.5); margin: auto; padding: 140px 5% 220px; }
+.route { position: absolute; pointer-events: none; inset: -65px 0 0; overflow: clip; }
+.route svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.ribbon { fill: none; stroke: #304d90; stroke-linecap: round; stroke-linejoin: round; }
+.mobileRoute { display: none !important; }
+.intro { position: relative; z-index: 2; display: grid; grid-template-columns: 43% 53%; gap: 4%; min-height: 730px; align-items: start; }
+.lead { position: relative; padding: 40px; margin: 0; background: #fff; border-radius: 16px; }
+.lead h3, .panel h3 { margin: 0 0 28px; font: 500 clamp(34px, 3.5vw, 48px)/1.03 var(--font-story-sans), sans-serif; letter-spacing: -.035em; }
+.lead p, .panel p { font-size: clamp(17px, 1.55vw, 21px); line-height: 1.55; letter-spacing: -.015em; }
+.lead p + p, .panel p + p { margin-top: 22px; }
+.journey a:focus-visible, .journey video:focus-visible { outline: 3px solid currentColor; outline-offset: 7px; }
+.polaroid a:focus-visible { outline-color: #662065; }
+.collage { position: relative; min-width: 0; height: 650px; margin-top: -140px; }
+.polaroid { position: relative; margin: 0; padding: 13px 13px 0; background: #fff; color: #29295d; box-shadow: 0 16px 32px rgb(27 16 45 / .16); }
+.polaroid figcaption { display: flex; align-items: center; justify-content: space-between; min-height: 49px; gap: 10px; font-size: 13px; line-height: 1.4; padding: 9px 2px; }
+.photoWindow { display: block; position: relative; overflow: hidden; }
+.photo { display: block; width: 100%; height: auto; }
+.crop { position: absolute; max-width: none; }
+.polaroid > a { display: block; }
+.mainPhoto { position: absolute; width: 95%; top: 210px; left: -2%; transform: rotate(-6deg); }
+.backPhoto { position: absolute; width: 72%; top: 10px; right: -2%; transform: rotate(8deg); }
+.portrait { position: absolute; width: 78%; top: 15px; right: 0; transform: rotate(7deg); }
+.videoFrame { position: absolute; width: 88%; top: 330px; left: -4%; transform: rotate(-5deg); }
+.videoFrame video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #29295d; }
+.smallPhoto { position: absolute; width: 55%; right: -2%; top: 700px; transform: rotate(7deg); }
+.introMemory { position: absolute; width: 30%; top: calc(100% - 50px); left: 3%; transform: rotate(6deg); }
+.lower { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 8%; margin-top: 230px; scroll-margin-top: 110px; }
+.panel { width: 49%; padding: 40px; background: #fff; border-radius: 16px; }
+.panel h3 { font-size: clamp(32px, 3.4vw, 46px); }
+.lowerPhoto { width: 42%; transform: rotate(-7deg); }
+.definitionStage { position: relative; z-index: 2; margin-top: 360px; }
+.definition { position: relative; z-index: 2; width: 44%; margin: 0 0 0 32%; padding: 48px; scroll-margin-top: 130px; }
+.visitMemory { position: absolute; width: 25%; left: -1%; top: 75px; transform: rotate(-8deg); }
+.recognitionMemory { position: absolute; width: 19%; right: -1%; top: -135px; transform: rotate(8deg); }
+.hackathonMemory { position: absolute; width: 34%; left: 4%; top: calc(100% + 150px); transform: rotate(-6deg); }
+ .journeyFigure { position: absolute; --hairline-plate: #f6f1fa; --hairline-hi: #662065; --hairline-edge: #304d90; --hairline-mid: #8c85b3; --hairline-lo: #c3bad5; --hairline-stroke: 1.2; }
+.journeyFigure > div:focus-visible { outline: 2px solid #662065; outline-offset: 6px; }
+.learning { margin-top: 700px; min-height: 960px; scroll-margin-top: 140px; }
+.learning .lead { background: #fff; border-radius: 16px; padding: 40px; margin: 0; }
+.learning .collage { height: 960px; }
+.projectMemory { position: absolute; width: 44%; top: 790px; left: -1%; transform: rotate(-8deg); }
+.community { margin-top: 180px; }
+.communityPhotos { position: relative; width: 42%; height: 600px; }
+.vocationsMemory { position: absolute; width: 95%; top: 0; left: 0; transform: rotate(-6deg); }
+.welcomeMemory { position: absolute; width: 74%; top: 315px; right: -1%; transform: rotate(8deg); }
+.details { position: absolute; z-index: 1; inset: 0; pointer-events: none; overflow: clip; }
+.wind { position: absolute; width: 110px; height: 270px; top: 770px; right: 8%; stroke: #29295d; stroke-width: 1.7; }
+.plane { position: absolute; display: block; }
+.planeDrift { display: block; animation: plane-float 7s ease-in-out infinite; }
+.plane img { display: block; width: 100%; height: auto; filter: drop-shadow(0 5px 3px rgb(24 29 70 / .18)); }
+.firstPlane { top: 880px; left: 44%; width: 200px; }
+.middlePlane { top: 48%; right: 0; width: 180px; transform: scaleX(-1) rotate(-8deg); }
+.middlePlane .planeDrift { animation-duration: 9s; animation-delay: -3s; }
+.lastPlane { bottom: 120px; left: 37%; width: 200px; transform: rotate(12deg); }
+.lastPlane .planeDrift { animation-duration: 8s; animation-delay: -5s; }
+.celebrationPlane { top: 74%; left: 3%; width: 180px; transform: scaleX(-1) rotate(14deg); }
+.celebrationPlane .planeDrift { animation-duration: 7.5s; animation-delay: -4s; }
+.photoCurve { position: absolute; z-index: -1; width: 40%; pointer-events: none; stroke: #662065; stroke-width: 1.6; stroke-linecap: round; }
+.introCurve { top: -60px; right: -1%; transform: rotate(-12deg); }
+.definitionCurve { top: 110px; left: -4%; transform: rotate(24deg); }
+.learningCurve { top: 480px; left: 0; transform: rotate(-19deg); }
+.communityCurve { top: 260px; left: 4%; transform: rotate(14deg); }
+@keyframes plane-float { 0%, 100% { transform: translate3d(0, 0, 0) rotate(-5deg); } 50% { transform: translate3d(14px, -28px, 0) rotate(5deg); } }
+.breeze { position: absolute; top: 1550px; left: 7%; width: 170px; stroke: #662065; stroke-width: 14; stroke-linecap: round; }
+.panel .profileHeading { font-size: clamp(28px, 2.8vw, 39px); line-height: 1.12; }
+.pmiLogo { display: block; width: 100%; max-width: 340px; height: auto; margin: 4px 0 28px; }
+.ideaFigure { width: 30%; left: 59%; top: calc(100% + 135px); }
+.laptopFigure { width: 27%; left: 57%; top: calc(100% - 60px); }
+.settleFigure { width: 26%; left: 43%; top: -315px; }
+.stackFigure { width: 26%; left: 4%; top: calc(100% - 200px); }
+.volunteerMemory { position: absolute; width: 28%; left: 4%; top: calc(100% - 460px); transform: rotate(5deg); }
+.limaMemory { position: absolute; width: 29%; left: 6%; top: calc(100% + 30px); transform: rotate(5deg); }
+.christmasMemory { position: absolute; width: 28%; left: 10%; top: calc(100% + 420px); transform: rotate(7deg); }
+.loupeFigure { width: 16%; left: 40%; top: calc(100% + 435px); }
+@media (max-width: 1000px) and (min-width: 768px) {
+  .canvas { padding-inline: 4%; }
+  .intro { grid-template-columns: 47% 49%; }
+  .collage { margin-top: -130px; }
+  .mainPhoto { top: 175px; }
+  .introMemory { width: 33%; }
+  .panel { width: 55%; padding: 32px; }
+  .definition { width: 44%; padding: 32px; }
+}
+@media (max-width: 767px) {
+  .hero { padding: 110px 22px 155px; }
+  .hero h1, .hero h2 { font-size: clamp(40px, 10.8vw, 64px); }
+  .hero > p { font-size: 19px; margin-top: 25px; }
+  .sheet { border-radius: 30px 30px 0 0; }
+  .canvas { padding: 50px 24px 110px; min-height: 0; }
+  .desktopRoute { display: none !important; }
+  .mobileRoute { display: block !important; }
+  .route { inset: -34px 0 0; }
+  .intro { display: flex; flex-direction: column; min-height: 0; gap: 32px; }
+  .lead { order: 1; padding: 30px 24px; margin: 0; }
+  .lead h3, .panel h3 { font-size: clamp(32px, 8.4vw, 43px); }
+  .lead p, .panel p { font-size: 17px; }
+  .collage { width: 100%; height: max(380px, calc(90vw + 40px)); margin-top: -30px; }
+  .backPhoto { width: 73%; top: 0; right: 1%; }
+  .mainPhoto { width: 94%; top: 150px; left: 0; }
+  .introMemory { position: relative; order: 2; width: 83%; top: auto; left: auto; margin: 12px 0 0 7%; }
+  .polaroid { padding: 9px 9px 0; }
+  .polaroid figcaption { min-height: 40px; font-size: 11px; }
+  .lower { flex-direction: column; gap: 60px; margin-top: 80px; }
+  .lowerPhoto { width: 90%; align-self: flex-start; }
+  .panel { width: 100%; padding: 30px 24px; }
+  .definitionStage { display: grid; grid-template-columns: 1fr 1fr; gap: 28px 20px; margin-top: 110px; }
+  .definition { grid-column: 1 / -1; order: 0; width: 100%; margin: 0; padding: 30px 24px; }
+  .visitMemory { position: relative; order: 1; width: 100%; left: auto; top: auto; margin-top: 15px; }
+  .recognitionMemory { position: relative; order: 2; width: 90%; right: auto; top: auto; align-self: center; justify-self: end; }
+  .hackathonMemory { position: relative; grid-column: 1 / -1; order: 3; width: 88%; top: auto; left: auto; margin: 15px 0 0 2%; }
+  .ideaFigure { position: relative; grid-column: 1 / -1; order: 4; width: 75%; top: auto; left: auto; justify-self: end; margin-top: -10px; }
+  .learning { min-height: 0; margin-top: 150px; }
+  .learning .lead { padding: 30px 24px; }
+  .learning .collage { height: clamp(730px, 120vw, 900px); }
+  .portrait { width: 85%; top: 0; }
+  .videoFrame { width: 96%; top: 245px; left: 0; }
+  .smallPhoto { width: 65%; top: 500px; right: 0; }
+  .projectMemory { width: 49%; top: 600px; left: 0; }
+  .communityPhotos { width: 100%; height: max(540px, calc(280px + 55vw)); }
+  .vocationsMemory { width: 90%; }
+  .welcomeMemory { width: 75%; top: 280px; right: 1%; }
+  .wind { top: 1100px; right: 3%; width: 65px; }
+  .firstPlane { top: 900px; left: 65%; width: 115px; }
+  .middlePlane { top: 53%; right: 0; width: 110px; }
+  .lastPlane { bottom: 85px; left: 50%; width: 140px; }
+  .breeze { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero { position: relative; min-height: 75svh; }
+  .collage, .details, .plane { transform: none !important; }
+  .planeDrift { animation: none; }
+}
+
+@media (max-width: 767px) {
+  .panel .profileHeading { font-size: clamp(28px, 7.6vw, 38px); }
+  .laptopFigure, .stackFigure { position: relative; width: 70%; left: auto; top: auto; }
+  .laptopFigure { order: 3; align-self: flex-end; }
+  .stackFigure { order: 3; align-self: flex-start; }
+  .volunteerMemory { position: relative; order: 2; width: 85%; left: auto; top: auto; align-self: flex-end; }
+  .settleFigure { position: relative; grid-column: 1 / -1; order: -1; width: 70%; left: auto; top: auto; justify-self: end; }
+  .limaMemory { position: relative; width: 85%; left: auto; top: auto; align-self: flex-start; }
+  .christmasMemory { position: relative; grid-column: 1 / -1; order: 5; width: 85%; left: auto; top: auto; margin-top: 18px; justify-self: start; }
+  .loupeFigure { position: relative; grid-column: 1 / -1; order: 6; width: 70%; left: auto; top: auto; justify-self: end; }
+  .celebrationPlane { top: 76%; left: 0; width: 125px; }
+  .photoCurve { width: 90%; }
+  .introCurve { top: 100px; right: -8%; }
+  .definitionCurve { top: 35%; left: -10%; }
+  .learningCurve { top: 120px; left: -12%; }
+  .communityCurve { top: 240px; left: -7%; }
+}
+

@@ -1,0 +1,70 @@
+.experience { position: relative; background: var(--public-blue); color: var(--public-paper); }
+.stage { position: relative; }
+.hero { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 24px; min-height: 100svh; padding: 130px 12vw; }
+.hero h1 { margin: 0; font: 550 clamp(86px, 12.5vw, 210px)/.98 var(--font-story-sans), sans-serif; letter-spacing: -.04em; }
+.panel { position: relative; background: var(--public-secondary); }
+.curtain { position: absolute; height: 100%; top: 0; right: calc(100% - 1px); overflow: visible; fill: var(--public-secondary); pointer-events: none; }
+.scrollCue { display: none; }
+.mobileCrest, .mobileCue { display: none; }
+.heroDescription { max-width: 42ch; margin: 0; color: var(--public-paper); font-size: 16px; line-height: 1.55; text-wrap: pretty; }
+.viewProjects { display: inline-flex; align-items: center; justify-content: center; gap: 16px; min-height: 48px; padding: 12px 22px; border: 0; border-radius: 4px; background: #662065; color: #fff; font: inherit; font-size: 13px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
+.viewProjects:hover { background: #7b2a7a; }
+.viewProjects:focus-visible, .scrollCue:focus-visible { outline: 2px solid var(--public-paper); outline-offset: 5px; }
+.list { list-style: none; margin: 0; padding: 115px 11.5vw 180px; display: flex; flex-direction: column; gap: 28px; }
+.projectItem { position: relative; }
+.project { position: relative; display: grid; grid-template-columns: 30px 116px 1fr 100px; align-items: center; gap: 30px; min-height: 240px; padding: 32px 36px; color: var(--public-paper); isolation: isolate; }
+.outline { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; z-index: -1; pointer-events: none; }
+.outline path { fill: var(--public-secondary); stroke: #8c7ba9; stroke-width: 1; vector-effect: non-scaling-stroke; transition: stroke .2s; }
+.project:hover .outline path, .project:focus-visible .outline path { stroke: var(--public-action); stroke-width: 1.5; }
+.project:focus-visible { outline: 2px solid var(--public-action); outline-offset: 7px; border-radius: 16px; }
+.number { align-self: start; padding-top: 5px; font-size: 13px; color: var(--public-muted); font-variant-numeric: tabular-nums; }
+.image { position: relative; display: block; width: 116px; height: 150px; }
+.image img { object-fit: contain; }
+.info { display: flex; flex-direction: column; align-items: start; }
+.info time { color: var(--public-muted); font-size: 12px; margin-bottom: 13px; }
+.info h2 { margin: 0; max-width: 24ch; font: 550 clamp(23px, 2.15vw, 36px)/1.1 var(--font-story-sans), sans-serif; letter-spacing: -.02em; text-wrap: balance; }
+.description { display: block; margin-top: 14px; max-width: 68ch; font-size: 14px; line-height: 1.55; color: #e4dced; }
+.visit { display: flex; align-items: center; justify-content: end; gap: 12px; font-size: 11px; white-space: nowrap; }
+.visit svg { color: var(--public-action); transition: transform .25s; }
+.project:hover .visit svg { transform: translate(3px,-3px); }
+.index { display: none; }
+.experience[data-animated] .stage { position: sticky; top: 0; height: 100svh; overflow: clip; }
+.experience[data-animated] .hero { position: absolute; inset: 0; }
+.experience[data-animated] .panel { position: absolute; inset: 0; }
+.experience[data-animated] .curtain { height: 100svh; }
+.experience[data-animated] .scrollCue { display: flex; position: absolute; top: calc(50% - 30px); left: -110px; width: 100px; height: 60px; align-items: center; justify-content: center; gap: 12px; color: var(--public-paper); background: transparent; border: 0; font-size: 13px; cursor: pointer; }
+.scrollCue svg { color: var(--public-action); }
+.experience[data-animated] .index { position: absolute; right: 3.5vw; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; }
+.index button { display: grid; place-items: center; width: 32px; height: 27px; border: 0; background: transparent; cursor: pointer; }
+.index button span { width: 16px; height: 2px; background: #8c7ba9; transition: width .25s, background .25s; }
+.index button[aria-current] span, .index button:hover span { width: 26px; background: var(--public-action); }
+@media (min-width: 1600px) { .list { padding-inline: max(11.5vw, calc((100vw - 1420px) / 2)); } .project { min-height: 270px; } .description { font-size: 16px; } }
+@media (max-width: 1000px) { .project { grid-template-columns: 22px 90px 1fr 24px; gap: 21px; padding: 28px; } .image { width: 90px; height: 125px; } .visit > span { display: none; } }
+@media (max-width: 767px) {
+  .hero { min-height: 100svh; padding: 110px 24px 145px; align-items: center; text-align: center; }
+  .hero h1 { font-size: clamp(54px, 15vw, 110px); }
+  .heroDescription { max-width: 34ch; font-size: 14px; }
+  .viewProjects svg { transform: rotate(90deg); }
+  .curtain { display: none; }
+  .mobileCrest { display: block; position: absolute; left: 0; bottom: calc(100% - 1px); width: 100%; height: 110px; fill: var(--public-secondary); pointer-events: none; }
+  .list { padding: 105px 25px 180px; gap: 24px; scroll-margin-top: 90px; }
+  .project { grid-template-columns: 76px 1fr 20px; align-items: start; gap: 18px 14px; padding: 24px 20px 28px; min-height: 0; border: 1px solid #8c7ba9; border-radius: 16px; }
+  .outline { display: none; }
+  .project:hover, .project:focus-visible { border-color: var(--public-action); }
+  .number { display: none; }
+  .image { width: 76px; height: 100px; grid-row: 1; }
+  .info { display: contents; }
+  .info time { grid-column: 2; grid-row: 1; margin: 0; font-size: 11px; line-height: 1.5; }
+  .info h2 { grid-column: 1 / -1; font-size: 27px; }
+  .description { grid-column: 1 / -1; margin-top: -3px; font-size: 14px; }
+  .visit { grid-column: 3; grid-row: 1; padding-top: 3px; }
+  .experience[data-animated] .index { right: 1px; }
+  .index button { width: 23px; }
+  .index button span { width: 8px; }
+  .index button[aria-current] span { width: 14px; }
+  .scrollCue { display: flex; position: absolute; align-items: center; justify-content: center; flex-direction: column; top: -76px; left: 50%; transform: translateX(-50%); width: 80px; height: 76px; gap: 6px; font-size: 11px; color: var(--public-paper); background: transparent; border: 0; cursor: pointer; }
+  .scrollCue .desktopCue { display: none; }
+  .scrollCue .mobileCue { display: block; }
+  .scrollCue svg { transform: rotate(90deg); }
+}
+@media (prefers-reduced-motion: reduce) { .project:hover .visit svg { transform: none; } .outline path, .visit svg, .index button span { transition: none; } .curtain { display: none; } }

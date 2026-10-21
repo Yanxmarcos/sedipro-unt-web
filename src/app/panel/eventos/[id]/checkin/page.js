@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { formatPersonName } from '@/lib/person-name'
 function tokenFromQr(value) {
   try {
     return new URL(value.trim()).pathname.split('/').pop()
@@ -62,7 +63,7 @@ export default function CheckinEventoPage() {
       })
       const d = await r.json()
       if (!r.ok) throw new Error(d.error)
-      const name = `${d.data.person.nombres} ${d.data.person.apellidos}`
+      const name = formatPersonName(d.data.person.nombres, d.data.person.apellidos)
       setMessage(
         d.alreadyRegistered
           ? `${name} ya fue registrado a las ${new Date(d.data.attendance.hora).toLocaleTimeString('es-PE')}.`
@@ -194,7 +195,7 @@ export default function CheckinEventoPage() {
               <div key={r._id} className="flex flex-wrap items-center justify-between gap-3 p-3">
                 <div>
                   <p className="font-semibold">
-                    {r.personaId.nombres} {r.personaId.apellidos}
+                    {formatPersonName(r.personaId.nombres, r.personaId.apellidos)}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {r.personaId.correo} · {r.codigo}

@@ -1,0 +1,833 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-14T22:14:00Z",
+  "title": "Design System: SEDIPRO UNT — sitio público",
+  "scope": {
+    "routes": [
+      "/",
+      "/proyectos",
+      "/nosotros",
+      "/login"
+    ],
+    "login": "Entorno público únicamente; cuadro original conservado.",
+    "excluded": [
+      "/panel",
+      "Páginas de eventos",
+      "/tecnologias-de-la-informacion"
+    ],
+    "sources": [
+      "src/components/public-site/public-site.module.css",
+      "src/components/public-site/public-shell.jsx",
+      "src/components/public-site/motion.jsx",
+      "src/components/public-site/sequences.jsx",
+      "src/components/layout/landing-only.jsx",
+      "src/app/page.js",
+      "src/components/public-site/home-institutional.jsx",
+      "src/components/public-site/home-institutional.module.css",
+      "src/components/public-site/home-content.js",
+      "src/components/public-site/section-liquid.jsx",
+      "src/components/public-site/project-journey.jsx",
+      "src/components/public-site/project-journey.module.css",
+      "src/components/public-site/navigation.jsx"
+    ],
+    "reference": "https://www.newformcap.com/",
+    "referenceStatus": "Referencia de composición y movimiento; no certificación de equivalencia ni fuente de tokens de marca.",
+    "homeOpening": {
+      "updated": "2026-10-12",
+      "purpose": "Informative institutional presentation and social/email contact",
+      "cover": "/img/institutional/portada.jpg",
+      "paper": "#fbfaf7",
+      "header": "Fixed transparent header, white on dark imagery and ink on light paper; no blur or background strip",
+      "animation": "One opening after image load; then 6s breathing with 0.65% width travel; paused offscreen/hidden and static with reduced motion",
+      "shader": "Cover and global HOME backdrop omit PageBackdrop/LiquidEther; colored HOME scenes mount SectionLiquid separately",
+      "otherSections": "Current institutional extension updates HOME only; /nosotros, /proyectos, /login and admin unchanged this turn",
+      "status": "Current restored opening: PublicHero followed by #historia / ElasticSection / ScrollStory, before ProjectJourney."
+    },
+    "story": {
+      "referenceFont": "TWK Lausanne",
+      "availableFont": "Inter Tight",
+      "weight": 550,
+      "lineHeight": 1.1,
+      "letterSpacing": "-0.02em",
+      "desktopHeight": "320svh",
+      "mobileHeight": "280svh",
+      "updated": "2026-10-13",
+      "animation": "Existing three-stage typing/erasing and side-entering recognition artwork motion retained",
+      "content": "Three original artworks: Voluntariado Universitario 2024, CONCEPMI 2025 and IPMC 2025; lower notes contain only the existing Conoce a SEDIPRO UNT action to /nosotros, without the institutional paragraph",
+      "artwork": "Original sizes 1080x1080, 864x1080 and 1080x1350; object-fit contain preserves complete artwork, original proportions and colors; no grayscale, image scrim or rounded border; sources recorded in .impeccable/assets-provenance.json",
+      "desktopLayout": "Artwork left 5%, width 32%, top 12svh, height 72svh; headline left 42%, right 4%, top 35svh, font-size clamp(40px, 6.05vw, 96px). Percentages are relative to the stage, including its 1600px cap at min-width 1700px",
+      "mobileLayout": "At max-width 767px: artwork left/right 24px, top 10svh, height 42svh; headline left/right 24px, top 57svh, font-size clamp(26px, 8.25vw, 43px)",
+      "reducedMotion": "Natural-height static layout with first caption, first artwork and /nosotros action; left/right/top/bottom reset to auto, no rejected paragraph",
+      "finishReview": {
+        "disposition": "ship",
+        "report": ".impeccable/review/recognitions-finish-review.md",
+        "scope": "Requested ScrollStory refinement and resolved wide-container finding only",
+        "screenshots": [
+          "recognitions-desktop.png",
+          "recognitions-mobile.png",
+          "recognitions-wide.png"
+        ],
+        "limits": "Section captures only; no whole-homepage, every-animation-frame, visually emulated reduced-motion or exact New Form parity certification; no detector rerun"
+      },
+      "background": "Shared SectionLiquid on colored HOME scenes including story; mouse only, autoDemo false, no PageBackdrop/top light, document-visible/fine-pointer/reduced-motion gating, 200px visibility margin, 160px upper extension (100px mobile), inverse curve mask"
+    },
+    "sectionDividers": {
+      "route": "/",
+      "geometry": "Two cubic SVG segments, flat outer 14% edges",
+      "driver": "-72 * tanh(scroll velocity / 1800), damped spring stiffness180 damping20 mass0.5",
+      "maxCenterDisplacement": "72px desktop, 45px mobile",
+      "reducedMotion": "Flat divider",
+      "surfaces": [
+        "#29295d",
+        "#304d90",
+        "#662065",
+        "#f6f1fa",
+        "#141020"
+      ],
+      "join": "4 SVG units overlap under the section to avoid antialias seams"
+    },
+    "homeInstitutional": {
+      "updated": "2026-10-14",
+      "authority": "User-dictated extension of the established world; HOME only",
+      "route": "/",
+      "unchangedRoutesThisTurn": [
+        "/nosotros",
+        "/proyectos",
+        "/login",
+        "admin"
+      ],
+      "sequence": [
+        "PublicHero",
+        "ScrollStory",
+        "ProjectJourney",
+        "HomeApproach",
+        "HomeValues",
+        "HomeAreas",
+        "HomeGoals",
+        "HomePMI",
+        "HomeMilestones",
+        "EditorialBands closing",
+        "HomeFooterFrame + PublicFooter"
+      ],
+      "projectShowcase": "Removed from HOME; route links remain navigation",
+      "direction": "ProjectJourney adds two chapters after ScrollStory: project-management definition/director profile, then SEDIPRO definition/university network; original opening and following HomeApproach retained.",
+      "network": {
+        "locations": [
+          "UNT",
+          "UPN",
+          "UCV"
+        ],
+        "city": "Trujillo",
+        "count": "More than 30 universities",
+        "sourceYear": 2024,
+        "claimStatus": "Explicitly historical brochure figure"
+      },
+      "approach": {
+        "desktopHeight": "380svh",
+        "mobileHeight": "300svh",
+        "stageHeight": "100svh",
+        "scale": 5.8,
+        "transformOrigin": "50% 44%",
+        "centralFill": "#8b4c99",
+        "sequence": "Translate circles to shared center; Formation integral caption; reopen with detailed captions; scale containing diagram into intersection; fade side copy",
+        "mergeProgress": [
+          0.12,
+          0.27,
+          0.38,
+          0.5
+        ],
+        "zoomProgress": [
+          0.68,
+          0.94
+        ],
+        "copyFadeProgress": [
+          0.67,
+          0.8
+        ],
+        "perCircleScaling": false,
+        "reducedMotion": "Natural section height, relative stage, static diagram and visible copy"
+      },
+      "values": {
+        "desktopHeight": "220svh",
+        "mobileHeight": "180svh",
+        "stageHeight": "100svh",
+        "items": [
+          "Integridad",
+          "Trabajo en equipo",
+          "Innovación",
+          "Vocación de servicio",
+          "Actitud positiva"
+        ],
+        "motion": "Per-row opacity .58 to 1 and x 0 to 12px",
+        "reducedMotion": "Natural height; all rows visible"
+      },
+      "areas": {
+        "items": [
+          "GTH",
+          "PMO",
+          "TI",
+          "MKT",
+          "LTK & FNZ"
+        ],
+        "interaction": "Roving tab focus, ArrowRight/Down and ArrowLeft/Up, Home/End, associated panel",
+        "panelTransition": "0.4s, opacity .5 to 1, x 20 to 0; no motion with reduced preference",
+        "mobile": "Wrapped horizontal tab row, single-column content"
+      },
+      "goals": {
+        "selectedNumbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          7,
+          8,
+          9,
+          10,
+          11,
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
+        "source": "User-supplied 2024 brochure page 11; full selected-goals artwork plus fifteen icon crops",
+        "panels": [
+          "Introducción",
+          "Personas",
+          "Desarrollo",
+          "Futuro compartido"
+        ],
+        "goalsPerGroup": 5,
+        "measurement": "ResizeObserver: viewport clientWidth and max(0, track scrollWidth minus viewport clientWidth)",
+        "desktopHeight": "calc(100svh + measured travel)",
+        "desktop": "Sticky 100svh viewport; vertical scroll drives x from 0 to minus measured travel, progress .06 to .94",
+        "mobile": "Native horizontal scroll, mandatory x snap, four controls",
+        "controlSize": "44px",
+        "reducedMotion": "All four panels vertical, natural height, no horizontal transform, progress or controls",
+        "allSeventeenClaimed": false
+      },
+      "pmi": {
+        "expandedName": "Project Management Institute",
+        "capm": "Certified Associate in Project Management",
+        "photo": "/img/institutional/brochure/encuentro-pmi-2023.webp",
+        "photoCaption": "SEDIPRO UNT · Lima, 2023",
+        "photoSource": "2024 brochure page 10"
+      },
+      "milestones": {
+        "foundation": "2013-08-30",
+        "achievements": [
+          {
+            "year": 2021,
+            "claim": "First place IPMC"
+          },
+          {
+            "year": 2023,
+            "claim": "First place CONCEPMI, Lima"
+          },
+          {
+            "year": 2025,
+            "claim": "Third place IPMC Perú"
+          }
+        ],
+        "achievementsSource": "Verified existing institutional content"
+      },
+      "closing": "Existing closing bands and footer preserved; colored footer now framed by SectionLiquid",
+      "sourceDocuments": [
+        "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BROUCHURE SEDIPRO 2024.pdf",
+        "C:/Users/Marcos/Documents/Proyectos/SEDIPRO/BIENVENIDA SEDIPRANA EXTRAORDINARIA 2026.pdf"
+      ],
+      "welcomeDocumentUse": "PMI definition only",
+      "excludedImports": [
+        "Old boards",
+        "Old projects",
+        "Old contact information"
+      ],
+      "truthReferences": [
+        "https://www.un.org/sustainabledevelopment/es/sustainable-development-goals/",
+        "https://www.pmi.org/certifications/certified-associate-capm"
+      ],
+      "additionalRasterInventory": "17 brochure crops already recorded in .impeccable/assets-provenance.json; inventory unchanged by documentation"
+    },
+    "homeFinishReview": {
+      "disposition": "ship",
+      "report": ".impeccable/review/home-finish-review.md",
+      "scope": "Reviewed HOME source and supplied seven scene captures only",
+      "screenshots": [
+        "institutional-focus-desktop.png",
+        "institutional-focus-zoom-desktop.png",
+        "institutional-ods-desktop.png",
+        "institutional-areas-desktop.png",
+        "institutional-pmi-desktop.png",
+        "institutional-focus-mobile.png",
+        "institutional-ods-mobile.png"
+      ],
+      "reportedViewports": {
+        "desktop": "1280x720",
+        "mobile": "390x844"
+      },
+      "savedImagePixels": {
+        "desktop": "1265x712",
+        "mobile": "375x812"
+      },
+      "builderReportedChecks": [
+        "Production build passed",
+        "Targeted ESLint passed",
+        "git diff --check passed",
+        "Area ArrowRight TI to Marketing",
+        "Desktop ODS control",
+        "Mobile ODS native scroll/control",
+        "console errors []",
+        "No root overflow"
+      ],
+      "reviewerReranChecks": false,
+      "fullPageCaptureAvailable": false,
+      "reducedMotionEvidence": "Source only; no browser preference emulation supplied",
+      "noCurrentSceneRenderVerdict": [
+        "cover",
+        "definition/network",
+        "values",
+        "milestones",
+        "closing"
+      ],
+      "notCertified": [
+        "Entire page visual coverage",
+        "Universal accessibility",
+        "Exact New Form reference parity",
+        "Intermediate approach frames",
+        "Dynamic liquid response and every animated boundary join",
+        "Unseen mobile groups"
+      ],
+      "detector": "Earlier Windows launcher/detector failed with cache_directory_failed; no detector result and no rerun"
+    },
+    "localReferences": [
+      {
+        "route": "/",
+        "component": "ProjectJourney",
+        "url": "https://mindmarket.com/",
+        "authority": "User-pinned local ribbon composition/reversible drawing, institutional palette and real-photo/video collage; original PublicHero/ScrollStory stay before it, small Hito pet unchanged; no exact pixel/timing parity claim."
+      }
+    ],
+    "homeJourneyHistorical": {
+      "updated": "2026-10-14",
+      "route": "/",
+      "component": "ProjectJourney",
+      "authority": "Approved local extension merging Dirección de proyectos and ¿Qué es una SEDIPRO? only. User explicitly pinned MindMarket ribbon animation/composition. Other HOME sections/routes and Hito pet behavior remain outside scope.",
+      "reference": "https://mindmarket.com/",
+      "panelException": "Four white panels are required by the user-pinned reference, in right/left/center/right sequence; they do not authorize a general card-grid system.",
+      "colorRoles": {
+        "field": "public-paper",
+        "ribbon": "public-blue",
+        "text": "public-secondary",
+        "action": "public-primary",
+        "panel": "journey-panel-white"
+      },
+      "desktopGeometry": {
+        "viewBox": "0 0 1944.2 6151.5",
+        "strokeWidth": 500,
+        "top": "340px",
+        "canvasMaxWidth": "1440px",
+        "canvasMinHeight": "calc(min(100vw, 1440px) * 3.29 + 340px)",
+        "topology": "Live-reference returning cubic loop, depth overlay and continuation over its crossing; three SVG path layers. Stroke width is a viewBox quantity, not a CSS width.",
+        "gradient": "userSpaceOnUse from (1730,2090) to (620,3320), stops 0 public-blue, .3 public-secondary, .8 public-blue",
+        "horizontalOverscan": "2% on each side"
+      },
+      "desktopLayout": {
+        "grid": "12 columns, 24px gap",
+        "panelColumns": [
+          "8 / 13",
+          "1 / 6",
+          "5 / 10",
+          "8 / 13"
+        ],
+        "padding": "100px 24px 120px; inline 30px at min-width 1440px",
+        "stopMinHeight": "min(53.75vw, 774px); third min(78.74vw, 1134px); fourth min(96.28vw, 1386px)",
+        "compact": "768–1000px: panel columns 7 / 13, 1 / 7, 4 / 11, 7 / 13; stop heights 640px, third 850px, fourth 950px; panel padding 28px"
+      },
+      "mobileLayout": {
+        "breakpoint": "max-width: 767px",
+        "viewBox": "0 0 400 3400",
+        "strokeWidth": 145,
+        "curve": "Own vertical curve; desktop loop hidden",
+        "padding": "65px 24px 85px",
+        "routeTop": "200px",
+        "flow": "Natural height, figure before each panel, 28px gap, stops padding 35px 0, third padding-block 80px; original artwork max-width 300px",
+        "panelPadding": "28px 24px",
+        "titleSize": "clamp(48px, 12vw, 82px)",
+        "panelTitleSize": "clamp(30px, 8vw, 43px)",
+        "bodySize": "17px"
+      },
+      "artwork": [
+        "/img/hito4.webp",
+        "/img/hito5.webp",
+        "/img/hito2.webp",
+        "/img/hito6.webp"
+      ],
+      "artworkMaterial": "Existing complete transparent rasters, proportionally rendered with object-fit contain; no generated pixels, parts or masks; existing provenance inventory preserved.",
+      "motion": {
+        "driver": "Motion useScroll target section; offsets start 65%, end 65%; progress reverses with native scrolling",
+        "pathProgress": "Numerical cubic arc-length fractions: loop ends .562932; shade starts .209622 and ends .430772; continuation follows loop",
+        "phaseVisibility": "Shade and continuation opacity gate from their start to start + .002; no early rounded-cap dots",
+        "figure": "Whole-raster y 32 to -32 and rotation -3 to 3 with local start end/end start progress",
+        "reduced": "Full static desktop layers including gradient crossing, full mobile curve, no figure transforms; all text readable",
+        "desktopScrollMapping": {
+          "input": [
+            0,
+            0.22,
+            0.37,
+            0.55,
+            0.82,
+            1
+          ],
+          "drawing": [
+            0.001,
+            0.21,
+            0.43,
+            0.72,
+            0.9,
+            1
+          ],
+          "purpose": "Returning loop consumes arc length without descending; keep crossing drawn while central reading panel remains visible. All desktop length/opacity gates use this mapped progress; mobile keeps linear raw progress."
+        }
+      },
+      "navigation": "Transparent header samples logo, menu-trigger and menu-bars centers separately only within data-nav-surface=mixed; white panel bounds take priority. Visible ribbon strokes determine white over ribbon versus ink over paper. Opacity-zero layers are skipped; partial paths use cached Path2D and a non-rendering 2D context with the actual drawn dash length, complete paths use native SVG hit testing. Future unpainted continuation cannot turn controls white over paper. Existing header rules restore outside.",
+      "content": "Four chapters: definition; project-director profile; SEDIPRO definition; university community UNT/UPN/UCV with more-than-30 figure explicitly attributed to the 2024 brochure. Native chapter anchors, final /nosotros link.",
+      "scopeJoin": "HomeApproach function/CSS preserved; its ElasticSection previous surface now public-paper. ProjectJourney has no SectionLiquid; obsolete merged exports/CSS removed.",
+      "finishReview": {
+        "disposition": "ship",
+        "report": ".impeccable/review/journey-finish-review.md",
+        "scope": "Three scored material fixes only: returning loop/self-crossing; gradient crossing depth/coordinated motion; persistence. Post-verdict bounded legibility confirmation covers final painted-stroke navigation correction.",
+        "screenshots": [
+          "journey-opening-final.png",
+          "journey-center-final.png",
+          "journey-mobile-final.png"
+        ],
+        "savedImagePixels": {
+          "desktop": "1265x712",
+          "mobile": "375x812"
+        },
+        "captureCoverage": "Opening shows full two-line heading, emerging ribbon and start of first panel. Refreshed center shows full SEDIPRO panel, original Hito and distinct front/back ribbon depth; menu label white over blue, bars dark over pale field. Mobile shows complete SEDIPRO panel/action; character at top is partly outside captured viewport, not cropped in the source raster. Fourth panel placement remains source-confirmed.",
+        "builderReportedChecks": [
+          "Final production build passed",
+          "Final targeted ESLint passed",
+          "No root overflow in desktop/mobile",
+          "Console errors []",
+          "Reversible front-pass progress decreased .347987 to .056706 on upward scroll and restored downward",
+          "Final refreshed center menu label/bars computed contrast colors confirmed"
+        ],
+        "reviewerReranChecks": false,
+        "fullPageCaptureAvailable": false,
+        "reducedMotionEvidence": "Source inspection only; no browser preference emulation",
+        "limits": "Verdict covers the scored fixes and bounded final nav confirmation, not whole HOME, every frame, exact pixel/timing parity or universal accessibility. Earlier Windows launcher/detector failure was not rerun; no detector result."
+      },
+      "status": "Historical large-Hito version; superseded by photo/video collage, not current geometry or artwork."
+    },
+    "homeJourney": {
+      "updated": "2026-10-14",
+      "component": "ProjectJourney",
+      "placement": "After PublicHero and #historia / ElasticSection / ScrollStory; before HomeApproach. Original HOME opening restored unchanged.",
+      "chapters": [
+        "Dirección de proyectos: definition and director profile",
+        "¿Qué es una SEDIPRO?: definition and university community"
+      ],
+      "heading": "First local title h2; only h1 belongs to PublicHero. No visual changes to collage, ribbon, photos or video during restoration.",
+      "currentDetails": "extensions.journeyNavigation, extensions.journeyMedia, extensions.motion; .impeccable/surfaces/public-site.md",
+      "restorationReview": {
+        "status": "ship",
+        "builderReportedChecks": "Build 10.4s and ESLint passed; DOM cover/story/journey/approach, single cover h1, mobile positions 0/811/3225, no root overflow.",
+        "captures": [
+          "restored-home-desktop.png",
+          "restored-history-desktop.png",
+          "restored-journey-desktop.png",
+          "restored-home-mobile.png",
+          "restored-journey-mobile.png"
+        ],
+        "report": ".impeccable/review/restored-home-review.md",
+        "scope": "Restoration and section order only; all five captures valid, no material UI defect observed. Does not certify whole HOME or broaden prior navigation verdict."
+      }
+    }
+  },
+  "extensions": {
+    "colorMeta": {
+      "public-primary": {
+        "role": "primary",
+        "displayName": "Púrpura institucional"
+      },
+      "public-action": {
+        "role": "primary",
+        "displayName": "Lavanda de acción"
+      },
+      "public-secondary": {
+        "role": "secondary",
+        "displayName": "Índigo institucional"
+      },
+      "public-blue": {
+        "role": "secondary",
+        "displayName": "Azul institucional"
+      },
+      "public-ink": {
+        "role": "neutral",
+        "displayName": "Tinta violeta oscura"
+      },
+      "public-paper": {
+        "role": "neutral",
+        "displayName": "Marfil"
+      },
+      "public-muted": {
+        "role": "neutral",
+        "displayName": "Lavanda apagado"
+      },
+      "cover-paper": {
+        "role": "neutral",
+        "displayName": "Papel de portada"
+      },
+      "journey-panel-white": {
+        "role": "neutral",
+        "displayName": "Blanco de lectura del journey",
+        "purpose": "Paneles inferiores de lectura y marcos Polaroid de HOME; no una receta general de tarjetas."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Titular monumental anterior",
+        "purpose": "Registro del titular monumental previo; HOME conserva portada institucional y ScrollStory antes de los dos heroes ProjectJourney."
+      },
+      "page-title": {
+        "displayName": "Título de subpágina",
+        "purpose": "Acompaña fotografía documental grande."
+      },
+      "editorial-band": {
+        "displayName": "Serif editorial",
+        "purpose": "Bandas y acentos expresivos."
+      },
+      "body": {
+        "displayName": "Texto público",
+        "purpose": "Tamaño base heredado; tamaños locales para notas y descripciones."
+      },
+      "home-headline": {
+        "displayName": "Titular institucional HOME",
+        "purpose": "Inter Tight disponible; TWK Lausanne no distribuida. Escala móvil clamp(40px,10vw,64px), con ajustes locales por escena."
+      },
+      "home-lead": {
+        "displayName": "Introducción institucional",
+        "purpose": "Párrafos destacados del módulo HOME; Manrope conserva cuerpo y serif los ámbitos del diagrama."
+      },
+      "journey-title": {
+        "displayName": "Hero local ProjectJourney",
+        "purpose": "Inter Tight 500, dos heroes sticky después de ScrollStory y antes de HomeApproach; primer titular h2. Móvil clamp(48px,12vw,86px)."
+      },
+      "journey-panel-title": {
+        "displayName": "Titular de panel journey",
+        "purpose": "Inter Tight 500, line-height 1.03; paneles inferiores. Móvil clamp(34px,9vw,49px)."
+      }
+    },
+    "shadows": [
+      {
+        "name": "public-action",
+        "value": "1px 8px 20px #6620653b",
+        "purpose": "Acciones públicas."
+      },
+      {
+        "name": "public-action-hover",
+        "value": "1px 8px 20px #66206565",
+        "purpose": "Hover de acciones públicas."
+      },
+      {
+        "name": "preserved-login-card",
+        "value": "12px 12px 0 #5f5f5f",
+        "purpose": "Cuadro de acceso original."
+      },
+      {
+        "name": "preserved-login-field",
+        "value": "4px 4px 0 #000",
+        "purpose": "Campos originales."
+      },
+      {
+        "name": "preserved-login-field-focus",
+        "value": "4px 4px 0 #737373",
+        "purpose": "Foco de campos originales."
+      },
+      {
+        "name": "journey-polaroid",
+        "value": "0 16px 32px rgb(27 16 45 / .16)",
+        "purpose": "Marcos fotográficos superpuestos del colaje HOME."
+      }
+    ],
+    "motion": [
+      {
+        "name": "public-ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Entradas y transformaciones públicas."
+      },
+      {
+        "name": "page-arrival",
+        "value": "0.65s; translateY(14px → 0); opacity(0.75 → 1)",
+        "purpose": "Cambio de ruta pública."
+      },
+      {
+        "name": "menu-arrival",
+        "value": "0.55s; clip-path: inset(0 0 100% 0) → inset(0)",
+        "purpose": "Apertura del menú."
+      },
+      {
+        "name": "reveal",
+        "value": "0.7s; y(18 → 0); opacity(0.65 → 1); viewport once, amount 0.15",
+        "purpose": "Entrada por scroll con initial=false."
+      },
+      {
+        "name": "hero-reel",
+        "value": "10s infinite; sólo en viewport, documento visible y sin movimiento reducido",
+        "purpose": "Segunda foto del título; hover pausa."
+      },
+      {
+        "name": "project-selection",
+        "value": "0.5s; opacity, y and rotate",
+        "purpose": "Cambio de poster; duración 0 con movimiento reducido."
+      },
+      {
+        "name": "statement",
+        "value": "opacity 0.5 → 1; scroll offset start 80%, end 55%",
+        "purpose": "Iluminación progresiva del texto."
+      },
+      {
+        "name": "impact-travel",
+        "value": "45s linear infinite; translateX(-50%)",
+        "purpose": "Cifras con pausa manual, hover y focus-within."
+      },
+      {
+        "name": "journey-ribbon",
+        "value": "Each sheet scroll offset start end/end end; [0,.12,.35,.6,1] → [.0001,.005,.12,.65,1]; width 44→500 desktop / 24→135 mobile during [0,.28]",
+        "purpose": "Dibujo/borrado reversible: bucle/cruce en primer capítulo, continuación en segundo; rutas completas con movimiento reducido."
+      },
+      {
+        "name": "journey-collage",
+        "value": "collage y [0,-45,-65] for progress [0,.55,1]; details y 18→-55, plane rotate -8→8",
+        "purpose": "Fotografías reales y trazo de viento/avión; sin parallax con movimiento reducido, sin cambios a la mascota pequeña."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide-scenes",
+        "value": "(min-width: 1700px)"
+      },
+      {
+        "name": "compact-desktop",
+        "value": "(max-width: 1000px)"
+      },
+      {
+        "name": "mobile",
+        "value": "(max-width: 767px)"
+      }
+    ],
+    "reducedMotion": {
+      "query": "(prefers-reduced-motion: reduce)",
+      "behavior": [
+        "Sin animación de página, menú o cifras; transiciones CSS de 0.01ms.",
+        "Historia y enfoque con altura natural y escenario relativo.",
+        "Texto del statement completamente visible; sin transformaciones de círculos.",
+        "ScrollStory: solo primera foto visible en lectura estática; cifras se distribuyen en filas sin duplicado decorativo.",
+        "Reveal y bandas sin animación; cambio de proyecto inmediato.",
+        "Sin humo WebGL ni PageBackdrop; Hito usa idle con frame 0.",
+        "HOME: portada vigente estática, valores de altura natural y todos los paneles ODS verticales; SectionLiquid omite shader.",
+        "ProjectJourney: heroes relativos, mínimo 75svh; rutas completas y sin parallax de colaje/detalles; texto y enlaces visibles. Evidencia de fuente, sin emulación visual actual."
+      ]
+    },
+    "fontLoading": {
+      "source": "next/font/google",
+      "sans": {
+        "family": "Manrope",
+        "variable": "--font-public-sans",
+        "subsets": [
+          "latin"
+        ],
+        "display": "swap"
+      },
+      "serif": {
+        "family": "Instrument Serif",
+        "variable": "--font-public-serif",
+        "weight": "400",
+        "style": [
+          "normal",
+          "italic"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "display": "swap"
+      },
+      "preservedLogin": "Geist/Arial y utilidades sans/mono originales de admin.css.",
+      "storySans": {
+        "family": "Inter Tight",
+        "variable": "--font-story-sans",
+        "subsets": [
+          "latin"
+        ],
+        "display": "swap",
+        "referenceFont": "TWK Lausanne",
+        "referenceFontStatus": "Unavailable; no font equivalence claimed"
+      }
+    },
+    "mascot": {
+      "preserved": true,
+      "manifest": "public/img/hito-pet/hito.json",
+      "sprites": "public/img/hito-pet/hito-sprites-v2.webp",
+      "rig": "public/img/hito-pet/hito-rig-v9.webp",
+      "behavior": "Arte raster/pixel y marcha conservados. greetOnMount=false difiere solamente la primera burbuja. No se monta mascota animada en /login."
+    },
+    "snippetNotes": "Los tokens públicos se declaran en el contenedor, no en :root; estos ejemplos resuelven sus valores a CSS literal para un shadow DOM independiente. No definen un sistema para las rutas excluidas. No se sintetizaron escalas tonales inexistentes.",
+    "homeSectionLiquid": {
+      "route": "/",
+      "scenes": [
+        "story",
+        "approach",
+        "values",
+        "areas",
+        "PMI",
+        "footer"
+      ],
+      "interaction": "mouse only",
+      "autoDemo": false,
+      "topLight": false,
+      "PageBackdrop": false,
+      "mountConditions": [
+        "Within 200px visibility margin",
+        "Document visible",
+        "(hover: hover) and (pointer: fine)",
+        "No reduced motion"
+      ],
+      "desktopUpperExtension": "160px",
+      "mobileUpperExtension": "100px",
+      "boundary": "Single scene renderer under the inverse SVG curve mask",
+      "colors": [
+        "#662065",
+        "#304D90",
+        "#B497CF"
+      ],
+      "mouseForce": 20,
+      "cursorSize": 100,
+      "viscous": 10,
+      "iterationsViscous": 32,
+      "iterationsPoisson": 32,
+      "resolution": 0.5,
+      "surfaceOverlayOpacity": 0.32
+    },
+    "journeyNavigation": {
+      "header": "fixed transparent",
+      "foreground": "Per-control paper/visible-stroke testing; painted dash and opacity respected.",
+      "photoProtection": "Full control rectangle intersects data-nav-media frame; local #141020 backing inset -8px, radius 8px, white content only while intersecting.",
+      "scope": "Logo and menu independently; no full header backing."
+    },
+    "journeyMedia": {
+      "images": "Original JPG shown full 4:3; institutional artwork photo regions selected with CSS windows; pixels preserved.",
+      "video": "Full local MOV transcoded H264/AAC MP4 1280×720, faststart, 1997206 bytes, container duration 6.453s, second-1 poster; muted manual native controls, playsInline, preload none, pause offscreen/hidden.",
+      "linework": "Geometric SVG wind and Lucide Send; no Hairline runtime copied.",
+      "provenance": ".impeccable/assets-provenance.json"
+    },
+    "journeyFinishReview": {
+      "report": ".impeccable/review/collage-finish-review.md",
+      "disposition": "ship",
+      "scope": "Only scored navigation contrast fix; ten valid same-path recaptures, no fix-introduced regression observed in them. Does not certify whole HOME, every animation frame, exact reference parity or visually emulated reduced motion.",
+      "validation": "Builder-reported final build 12.6s, ESLint and diff check exit 0; empty console errors, no mobile root overflow, reversible path observed; manual muted video playback observed. Documenter read source and verdict without rerunning.",
+      "detector": "Not rerun; prior Windows cache_directory_failed, no detector result."
+    }
+  },
+  "components": [
+    {
+      "name": "Acción pública",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Enlace lavanda con flecha para las llamadas a la acción públicas.",
+      "html": "<a class=\"ds-action\" href=\"#proyectos\">Explorar proyectos<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M7 17 17 7M7 7h10v10\"/></svg></a>",
+      "css": ".ds-action{display:inline-flex;align-items:center;justify-content:space-between;gap:30px;min-height:52px;padding:17px 25px;border-radius:5px;background:#e2bcf1;color:#141020;font-family:Manrope,sans-serif;font-size:11px;font-weight:750;letter-spacing:.03em;text-transform:uppercase;text-decoration:none;box-shadow:1px 8px 20px #6620653b;transition:background .25s,box-shadow .25s}.ds-action:hover{background:#efdbf7;box-shadow:1px 8px 20px #66206565}.ds-action svg{transition:transform .3s cubic-bezier(.16,1,.3,1)}.ds-action:hover svg{transform:translate(3px,-3px)}.ds-action:focus-visible{outline:2px solid #e2bcf1;outline-offset:6px}@media(prefers-reduced-motion:reduce){.ds-action,.ds-action svg{transition-duration:.01ms}}"
+    },
+    {
+      "name": "Enlace de menú",
+      "kind": "nav",
+      "description": "Fila tipográfica del diálogo de navegación, con estado actual.",
+      "html": "<nav class=\"ds-menu\"><a href=\"#inicio\" aria-current=\"page\">Inicio<svg width=\"44\" height=\"44\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M7 17 17 7M7 7h10v10\"/></svg></a></nav>",
+      "css": ".ds-menu{background:#141020;padding:24px;color:#f6f1fa;font-family:Manrope,sans-serif}.ds-menu a{display:flex;align-items:center;justify-content:space-between;font-size:clamp(55px,8.5vw,120px);line-height:1.15;letter-spacing:-.04em;font-weight:500;color:inherit;text-decoration:none;border-bottom:1px solid rgba(222,203,239,.25);padding:7px 0 15px;transition:color .25s,padding .35s cubic-bezier(.16,1,.3,1)}.ds-menu a:hover,.ds-menu a[aria-current=page]{color:#e2bcf1;padding-left:12px}.ds-menu a:focus-visible{outline:2px solid #e2bcf1;outline-offset:6px}@media(max-width:767px){.ds-menu a{font-size:clamp(52px,13vw,80px)}}@media(prefers-reduced-motion:reduce){.ds-menu a{transition-duration:.01ms}}"
+    },
+    {
+      "name": "Selector de proyectos",
+      "kind": "button",
+      "description": "Pestaña de proyecto, número serif y etiqueta sans; foco visible y selección lavanda.",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\" aria-label=\"Proyectos destacados\"><button role=\"tab\" aria-selected=\"true\" type=\"button\"><span>01</span><span>SEDICHAMPIONS LEAGUE</span></button></div>",
+      "css": ".ds-tabs{background:#141020;padding:24px}.ds-tabs button{display:flex;align-items:center;gap:25px;text-align:left;background:none;color:#cdc3dc;padding:20px 0;border:0;border-bottom:1px solid rgba(222,203,239,.25);cursor:pointer}.ds-tabs button span:first-child{font-family:\"Instrument Serif\",serif;font-size:52px;line-height:1}.ds-tabs button span:last-child{font-family:Manrope,sans-serif;font-size:12px;font-weight:600;letter-spacing:.03em}.ds-tabs button[aria-selected=true]{color:#e2bcf1}.ds-tabs button:focus-visible{outline:2px solid #e2bcf1;outline-offset:6px}"
+    },
+    {
+      "name": "Enlace editorial",
+      "kind": "button",
+      "description": "Acceso textual a un proyecto, separado por línea fina.",
+      "html": "<div class=\"ds-link-canvas\"><a class=\"ds-text-link\" href=\"#proyecto\">Conocer el proyecto<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M7 17 17 7M7 7h10v10\"/></svg></a></div>",
+      "css": ".ds-link-canvas{background:#141020;padding:24px}.ds-text-link{display:inline-flex;align-items:center;gap:25px;color:#f6f1fa;font-family:Manrope,sans-serif;font-size:13px;text-decoration:none;border-bottom:1px solid rgba(222,203,239,.25);padding:14px 0;margin-top:30px}.ds-text-link svg{transition:transform .3s cubic-bezier(.16,1,.3,1)}.ds-text-link:hover svg{transform:translate(3px,-3px)}.ds-text-link:focus-visible{outline:2px solid #e2bcf1;outline-offset:6px}@media(prefers-reduced-motion:reduce){.ds-text-link svg{transition-duration:.01ms}}"
+    },
+    {
+      "name": "Campo del acceso conservado",
+      "kind": "input",
+      "refersTo": "login-input",
+      "description": "Campo original del cuadro de acceso; no adoptar como campo general del sitio público.",
+      "html": "<label class=\"ds-login-label\">Usuario<input class=\"ds-login-input\" placeholder=\"Ingresa tu usuario\" autocomplete=\"username\"></label>",
+      "css": ".ds-login-label{display:grid;gap:8px;font-family:Geist,Arial,sans-serif;font-size:12px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#000;background:#f4f1ea;padding:24px}.ds-login-input{height:48px;border-radius:0;border:2px solid #000;background:#fff;padding:0 16px;font-family:Geist,Arial,sans-serif;font-size:16px;color:#000;box-shadow:4px 4px 0 #000;outline:none}.ds-login-input::placeholder{color:rgba(0,0,0,.4)}.ds-login-input:focus-visible{border-color:#000;box-shadow:4px 4px 0 #737373}.ds-login-input:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Cuadro del acceso conservado",
+      "kind": "card",
+      "refersTo": "login-card",
+      "description": "Contenedor original del acceso, con borde negro y sombra dura.",
+      "html": "<section class=\"ds-login-card\"><div class=\"ds-login-card-header\"><h2>Iniciar sesión</h2><p>Accede al panel interno de SEDIPRO UNT.</p></div></section>",
+      "css": ".ds-login-card{border:3px solid #000;border-radius:0;background:#f4f1ea;color:#000;box-shadow:12px 12px 0 #5f5f5f;font-family:Geist,Arial,sans-serif}.ds-login-card-header{padding:28px 24px;border-bottom:3px solid #000}.ds-login-card h2{margin:0 0 8px;font-size:30px;font-weight:900;text-transform:uppercase;line-height:1;letter-spacing:-.025em}.ds-login-card p{margin:0;font-size:16px;color:rgba(0,0,0,.65)}"
+    },
+    {
+      "name": "Pestaña de área HOME",
+      "kind": "button",
+      "description": "Estado seleccionado de las cinco áreas; el componente de aplicación aporta foco rotatorio y panel asociado.",
+      "html": "<div class=\"ds-area-tabs\" role=\"tablist\" aria-label=\"Nuestras áreas\"><button type=\"button\" role=\"tab\" aria-selected=\"true\"><span>PMO</span><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M7 17 17 7M7 7h10v10\"/></svg></button></div>",
+      "css": ".ds-area-tabs{background:#662065;padding:24px}.ds-area-tabs button{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0;width:100%;background:none;color:#f6f1fa;border:0;border-bottom:1px solid #f6f1fa4d;text-align:left;opacity:.75}.ds-area-tabs span{font-family:Inter Tight,sans-serif;font-size:32px;font-weight:500;letter-spacing:-.02em}.ds-area-tabs button[aria-selected=true]{opacity:1;color:#efdbf7}.ds-area-tabs button[aria-selected=true] svg{transform:rotate(45deg)}.ds-area-tabs button:hover{opacity:1}.ds-area-tabs button:focus-visible{outline:2px solid #e2bcf1;outline-offset:6px}"
+    },
+    {
+      "name": "Control ODS HOME",
+      "kind": "button",
+      "description": "Control de 44px para uno de los cuatro paneles de ejes temáticos.",
+      "html": "<div class=\"ds-goal-controls\" role=\"group\" aria-label=\"Secciones de ejes temáticos\"><button type=\"button\" aria-label=\"Ver Personas\" aria-pressed=\"true\"><span aria-hidden=\"true\"></span></button></div>",
+      "css": ".ds-goal-controls{display:flex;background:#f6f1fa;padding:24px}.ds-goal-controls button{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:none}.ds-goal-controls span{width:8px;height:8px;border-radius:50%;background:#29295d66}.ds-goal-controls button[aria-pressed=true] span{background:#662065}.ds-goal-controls button:focus-visible{outline:2px solid #e2bcf1;outline-offset:6px}@media(prefers-reduced-motion:reduce){.ds-goal-controls{display:none}}"
+    },
+    {
+      "name": "Panel de lectura ProjectJourney",
+      "kind": "custom",
+      "refersTo": "journey-panel",
+      "description": "Panel inferior blanco de los dos capítulos HOME; la introducción principal usa respaldo de papel lavanda. Excepción local de composición.",
+      "html": "<article class=\"ds-journey-panel\"><h3>Conectados por<br>un mismo propósito.</h3><p>Las SEDIPRO forman parte de una red universitaria de dirección de proyectos.</p><a href=\"/nosotros\">Conoce a SEDIPRO UNT <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M7 17 17 7M7 7h10v10\"/></svg></a></article>",
+      "css": ".ds-journey-panel{padding:40px;border-radius:16px;background:#fff;color:#29295d;font-family:Manrope,sans-serif}.ds-journey-panel h3{margin:0 0 28px;font-family:Inter Tight,sans-serif;font-size:clamp(36px,3.7vw,53px);font-weight:500;line-height:1.03;letter-spacing:-.035em}.ds-journey-panel p{font-size:clamp(17px,1.55vw,21px);line-height:1.55;letter-spacing:-.015em}.ds-journey-panel a{display:inline-flex;align-items:center;justify-content:space-between;gap:28px;max-width:100%;min-height:58px;margin-top:32px;padding:14px 20px;border-radius:12px;background:#662065;color:#fff;font-size:16px;text-decoration:none}.ds-journey-panel svg{flex-shrink:0;transition:transform .25s cubic-bezier(.16,1,.3,1)}.ds-journey-panel a:hover svg{transform:translate(2px,-2px)}.ds-journey-panel a:focus-visible{outline:3px solid currentColor;outline-offset:7px}@media(max-width:767px){.ds-journey-panel{padding:30px 24px}.ds-journey-panel h3{font-size:clamp(34px,9vw,49px)}.ds-journey-panel p{font-size:17px}.ds-journey-panel a{font-size:14px;gap:16px;padding-inline:16px}}@media(prefers-reduced-motion:reduce){.ds-journey-panel svg{transition:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Una publicación viva",
+    "overview": "Una presentación editorial de SEDIPRO UNT: títulos monumentales, fotografías institucionales y serif expresiva entre superficies de los tres colores de marca. Las superficies son planas, con líneas finas y espacio amplio para contar la historia del equipo. En HOME el líquido responde al mouse dentro de las escenas de color; las otras rutas conservan su tratamiento previo de humo.\n\nLa extensión local del 14 de octubre aplica la referencia MindMarket dentro\nde ProjectJourney, después de ScrollStory: «Dirección / de proyectos.» sobre índigo y «¿Qué es / una\nSEDIPRO?» sobre púrpura quedan detrás de sus hojas de papel lavanda que suben\ncon el scroll. Un punto inicial crece hasta convertirse en cinta con bucle y\ncontinuación; los colajes usan personas reales, video y trazo de viento/avión.\nLos Hito grandes de la versión previa se retiran de esta composición; la\nmascota pequeña conserva su comportamiento. Es una extensión local del mundo\neditorial, no una receta general de tarjetas ni una sustitución de identidad.\nLa revisión final del colaje emitió ship para el único hallazgo puntuado: el\ncontraste de navegación sobre fotografías. Las diez recapturas requeridas son\nválidas y no muestran regresiones introducidas por esa corrección. El alcance\nno certifica toda HOME; el ship previo corresponde a la versión histórica. No se afirma paridad exacta de píxeles ni\ntiempos con MindMarket.\n\nEste documento conserva el sistema implementado en `/`, `/proyectos`, `/nosotros` y el entorno público de `/login`, con una actualización actual limitada a `/`. El cuadro de acceso conserva su lenguaje original. El panel, las páginas de eventos y `/tecnologias-de-la-informacion` mantienen sus sistemas existentes; estas reglas no autorizan rediseñarlos. La composición y la evidencia de HOME se registran en `.impeccable/surfaces/public-site.md`.",
+    "keyCharacteristics": [
+      "Tipografía sans monumental con acentos serif editoriales.",
+      "Escenas de índigo, azul y púrpura, papel claro, tinta oscura y acciones lavanda.",
+      "Fotografía institucional, video local y recortes documentales con procedencia registrada; posters completos en las rutas existentes.",
+      "Movimiento ligado al scroll con alternativas estáticas accesibles."
+    ],
+    "rules": [
+      {
+        "name": "The Scope Rule",
+        "body": "Las variables públicas viven en el contenedor público, no en la raíz global; conservar esa frontera evita transferir esta paleta al panel y a las páginas excluidas.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "Do mantener los tokens y estilos públicos dentro de su contenedor y rutas autorizadas.",
+      "Do reutilizar el logotipo, fotografías, posters y Hito registrados en la procedencia de recursos.",
+      "Do conservar contenido visible, navegación por teclado y alternativas de movimiento reducido.",
+      "Do preservar el cuadro de acceso y su tipografía, campos y autenticación existentes."
+    ],
+    "donts": [
+      "Don't aplicar este sistema al panel, eventos o Tecnologías de la Información.",
+      "Don't reemplazar la identidad de SEDIPRO por los colores, textos o recursos de New Form.",
+      "Don't convertir las filas editoriales en una grilla general de tarjetas.",
+      "Don't generalizar los cuatro paneles blancos de ProjectJourney: son una excepción local requerida por la composición MindMarket fijada por el usuario.",
+      "Don't tratar la referencia como certificación de equivalencia: estas notas describen el código implementado."
+    ]
+  }
+}

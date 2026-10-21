@@ -1,0 +1,31 @@
+.content { display: contents; }
+.screen { --loader-blue: #304d90; --loader-paper: #f6f1fa; position: fixed; inset: 0; width: 100vw; z-index: 10000; overflow: hidden; isolation: isolate; touch-action: none; color: var(--loader-paper); font-family: var(--font-geist-sans), Arial, sans-serif; }
+.sheet { position: absolute; inset: 0; background: var(--loader-blue); will-change: transform; }
+.upper { z-index: 2; }
+.lower { z-index: 1; }
+.logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: clamp(245px,34vw,490px); }
+.logo svg { display: block; width: 100%; height: auto; }
+.logo svg path { fill: var(--loader-paper); }
+.edge { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; opacity: 0; pointer-events: none; }
+.edge path { stroke: var(--loader-paper); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.message { position: absolute; left: 50%; bottom: 4.5vh; width: min(520px,calc(100vw - 48px)); margin: 0; transform: translateX(-50%); font-size: 14px; font-weight: 400; line-height: 1.55; text-align: center; text-wrap: balance; }
+.screen[data-phase="closing"] .sheet { transform: translateY(0); transition: transform 340ms cubic-bezier(.65,0,.35,1); }
+.screen[data-phase="opening"] .sheet { transition: transform 850ms cubic-bezier(.76,0,.24,1); }
+.screen[data-phase="opening"] .upper, .screen[data-phase="idle"] .upper { transform: translateY(-55%); }
+.screen[data-phase="opening"] .lower, .screen[data-phase="idle"] .lower { transform: translateY(55%); }
+.screen[data-phase="closing"] .edge, .screen[data-phase="opening"] .edge { opacity: 1; }
+.screen[data-phase="idle"] { visibility: hidden; pointer-events: none; }
+.screen[data-phase="idle"] .sheet { will-change: auto; }
+/* If hydration never starts, release the SSR curtain instead of trapping the page. */
+.screen:not([data-controlled]) { animation: release 0s 12s forwards; }
+@keyframes release { to { visibility: hidden; pointer-events: none; } }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 600px) {
+  .logo { width: min(76vw,350px); }
+  .message { bottom: 42px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen[data-phase="closing"] .sheet, .screen[data-phase="opening"] .sheet, .screen[data-phase="idle"] .sheet { transform: none; transition: none; }
+  .screen[data-phase="opening"] { opacity: 0; transition: opacity 120ms linear; }
+  .screen .edge { display: none; }
+}
