@@ -35,13 +35,13 @@
 .coverArtwork[data-cover-ready] .coverCurtain { visibility: visible; }
 .coverCurtain img { object-fit: cover; object-position: center; }
 .coverLeft { clip-path: polygon(0 0,30.81% 0,30.6% 2.5%,30.66% 5%,31.61% 7.5%,30.66% 10%,30.49% 12.5%,29.98% 15%,29.95% 17.5%,29.89% 20%,29.42% 22.5%,29.12% 25%,28.83% 27.5%,28.41% 30%,28.77% 32.5%,28.41% 35%,28.2% 37.5%,29.15% 40%,27.85% 42.5%,26.72% 45%,25.77% 47.5%,26.54% 50%,25.95% 52.5%,25.89% 55%,25.47% 57.5%,25.24% 60%,25.06% 62.5%,25.59% 65%,24.67% 67.5%,24.61% 70%,24.26% 72.5%,24.2% 75%,24.08% 77.5%,23.7% 80%,23.49% 82.5%,23.37% 85%,23.25% 87.5%,22.54% 90%,22.21% 92.5%,21.92% 95%,21.62% 97.5%,21.44% 100%,0 100%); }
-.coverArtwork[data-cover-ready] .coverLeft { animation: cover-open-left 1.15s cubic-bezier(0.16,1,0.3,1) both, cover-breathe-left 9s ease-in-out 1.15s infinite; animation-play-state: running, var(--cover-drift-state); }
+.coverArtwork[data-cover-ready] .coverLeft { animation: cover-open-left 1.8s cubic-bezier(0.16,1,0.3,1) both, cover-breathe-left 16s ease-in-out 1.8s infinite; animation-play-state: running, var(--cover-drift-state); }
 .coverRight { clip-path: polygon(78.05% 0,100% 0,100% 100%,70.88% 100%,70.91% 97.5%,70.91% 95%,71.03% 92.5%,71.29% 90%,71.35% 87.5%,71.38% 85%,71.35% 82.5%,71.86% 80%,72.18% 77.5%,72.39% 75%,72.63% 72.5%,72.51% 70%,72.6% 67.5%,72.98% 65%,72.78% 62.5%,72.6% 60%,73.07% 57.5%,73.72% 55%,73.46% 52.5%,73.07% 50%,74.64% 47.5%,74.73% 45%,74.85% 42.5%,75.12% 40%,75.18% 37.5%,75.39% 35%,75.42% 32.5%,75.59% 30%,75.68% 27.5%,75.77% 25%,75.89% 22.5%,76.19% 20%,76.36% 17.5%,76.33% 15%,76.69% 12.5%,77.16% 10%,77.43% 7.5%,77.85% 5%,77.67% 2.5%); }
-.coverArtwork[data-cover-ready] .coverRight { animation: cover-open-right 1.15s cubic-bezier(0.16,1,0.3,1) both, cover-breathe-right 9s ease-in-out 1.15s infinite; animation-play-state: running, var(--cover-drift-state); }
+.coverArtwork[data-cover-ready] .coverRight { animation: cover-open-right 1.8s cubic-bezier(0.16,1,0.3,1) both, cover-breathe-right 16s ease-in-out 1.8s infinite; animation-play-state: running, var(--cover-drift-state); }
 @keyframes cover-open-left { from { transform: translateX(29%); } to { transform: translateX(0); } }
 @keyframes cover-open-right { from { transform: translateX(-29%); } to { transform: translateX(0); } }
-@keyframes cover-breathe-left { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(1.8%); } }
-@keyframes cover-breathe-right { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-1.8%); } }
+@keyframes cover-breathe-left { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(0.9%); } }
+@keyframes cover-breathe-right { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-0.9%); } }
 .coverContact { position: relative; z-index: 4; display: grid; grid-template-columns: 1fr 1.25fr; gap: 6vw; padding: 25px 4vw 16px; }
 .coverContact p { max-width: 52ch; font-size: 14px; line-height: 1.6; }
 .coverConnections { display: flex; flex-direction: column; align-items: flex-end; gap: 14px; }
@@ -138,7 +138,8 @@
 .storyPhoto img { display: block; width: 100%; height: auto; object-fit: contain; object-position: center; }
 .editorialBands { position: relative; padding: 100px 0; overflow: hidden; }
 .editorialBands.compactBands { padding-top: 24px; }
-.editorialBand { display: flex; width: max-content; gap: 60px; font-family: var(--font-public-serif), serif; font-size: clamp(80px, 13vw, 200px); line-height: 1.1; letter-spacing: -0.03em; }
+/* Keep lettering above the following elastic divider (z-index: 3). */
+.editorialBand { position: relative; z-index: 4; display: flex; width: max-content; gap: 60px; font-family: var(--font-public-serif), serif; font-size: clamp(80px, 13vw, 200px); line-height: 1.1; letter-spacing: -0.03em; }
 .editorialBand > span { display: inline-flex; align-items: center; gap: 45px; white-space: nowrap; }
 .editorialBand:nth-child(2) { font-style: italic; color: var(--public-action); }
 .bandImage { position: relative; width: 2em; height: 0.75em; overflow: hidden; border-radius: 12px; }
@@ -395,7 +396,7 @@
 .storyVisual { position: absolute; inset: 0; margin: 0; overflow: visible; }
 .storyPhoto { position: absolute; margin: 0; left: 12.5%; top: 9svh; width: 44%; aspect-ratio: var(--story-ratio); border-radius: 6px; overflow: hidden; background: transparent; }
 .storyPhoto:first-child { width: 49.5%; }
-.storyCopy { position: absolute; z-index: 5; left: 38.5%; right: 4%; top: 35svh; }
+.storyCopy { position: absolute; z-index: 5; left: 50.5%; right: 4%; top: 35svh; }
 .storyCopy .storyHeadline { font-family: 'TWK Lausanne', var(--font-story-sans), sans-serif; font-size: clamp(38px, 5.15vw, 96px); font-weight: 550; line-height: 1.1; letter-spacing: -0.02em; color: var(--public-paper); text-shadow: 0 2px 14px #141020b3; }
 .storyHeadline[data-story-phase="0"] { transform: translateX(2vw); }
 .storyTextLine { display: block; min-height: 1.1em; white-space: nowrap; }
