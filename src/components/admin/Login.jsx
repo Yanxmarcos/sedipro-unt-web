@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import Logo from "@/components/admin-shared/Logo";
@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { LoginAccess } from "@/components/public-site/login-access";
+import { AccountLoading } from "@/components/admin/page-state";
+import { loginDestination } from "@/lib/auth-session.mjs";
 
 const settings = {
   admin: {
@@ -51,7 +53,37 @@ export default function Login({ kind = "admin" }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [turnos, setTurnos] = useState(null);
+  const [checkingSession, setCheckingSession] = useState(kind === "admin");
   const current = settings[kind];
+
+  useEffect(() => {
+    if (kind !== "admin") return;
+    const controller = new AbortController();
+    async function checkSession() {
+      try {
+        const response = await fetch("/api/auth/verify", {
+          cache: "no-store", credentials: "include",
+          signal: AbortSignal.any([controller.signal, AbortSignal.timeout(8000)]),
+        });
+        const result = response.ok ? await response.json() : null;
+        if (controller.signal.aborted) return;
+        const destination = result?.authenticated && loginDestination(result.user);
+        if (destination) {
+          router.replace(destination);
+          return;
+        }
+      } catch {
+        if (controller.signal.aborted) return;
+      }
+      setCheckingSession(false);
+    }
+    void checkSession();
+    window.addEventListener("focus", checkSession);
+    return () => {
+      controller.abort();
+      window.removeEventListener("focus", checkSession);
+    };
+  }, [kind, router]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -98,6 +130,7 @@ export default function Login({ kind = "admin" }) {
     }
   }
 
+  if (kind === "admin" && checkingSession) return <div className="admin-root"><AccountLoading pending /></div>;
   if (kind === "admin") return <LoginAccess username={username} setUsername={setUsername} password={password} setPassword={setPassword} showPassword={showPassword} setShowPassword={setShowPassword} error={error} loading={loading} onSubmit={handleSubmit} />;
 
   return (

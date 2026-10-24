@@ -5,9 +5,11 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { panelPermissions } from "@/lib/panel-permissions.mjs";
+import { sessionDeadline } from "@/lib/auth-session.mjs";
 
 const PanelSessionContext = createContext(null);
 
@@ -17,24 +19,40 @@ export function PanelSessionProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
+  const [deadline, setDeadline] = useState(null);
+  const refreshVersion = useRef(0);
 
   const refresh = useCallback(async () => {
+    const version = ++refreshVersion.current;
+    const startedAt = Date.now();
     try {
       const response = await fetch("/api/auth/verify", {
         cache: "no-store",
         credentials: "include",
       });
       const result = await response.json();
+      if (version !== refreshVersion.current) return;
       if (response.status === 401 || response.status === 403) {
         setUser(null);
         setAuthenticated(false);
         setAssignments([]);
         setError("");
+        setDeadline(null);
         return;
       }
       if (!response.ok)
         throw new Error(result.message || "No se pudo verificar la sesión.");
 
+      const nextDeadline = sessionDeadline(result.session, startedAt, Date.now());
+      if (nextDeadline !== null && nextDeadline <= Date.now()) {
+        setUser(null);
+        setAuthenticated(false);
+        setAssignments([]);
+        setDeadline(null);
+        setError("");
+        return;
+      }
+      setDeadline(nextDeadline);
       setUser(result.user);
       setAuthenticated(true);
       setError("");
@@ -42,8 +60,10 @@ export function PanelSessionProvider({ children }) {
         const assignedResponse = await fetch("/api/mi/asistencias", {
           cache: "no-store",
         });
+        if (version !== refreshVersion.current) return;
         if (assignedResponse.ok) {
           const assigned = await assignedResponse.json();
+          if (version !== refreshVersion.current) return;
           setAssignments(assigned.data || []);
         } else {
           setAssignments([]);
@@ -52,9 +72,10 @@ export function PanelSessionProvider({ children }) {
         setAssignments([]);
       }
     } catch (failure) {
-      setError(failure.message || "No se pudo conectar con el servidor.");
+      if (version === refreshVersion.current)
+        setError(failure.message || "No se pudo conectar con el servidor.");
     } finally {
-      setLoading(false);
+      if (version === refreshVersion.current) setLoading(false);
     }
   }, []);
 
@@ -67,6 +88,20 @@ export function PanelSessionProvider({ children }) {
       window.removeEventListener("focus", refresh);
     };
   }, [refresh]);
+
+  useEffect(() => {
+    if (!authenticated || deadline === null) return;
+    const timer = window.setTimeout(() => {
+      ++refreshVersion.current;
+      setAuthenticated(false);
+      setUser(null);
+      setAssignments([]);
+      setDeadline(null);
+      setError("");
+      setLoading(false);
+    }, Math.max(0, deadline - Date.now()));
+    return () => window.clearTimeout(timer);
+  }, [authenticated, deadline]);
 
   useEffect(() => {
     if (!authenticated || user?.mustChangePassword) return;
@@ -116,6 +151,7 @@ export function PanelSessionProvider({ children }) {
         loading,
         error,
         authenticated,
+        deadline,
         refresh,
         permissions: panelPermissions(user),
       }}

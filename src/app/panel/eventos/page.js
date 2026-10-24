@@ -1,239 +1,213 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { AdminCheckbox } from "@/components/admin/form-controls";
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  ArrowRight,
+  CalendarDays,
+  FileText,
+  Plus,
+  Search,
+  Trash2,
+} from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { AdminConfirm } from "@/components/admin/form-controls";
 import { usePanelSession } from "@/components/admin/panel-session";
 import { panelApi } from "@/lib/panel-api";
-const input = "mt-1 w-full outline-none";
-const initial = {
-  titulo: "",
-  descripcion: "",
-  fechaInicio: "",
-  fechaFin: "",
-  lugar: "",
-  cupo: "",
-  estado: "borrador",
-  inscripcionAbierta: false,
-};
+import { venueSummary } from "@/lib/event-location.mjs";
+import {
+  EventSettings,
+  formatEventDate,
+  EVENT_STATES,
+} from "@/components/event-forms-admin/event-settings";
+
 export default function EventosPage() {
+  const router = useRouter();
   const { permissions } = usePanelSession();
-  const [archiveTarget, setArchiveTarget] = useState(null);
-  const [archiving, setArchiving] = useState(false);
   const [events, setEvents] = useState([]);
-  const [form, setForm] = useState(initial);
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const load = useCallback(
-    () =>
-      fetch("/api/eventos")
-        .then(async (r) => {
-          const d = await r.json();
-          if (!r.ok) throw new Error(d.error);
-          setEvents(d.data);
-        })
-        .catch((e) => setError(e.message))
-        .finally(() => setLoading(false)),
-    [],
-  );
+  const [query, setQuery] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const load = useCallback(async () => {
+    try {
+      const result = await panelApi("/api/eventos?incluirArchivados=true");
+      setEvents(result.data || []);
+      setError("");
+    } catch (failure) {
+      setError(failure.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
   useEffect(() => {
     load();
   }, [load]);
-  const set = (key, value) =>
-    setForm((x) => ({
-      ...x,
-      [key]: value,
-    }));
-  async function submit(e) {
-    e.preventDefault();
+  const filtered = useMemo(
+    () =>
+      events.filter((event) =>
+        `${event.titulo} ${event.lugar || ""}`
+          .toLocaleLowerCase("es")
+          .includes(query.toLocaleLowerCase("es")),
+      ),
+    [events, query],
+  );
+
+  async function createEvent(values) {
     setSaving(true);
     setError("");
     try {
-      const r = await fetch("/api/eventos", {
+      const result = await panelApi("/api/eventos", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
+        body: values,
       });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error);
-      setForm(initial);
       setOpen(false);
-      await load();
-    } catch (e) {
-      setError(e.message);
+      router.push(`/panel/eventos/${result.data._id}`);
+    } catch (failure) {
+      setError(failure.message);
     } finally {
       setSaving(false);
     }
   }
+
   return (
     <div className="space-y-6">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+      <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-foreground text-2xl font-semibold tracking-tight">
             Eventos
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Inscripciones externas, QR y control presencial.
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Crea una inscripción a la medida de tu próximo encuentro.
           </p>
         </div>
-        <Button
-          onClick={() => setOpen((x) => !x)}
-          type="button"
-          variant="default"
+        {permissions.canManageEvents && <div className="flex flex-wrap gap-2">{permissions.canViewEventAudit && <Link href="/panel/eventos/auditoria" className={buttonVariants({ variant: "outline" })}>Auditoría</Link>}<Link href="/panel/eventos/comunicaciones" className={buttonVariants({ variant: "outline" })}>Suscripciones</Link><Button
+          onClick={() => {
+            setError("");
+            setOpen(true);
+          }}
         >
-          {open ? "Cancelar" : "+ Crear evento"}
-        </Button>
-      </div>
-      {error && (
-        <p className="mb-4 rounded-lg bg-muted p-3 text-sm text-destructive">
+          <Plus />
+          Crear evento
+        </Button></div>}
+      </header>
+      {error && !open && (
+        <div
+          role="alert"
+          className="rounded-lg border border-destructive/30 p-4 text-sm text-destructive"
+        >
           {error}
-        </p>
-      )}
-      {open && (
-        <form
-          onSubmit={submit}
-          className="mb-6 rounded-xl border bg-card p-6 shadow-xs space-y-6"
-        >
-          <h2 className="mb-4 text-lg font-semibold">Nuevo evento</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <Label className="text-sm font-medium grid gap-2">
-              Título
-              <Input
-                required
-                value={form.titulo}
-                onChange={(e) => set("titulo", e.target.value)}
-                className={cn(input, "")}
-              />
-            </Label>
-            <Label className="text-sm font-medium grid gap-2">
-              Lugar
-              <Input
-                value={form.lugar}
-                onChange={(e) => set("lugar", e.target.value)}
-                className={cn(input, "")}
-              />
-            </Label>
-            <Label className="text-sm font-medium grid gap-2">
-              Inicio
-              <Input
-                required
-                type="datetime-local"
-                value={form.fechaInicio}
-                onChange={(e) => set("fechaInicio", e.target.value)}
-                className={cn(input, "")}
-              />
-            </Label>
-            <Label className="text-sm font-medium grid gap-2">
-              Fin
-              <Input
-                type="datetime-local"
-                value={form.fechaFin}
-                onChange={(e) => set("fechaFin", e.target.value)}
-                className={cn(input, "")}
-              />
-            </Label>
-            <Label className="text-sm font-medium grid gap-2">
-              Cupo{" "}
-              <span className="font-normal text-muted-foreground">
-                vacío = ilimitado
-              </span>
-              <Input
-                min="1"
-                type="number"
-                value={form.cupo}
-                onChange={(e) => set("cupo", e.target.value)}
-                className={cn(input, "")}
-              />
-            </Label>
-            <Label className="flex items-center gap-2 pt-6 text-sm">
-              <AdminCheckbox
-                checked={form.inscripcionAbierta}
-                onChange={(e) => set("inscripcionAbierta", e.target.checked)}
-              />
-              Abrir inscripción al publicarlo
-            </Label>
-          </div>
-          <Label className="mt-4 text-sm font-medium grid gap-2">
-            Descripción
-            <Textarea
-              value={form.descripcion}
-              onChange={(e) => set("descripcion", e.target.value)}
-              className={cn(input, "")}
-            />
-          </Label>
-          <Button
-            disabled={saving}
-            type="submit"
-            variant="default"
-            className="mt-4 disabled:opacity-50"
-          >
-            {saving ? "Guardando…" : "Crear borrador"}
+          <Button variant="link" onClick={load} className="ml-2 text-inherit">
+            Reintentar
           </Button>
-        </form>
+        </div>
       )}
-      <div className="overflow-hidden rounded-xl border bg-muted shadow-sm">
+      <section className="overflow-hidden rounded-xl border bg-card">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b p-4 sm:p-5">
+          <h2 className="text-sm font-semibold">
+            Eventos{" "}
+            <span className="ml-1 font-normal tabular-nums text-muted-foreground">
+              ({events.length})
+            </span>
+          </h2>
+          <div className="relative w-full sm:w-72">
+            <Search className="pointer-events-none absolute left-3 top-2.5 size-4 text-muted-foreground" />
+            <Input
+              aria-label="Buscar eventos"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Buscar por nombre o lugar"
+              className="pl-9"
+            />
+          </div>
+        </div>
         {loading ? (
-          <p className="p-8 text-center text-muted-foreground">
-            Cargando eventos…
-          </p>
-        ) : events.length === 0 ? (
-          <p className="p-8 text-center text-muted-foreground">
-            Aún no hay eventos.
-          </p>
-        ) : (
+          <div role="status" className="space-y-5 p-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-14 animate-pulse rounded-lg bg-muted" />
+            ))}
+            <span className="sr-only">Cargando eventos</span>
+          </div>
+        ) : filtered.length ? (
           <div className="divide-y">
-            {events.map((event) => (
+            {filtered.map((event) => (
               <article
                 key={event._id}
-                className="flex flex-wrap items-center justify-between gap-4 p-5"
+                className="flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6"
               >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-foreground text-lg font-semibold">
-                      {event.titulo}
-                    </h2>
-                    <Badge variant="secondary" className="">
-                      {event.estado}
+                <div className="min-w-0 flex-1 basis-64">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {event.archivadoAt ? (
+                      <span className="break-words font-semibold text-foreground">
+                        {event.titulo}
+                      </span>
+                    ) : (
+                      <Link
+                        href={`/panel/eventos/${event._id}`}
+                        className="break-words font-semibold text-foreground underline-offset-4 hover:underline"
+                      >
+                        {event.titulo}
+                      </Link>
+                    )}
+                    <Badge
+                      variant={
+                        event.estado === "publicado" && event.inscripcionAbierta
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {event.archivadoAt
+                        ? "Archivado"
+                        : EVENT_STATES[event.estado] || event.estado}
                     </Badge>
                   </div>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {new Date(event.fechaInicio).toLocaleString("es-PE")} ·{" "}
-                    {event.lugar || "Sin lugar"}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {event.totalInscripciones} inscritos ·{" "}
-                    {event.totalAsistencias} presentes
-                    {event.cupo ? ` · cupo ${event.cupo}` : ""}
-                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                    <span className="inline-flex items-center gap-1.5">
+                      <CalendarDays className="size-3.5" />
+                      {formatEventDate(event.fechaInicio)}
+                    </span>
+                    <span>{venueSummary(event)}</span>
+                    <span className="tabular-nums">
+                      {event.totalInscripciones || 0} inscripciones
+                      {event.cupo ? ` / ${event.cupo} cupos` : ""}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">Creado por {event.creador?.nombre || "Cuenta no disponible"}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Link
-                    href={`/panel/eventos/${event._id}`}
-                    className={buttonVariants({
-                      variant: "outline",
-                    })}
-                  >
-                    Gestionar
-                  </Link>
-                  {permissions.canDelete && (
+                  {event.puedeTomarAsistencia && <Link href={`/panel/eventos/${event._id}/checkin`} className={buttonVariants({ size: "sm" })}>Tomar asistencia</Link>}
+                  {!event.archivadoAt && (
+                    <Link
+                      href={`/panel/eventos/${event._id}`}
+                      className={buttonVariants({
+                        variant: "outline",
+                        size: "sm",
+                      })}
+                    >
+                      Gestionar
+                      <ArrowRight />
+                    </Link>
+                  )}
+                  {permissions.canDeleteEvents && (
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="icon-sm"
-                      title="Eliminar"
-                      aria-label={"Eliminar " + event.titulo}
-                      onClick={() => setArchiveTarget(event)}
+                      aria-label={`Eliminar ${event.titulo}`}
+                      title="Eliminar evento"
+                      onClick={() => setDeleteTarget(event)}
                     >
                       <Trash2 />
                     </Button>
@@ -242,32 +216,83 @@ export default function EventosPage() {
               </article>
             ))}
           </div>
+        ) : (
+          <div className="mx-auto flex max-w-md flex-col items-center px-6 py-16 text-center">
+            <FileText
+              className="mb-4 size-9 text-muted-foreground"
+              strokeWidth={1.5}
+            />
+            <h3 className="text-base font-semibold">
+              {query
+                ? "No encontramos ese evento"
+                : "Tu próximo evento empieza aquí"}
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {query
+                ? "Prueba otro nombre o elimina la búsqueda."
+                : "Crea el evento, prepara sus preguntas y comparte un único enlace de inscripción."}
+            </p>
+            {(query || permissions.canManageEvents) && <Button
+              variant="outline"
+              className="mt-5"
+              onClick={() => (query ? setQuery("") : setOpen(true))}
+            >
+              {query ? "Limpiar búsqueda" : "Crear mi primer evento"}
+            </Button>}
+          </div>
         )}
-      </div>
+      </section>
+      <Dialog
+        open={open}
+        onOpenChange={(next) => {
+          if (!saving) setOpen(next);
+        }}
+      >
+        <DialogContent className="max-h-[90svh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Crear evento</DialogTitle>
+            <DialogDescription>
+              Empieza con los datos del encuentro. Después podrás construir y
+              publicar su formulario.
+            </DialogDescription>
+          </DialogHeader>
+          {error && (
+            <p role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+          )}
+          <EventSettings
+            onSave={createEvent}
+            saving={saving}
+            create
+            onCancel={() => setOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
       <AdminConfirm
-        show={Boolean(archiveTarget)}
-        title="Eliminar evento"
-        message="El evento dejará de estar disponible. Sus inscripciones y asistencias se conservan en el historial."
-        confirmText={archiving ? "Eliminando…" : "Eliminar"}
+        show={Boolean(deleteTarget)}
+        title="Eliminar evento definitivamente"
+        message="Se borrarán el evento, su formulario, inscripciones y QR. Solo se conservarán las fichas de participantes vinculados a otros eventos. Esta acción no se puede deshacer. Si existe una hoja de Google, se conserva por separado."
+        confirmText={deleting ? "Eliminando…" : "Eliminar definitivamente"}
         type="error"
         onCancel={() => {
-          if (!archiving) setArchiveTarget(null);
+          if (!deleting) setDeleteTarget(null);
         }}
         onConfirm={async () => {
-          if (archiving) return;
-          setArchiving(true);
-          setError("");
+          if (deleting) return;
+          setDeleting(true);
           try {
-            await panelApi("/api/eventos/" + archiveTarget._id, {
+            await panelApi(`/api/eventos/${deleteTarget._id}`, {
               method: "DELETE",
+              body: { confirmacion: deleteTarget._id },
             });
-            setArchiveTarget(null);
+            setDeleteTarget(null);
             await load();
           } catch (failure) {
             setError(failure.message);
-            setArchiveTarget(null);
+            setDeleteTarget(null);
           } finally {
-            setArchiving(false);
+            setDeleting(false);
           }
         }}
       />

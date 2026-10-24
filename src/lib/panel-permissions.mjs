@@ -18,6 +18,9 @@ export function panelPermissions(user) {
     isSuperadmin,
     isAdmin,
     canManage: isAdmin || role === "DIRECTIVA",
+    canManageEvents: Boolean(ROLE_LABELS[role]),
+    canDeleteEvents: isSuperadmin,
+    canViewEventAudit: isSuperadmin,
     canDelete: isAdmin,
     canManageRoles: isAdmin,
   };
@@ -42,12 +45,15 @@ export function canOpenPanelPage(pathname, user, assignments = []) {
     return true;
   if (pathname === "/panel/usuarios" || pathname.startsWith("/panel/usuarios/"))
     return panelPermissions(user).isAdmin;
-  if (
-    pathname === "/panel/sesiones" ||
-    pathname.startsWith("/panel/sesiones/")
-  )
+  if (pathname === "/panel/sesiones" || pathname.startsWith("/panel/sesiones/"))
     return panelPermissions(user).isSuperadmin;
   if (pathname === "/panel/votaciones/votar") return true;
+  if (pathname === "/panel/eventos/comunicaciones")
+    return panelPermissions(user).canManageEvents;
+  if (pathname === "/panel/eventos/auditoria")
+    return panelPermissions(user).canViewEventAudit;
+  if (pathname === "/panel/eventos" || pathname.startsWith("/panel/eventos/"))
+    return Boolean(ROLE_LABELS[normalizeRole(user?.rol)]);
   if (pathname === "/panel/asistencias/tomar") return true;
   if (pathname.startsWith("/panel/asistencias/tomar/")) {
     const id = pathname.split("/").at(-1);

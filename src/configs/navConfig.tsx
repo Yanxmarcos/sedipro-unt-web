@@ -49,7 +49,7 @@ export const navItems: NavItem[] = [
     items: [{ icon: "LayoutDashboard", label: "Resumen", href: "/panel" }],
   },
   {
-    groupLabel: "ASISTENCIA",
+    groupLabel: "ASISTENCIA INTERNA",
     items: [
       {
         icon: "CalendarCheck",
@@ -75,9 +75,8 @@ export const navItems: NavItem[] = [
     items: [
       {
         icon: "CalendarDays",
-        label: "Eventos (Beta)",
+        label: "Eventos",
         href: "/panel/eventos",
-        disabled: true,
       },
     ],
   },

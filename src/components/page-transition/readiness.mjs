@@ -7,7 +7,7 @@ export const LOADING_ROUTES = {
 
 export function loadingPath(pathname) {
   const path = pathname.replace(/\/$/, "") || "/";
-  return Object.hasOwn(LOADING_ROUTES, path) ? path : null;
+  return Object.hasOwn(LOADING_ROUTES, path) || /^\/eventos\/[^/]+$/.test(path) ? path : null;
 }
 
 export function navigationDestination(anchor, event, location) {
@@ -59,6 +59,24 @@ function firstViewImages(root) {
   });
 }
 
+function contentReady(root, signal) {
+  return new Promise(resolve => {
+    let observer;
+    const finish = () => {
+      observer?.disconnect();
+      signal.removeEventListener("abort", finish);
+      resolve();
+    };
+    const check = () => {
+      if (signal.aborted || !root.querySelector('[data-page-ready="false"]')) finish();
+    };
+    observer = new MutationObserver(check);
+    observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-page-ready"] });
+    signal.addEventListener("abort", finish, { once: true });
+    check();
+  });
+}
+
 // This is settled readiness of the first view, not an invented download-byte percentage.
 // Lazy photos/videos farther down the page deliberately do not hold the entrance open.
 export async function waitForView(root, onProgress, signal, maximumWait = 10000) {
@@ -73,6 +91,9 @@ export async function waitForView(root, onProgress, signal, maximumWait = 10000)
     await nextPaint(local.signal);
     await nextPaint(local.signal);
     if (local.signal.aborted) return false;
+    await contentReady(root, local.signal);
+    if (local.signal.aborted) return false;
+    await nextPaint(local.signal);
     const sheets = [...document.querySelectorAll('link[rel="stylesheet"]')].map(link => untilEvent(link, () => Boolean(link.sheet), "load", "error", local.signal));
     const images = firstViewImages(root).map(async image => {
       await untilEvent(image, () => image.complete, "load", "error", local.signal);

@@ -4,7 +4,9 @@ import { Providers } from "@/components/layout/providers";
 import { LandingOnly } from "@/components/layout/landing-only";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { PublicPageTransition } from "@/components/page-transition/public-page-transition";
+import { PublicScrollbar } from "@/components/layout/public-scrollbar";
 import "./globals.css";
+import "@/components/layout/scrollbar.css";
 import { pageMetadata, SITE_URL } from "@/lib/seo.mjs";
 
 const geist = Geist({
@@ -65,6 +67,7 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-poppins">
+        <PublicScrollbar />
         <ThemeProvider>
           <Providers>
             <PublicPageTransition><LandingOnly>{children}</LandingOnly></PublicPageTransition>
