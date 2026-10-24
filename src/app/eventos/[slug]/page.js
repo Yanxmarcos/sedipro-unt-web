@@ -1,331 +1,607 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { Inter_Tight, Manrope } from "next/font/google";
 import QRCode from "qrcode";
-import { CalendarDays, MapPin, ShieldCheck } from "lucide-react";
-import GhostFibers from "@/components/GhostFibers";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  Check,
+  CheckCircle2,
+  Download,
+  KeyRound,
+  LoaderCircle,
+  Mail,
+  QrCode,
+  RefreshCw,
+  ShieldCheck,
+} from "lucide-react";
+import { EventFormRunner } from "@/components/event-forms/form-runner";
+import styles from "@/components/event-forms/public-form.module.css";
+import { EventVenue } from "@/components/event-forms/event-venue";
+import { PublicFooter } from "@/components/public-site/footer";
+import { ElasticSection } from "@/components/public-site/elastic-section";
+import { HomeFooterFrame } from "@/components/public-site/home-institutional";
 
-const field =
-  "mt-1 w-full rounded-lg border border-white/25 bg-white/75 px-3 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-[#672577] focus:ring-2 focus:ring-[#672577]/20";
+const footerSans = Manrope({ subsets: ["latin"], variable: "--font-public-sans", display: "swap" });
+const footerStory = Inter_Tight({ subsets: ["latin"], variable: "--font-story-sans", display: "swap" });
 
-const upperLetters = (value, maxLength) =>
-  value
-    .toUpperCase()
-    .replace(/[^A-ZÁÉÍÓÚÜÑ\s]/g, "")
-    .slice(0, maxLength);
-function Surface({ children, className = "" }) {
+const dateFormat = new Intl.DateTimeFormat("es-PE", {
+  timeZone: "America/Lima",
+  dateStyle: "long",
+  timeStyle: "short",
+});
+function eventDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? "Fecha por confirmar"
+    : dateFormat.format(date);
+}
+
+async function requestJson(url, options = {}) {
+  let response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      cache: "no-store",
+      headers: {
+        ...(options.body ? { "Content-Type": "application/json" } : {}),
+        ...options.headers,
+      },
+    });
+  } catch (error) {
+    if (error.name === "AbortError") throw error;
+    throw new Error(
+      "No pudimos conectar. Revisa tu conexión y vuelve a intentarlo.",
+    );
+  }
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(
+      result.error || result.message || "No se pudo completar la solicitud.",
+    );
+    error.fields = result.errors || {};
+    error.code = result.code;
+    throw error;
+  }
+  return result;
+}
+
+function Confirmation({ registration, message }) {
+  const [qr, setQr] = useState("");
+  const [qrError, setQrError] = useState(false);
+  useEffect(() => {
+    let current = true;
+    if (!registration.qrValue) return;
+    QRCode.toDataURL(registration.qrValue, {
+      width: 420,
+      margin: 3,
+      errorCorrectionLevel: "M",
+      color: { dark: "#29295d", light: "#ffffff" },
+    })
+      .then((url) => {
+        if (current) {
+          setQr(url);
+          setQrError(false);
+        }
+      })
+      .catch(() => {
+        if (current) setQrError(true);
+      });
+    return () => {
+      current = false;
+    };
+  }, [registration.qrValue]);
+
+  function downloadConfirmation() {
+    const text = `SEDIPRO UNT\nConfirmación de inscripción\n\nEvento: ${registration.eventTitle}\nParticipante: ${registration.nombre}\nCódigo de inscripción: ${registration.codigo}\nEstado: Inscripción confirmada\n`;
+    const url = URL.createObjectURL(
+      new Blob([text], { type: "text/plain;charset=utf-8" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `inscripcion-${registration.codigo}.txt`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   return (
     <section
-      className={`mx-auto w-full max-w-2xl overflow-hidden rounded-[14px] border border-white/20 bg-[#120f1773] shadow-[0_4px_32px_#00000040,inset_0_.5px_#ffffff0f] backdrop-blur-[32px] backdrop-saturate-[1.3] ${className}`}
+      className={styles.confirmation}
+      aria-labelledby="registration-success-title"
     >
-      {children}
+      <div className={styles.successIcon}>
+        <CheckCircle2 size={36} strokeWidth={1.5} />
+      </div>
+      <h2 id="registration-success-title">Tu lugar está confirmado.</h2>
+      <p className={styles.successMessage}>
+        {message ||
+          "Tu inscripción se registró correctamente. ¡Nos vemos en el evento!"}
+      </p>
+      <dl className={styles.ticketInfo}>
+        <div>
+          <dt>Participante</dt>
+          <dd>{registration.nombre}</dd>
+        </div>
+        <div>
+          <dt>Código de inscripción</dt>
+          <dd className={styles.ticketCode}>{registration.codigo}</dd>
+        </div>
+      </dl>
+      {registration.qrValue && (
+        <div className={styles.qrArea}>
+          {qr ? (
+            <Image
+              unoptimized
+              src={qr}
+              width={240}
+              height={240}
+              alt={`QR de la inscripción ${registration.codigo}`}
+            />
+          ) : qrError ? (
+            <p role="alert">
+              Tu inscripción está confirmada, pero no pudimos dibujar el QR.
+              Recarga y usa «Recuperar mi inscripción» para volver a obtenerlo.
+            </p>
+          ) : (
+            <p role="status">
+              <LoaderCircle size={20} className={styles.spin} />
+              Preparando tu QR…
+            </p>
+          )}
+          <p>Guarda tu QR para tenerlo a mano el día del evento.</p>
+        </div>
+      )}
+      <div className={styles.confirmationActions}>
+        {qr && (
+          <a
+            className={styles.primaryButton}
+            href={qr}
+            download={`qr-${registration.codigo}.png`}
+          >
+            <Download size={17} />
+            Descargar mi QR
+          </a>
+        )}
+        <button
+          className={qr ? styles.secondaryButton : styles.primaryButton}
+          type="button"
+          onClick={downloadConfirmation}
+        >
+          <Download size={17} />
+          Descargar confirmación
+        </button>
+      </div>
+      <div className={styles.deliveryNote}>
+        <Mail size={18} />
+        <p>
+          {registration.correoEstado === "sin_configurar"
+            ? "El envío de correos aún no está disponible. Descarga tu confirmación para conservarla."
+            : registration.correoEstado === "enviado"
+              ? "También enviamos la confirmación a tu correo registrado."
+              : "Tu inscripción ya está guardada. La confirmación por correo está pendiente de envío."}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function Recovery({ slug, available, onRecovered, onBack }) {
+  const [dni, setDni] = useState("");
+  const [code, setCode] = useState("");
+  const [challengeId, setChallengeId] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const scope = "recover-registration";
+
+  async function requestCode(event) {
+    event.preventDefault();
+    if (!/^\d{8}$/.test(dni)) {
+      setError("Escribe los 8 dígitos de tu DNI.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const response = await requestJson(
+        `/api/eventos/public/${encodeURIComponent(slug)}/recuperar`,
+        { method: "POST", body: JSON.stringify({ dni }) },
+      );
+      const result = response.data || response;
+      setChallengeId(result.challengeId);
+      setMessage(
+        result.message ||
+          "Si tienes una inscripción vigente, recibirás un código en el correo que registraste.",
+      );
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function verifyCode(event) {
+    event.preventDefault();
+    if (!/^\d{6}$/.test(code)) {
+      setError("Escribe el código de 6 dígitos que recibiste.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const response = await requestJson(
+        `/api/eventos/public/${encodeURIComponent(slug)}/recuperar/verificar`,
+        { method: "POST", body: JSON.stringify({ challengeId, code }) },
+      );
+      onRecovered(response.data);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className={styles.recovery} aria-labelledby="recovery-title">
+      <KeyRound size={30} strokeWidth={1.5} className={styles.recoveryIcon} />
+      <h2 id="recovery-title">Recupera tu inscripción.</h2>
+      <p>
+        Vuelve a ver tu confirmación y descarga tu QR, si este evento lo
+        utiliza.
+      </p>
+      {!available ? (
+        <div className={styles.closedNotice}>
+          <Mail size={20} />
+          <p>
+            La recuperación por correo aún no está disponible para este evento.
+            Si ya te inscribiste, conserva la confirmación que descargaste o
+            comunícate con la organización.
+          </p>
+        </div>
+      ) : challengeId ? (
+        <form onSubmit={verifyCode} noValidate>
+          <p className={styles.recoveryMessage}>{message}</p>
+          <label className={styles.label} htmlFor={`${scope}-code`}>
+            Código de verificación
+          </label>
+          <input
+            id={`${scope}-code`}
+            className={`${styles.input} ${styles.codeInput}`}
+            value={code}
+            onChange={(event) =>
+              setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
+            }
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            aria-describedby={error ? `${scope}-error` : undefined}
+            disabled={busy}
+          />
+          {error && (
+            <p className={styles.fieldError} id={`${scope}-error`} role="alert">
+              {error}
+            </p>
+          )}
+          <button
+            className={styles.primaryButton}
+            disabled={busy}
+            type="submit"
+          >
+            {busy ? (
+              <LoaderCircle size={17} className={styles.spin} />
+            ) : (
+              <QrCode size={17} />
+            )}
+            {busy ? "Verificando…" : "Ver mi inscripción"}
+          </button>
+          <button
+            className={styles.textButton}
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              setChallengeId("");
+              setCode("");
+              setError("");
+            }}
+          >
+            Cambiar DNI o solicitar otro código
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={requestCode} noValidate>
+          <label className={styles.label} htmlFor={`${scope}-dni`}>
+            DNI
+          </label>
+          <input
+            id={`${scope}-dni`}
+            className={styles.input}
+            value={dni}
+            onChange={(event) =>
+              setDni(event.target.value.replace(/\D/g, "").slice(0, 8))
+            }
+            inputMode="numeric"
+            maxLength={8}
+            autoComplete="off"
+            aria-describedby={error ? `${scope}-error` : `${scope}-help`}
+            disabled={busy}
+          />
+          <p className={styles.help} id={`${scope}-help`}>
+            Si estás inscrito, enviaremos un código al correo que utilizaste.
+          </p>
+          {error && (
+            <p className={styles.fieldError} id={`${scope}-error`} role="alert">
+              {error}
+            </p>
+          )}
+          <button
+            className={styles.primaryButton}
+            disabled={busy}
+            type="submit"
+          >
+            {busy ? (
+              <LoaderCircle size={17} className={styles.spin} />
+            ) : (
+              <ArrowRight size={17} />
+            )}
+            {busy ? "Solicitando…" : "Enviar código"}
+          </button>
+        </form>
+      )}
+      <p className={styles.privacyNote}>
+        <ShieldCheck size={16} />
+        Verificamos tu correo antes de mostrar tu inscripción.
+      </p>
+      <button
+        className={styles.textButton}
+        type="button"
+        onClick={onBack}
+        disabled={busy}
+      >
+        <ArrowLeft size={16} />
+        Volver al evento
+      </button>
     </section>
   );
 }
 
 export default function EventoPublicoPage() {
   const { slug } = useParams();
+  return <EventoPublico key={slug} slug={slug} />;
+}
+
+function EventoPublico({ slug }) {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [saving, setSaving] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(null);
-  const [form, setForm] = useState({
-    nombres: "",
-    apellidos: "",
-    correo: "",
-    dni: "",
-    celular: "",
-    organizacion: "",
-    respuestas: {},
-  });
+  const [recovering, setRecovering] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const submission = useRef({ signature: "", key: "" });
+  const resultHeading = useRef(null);
   useEffect(() => {
     if (!slug) return;
-    fetch(`/api/eventos/public/${slug}`)
-      .then(async (r) => {
-        const data = await r.json();
-        if (!r.ok) throw new Error(data.error);
-        setEvent(data.data);
+    const controller = new AbortController();
+    requestJson(`/api/eventos/public/${encodeURIComponent(slug)}`, {
+      signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]),
+    })
+      .then((response) => {
+        setEvent(response.data);
+        setError("");
       })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [slug]);
-  const set = (key, value) =>
-    setForm((current) => ({ ...current, [key]: value }));
-  async function submit(e) {
-    e.preventDefault();
-    setSaving(true);
+      .catch((error) => {
+        if (error.name !== "AbortError") setError(error.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [slug, attempt]);
+
+  async function submit(payload) {
+    if (submitting) return;
+    setSubmitting(true);
     setError("");
+    setFieldErrors({});
+    const signature = JSON.stringify({ version: event.version, ...payload });
+    if (submission.current.signature !== signature)
+      submission.current = { signature, key: crypto.randomUUID() };
     try {
-      const response = await fetch(
-        `/api/eventos/public/${slug}/inscripciones`,
+      const response = await requestJson(
+        `/api/eventos/public/${encodeURIComponent(slug)}/inscripciones`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify({
+            version: event.version,
+            ...payload,
+            idempotencyKey: submission.current.key,
+          }),
         },
       );
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-      const qr = await QRCode.toDataURL(data.data.qrValue, {
-        width: 300,
-        margin: 2,
-        color: { dark: "#4a1a5e", light: "#ffffff" },
-      });
-      setDone({ ...data.data, qr });
-    } catch (e) {
-      setError(e.message);
+      setDone(response.data);
+      requestAnimationFrame(() => resultHeading.current?.focus());
+    } catch (error) {
+      setError(error.message);
+      setFieldErrors(error.fields || {});
     } finally {
-      setSaving(false);
+      setSubmitting(false);
     }
   }
+
   if (loading)
     return (
-      <main className="grid min-h-screen place-items-center bg-[#160c22] text-white">
-        Cargando evento…
-      </main>
+      <main className={styles.page} data-page-ready="false" aria-busy="true" />
     );
-  if (error && !event)
+  if (!event)
     return (
-      <main className="grid min-h-screen place-items-center bg-[#160c22] p-6 text-center text-white">
-        {error}
-      </main>
-    );
-  return (
-    <main className="relative min-h-screen overflow-hidden px-4 py-8 sm:py-12">
-      <div className="absolute inset-0 -z-10">
-        <GhostFibers lineColor="#672577" glowColor="#c98ae0" />
-      </div>
-      <div className="absolute inset-0 -z-10 bg-[#120d1a]/35" />
-      {done ? (
-        <Surface className="max-w-lg p-7 text-center text-white">
-          <img
+      <main className={styles.page}>
+        <div className={styles.unavailable}>
+          <Image
             src="/logos/sedi-logo.svg"
             alt="SEDIPRO UNT"
-            className="mx-auto h-auto w-40 brightness-0"
+            width={170}
+            height={60}
           />
-          <p className="mt-6 text-sm font-bold tracking-[.2em] text-[#e9c9f3]">
-            INSCRIPCIÓN CONFIRMADA
+          <CalendarDays size={36} strokeWidth={1.5} />
+          <h1>Este evento no está disponible.</h1>
+          <p>
+            {error || "Comprueba el enlace o consulta con la organización."}
           </p>
-          <h1 className="mt-2 text-2xl font-bold">
-            ¡Nos vemos en {event.titulo}!
-          </h1>
-          <p className="mt-3 text-white/75">
-            Guarda este QR. Se solicitará al ingreso.
-          </p>
-          <img
-            className="mx-auto my-5 rounded-xl bg-white p-2"
-            src={done.qr}
-            alt="Código QR de asistencia"
-          />
-          <p className="rounded-lg bg-white/10 p-3 font-mono font-bold text-white">
-            {done.codigo}
-          </p>
-          <p className="mt-4 text-sm text-white/70">Inscrito: {done.nombre}</p>
-        </Surface>
-      ) : (
-        <Surface>
-          <header className="border-b text-center border-white/10 bg-white/[.06] p-6 text-white sm:p-8">
-            <img
-              src="/logos/sedi-logo.svg"
-              alt="SEDIPRO UNT"
-              className="mx-auto block h-auto w-40 brightness-0 invert"
-            />
-            <p className="mt-6 text-xs font-bold tracking-[.2em] text-purple-500">
-              EVENTO
-            </p>
-            <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
-              {event.titulo}
-            </h1>
-            {event.descripcion && (
-              <p className="mt-3 whitespace-pre-wrap text-white/80">
-                {event.descripcion}
-              </p>
-            )}
-            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/85">
-              <span className="flex items-center gap-2">
-                <CalendarDays size={16} strokeWidth={2} />
-                {new Date(event.fechaInicio).toLocaleString("es-PE")}
-              </span>
-              {event.lugar && (
-                <span className="flex items-center gap-2">
-                  <MapPin size={16} strokeWidth={2} />
-                  {event.lugar}
-                </span>
-              )}
-            </div>
-          </header>
-          <form
-            onSubmit={submit}
-            className="space-y-4 bg-transparent p-6 text-white sm:p-8"
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            onClick={() => {
+              setLoading(true);
+              setAttempt((value) => value + 1);
+            }}
           >
-            <h2 className="text-xl font-bold text-white">Formulario</h2>
-            {error && (
-              <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
-                {error}
-              </p>
+            <RefreshCw size={16} />
+            Volver a intentar
+          </button>
+          <Link href="/" className={styles.textButton}>
+            Ir a SEDIPRO UNT
+            <ArrowRight size={15} />
+          </Link>
+        </div>
+      </main>
+    );
+
+  return (
+    <div className={styles.page}>
+      <header className={styles.siteHeader}>
+        <div className={styles.siteHeaderInner}>
+        <Link href="/" aria-label="SEDIPRO UNT, ir al inicio">
+          <Image
+            src="/logos/sedi-logo.svg"
+            alt="SEDIPRO UNT"
+            width={156}
+            height={55}
+          />
+        </Link>
+        <span>Inscripciones</span>
+        <Link href="/" className={styles.siteBack}>
+          Volver al sitio
+          <ArrowRight size={20} />
+        </Link>
+        </div>
+      </header>
+      <main id="main-content" className={styles.layout}>
+        <aside className={styles.eventAside} aria-labelledby="event-title">
+          <div className={styles.eventIntro}>
+            <h1 id="event-title">{event.titulo}</h1>
+            {event.descripcion && (
+              <p className={styles.eventDescription}>{event.descripcion}</p>
             )}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-sm font-semibold">
-                Nombres
-                <input
-                  required
-                  autoCapitalize="characters"
-                  className={field}
-                  value={form.nombres}
-                  onChange={(e) =>
-                    set("nombres", upperLetters(e.target.value, 80))
-                  }
-                />
-              </label>
-              <label className="text-sm font-semibold">
-                Apellidos
-                <input
-                  required
-                  autoCapitalize="characters"
-                  className={field}
-                  value={form.apellidos}
-                  onChange={(e) =>
-                    set("apellidos", upperLetters(e.target.value, 80))
-                  }
-                />
-              </label>
-            </div>
-            <label className="block text-sm font-semibold">
-              Correo electrónico
-              <input
-                required
-                type="email"
-                inputMode="email"
-                autoCapitalize="none"
-                autoCorrect="off"
-                className={field}
-                value={form.correo}
-                onChange={(e) => set("correo", e.target.value)}
+            <dl className={styles.eventDetails}>
+              <div>
+                <dt>
+                  <CalendarDays size={18} />
+                  Cuándo
+                </dt>
+                <dd>{eventDate(event.fechaInicio)}</dd>
+              </div>
+            </dl>
+            <EventVenue event={event} />
+          </div>
+        </aside>
+        <div className={styles.formPanel}>
+          {done ? (
+            <div ref={resultHeading} tabIndex={-1}>
+              <Confirmation
+                registration={done}
+                message={event.formulario?.settings?.confirmationMessage}
               />
-            </label>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-sm font-semibold">
-                DNI{" "}
-                <span className="font-normal text-white/70">
-                  {form.dni.length}/8
-                </span>
-                <input
-                  required
-                  inputMode="numeric"
-                  maxLength="8"
-                  pattern="[0-9]{8}"
-                  className={field}
-                  value={form.dni}
-                  onChange={(e) =>
-                    set("dni", e.target.value.replace(/\D/g, "").slice(0, 8))
-                  }
-                />
-              </label>
-              <label className="text-sm font-semibold">
-                Celular{" "}
-                <span className="font-normal text-white/70">
-                  {form.celular.length}/9
-                </span>
-                <input
-                  required
-                  inputMode="numeric"
-                  maxLength="9"
-                  pattern="[0-9]{9}"
-                  className={field}
-                  value={form.celular}
-                  onChange={(e) =>
-                    set(
-                      "celular",
-                      e.target.value.replace(/\D/g, "").slice(0, 9),
-                    )
-                  }
-                />
-              </label>
             </div>
-            <label className="block text-sm font-semibold">
-              Universidad, organización o empresa{" "}
-              <span className="font-normal text-white/70">
-                {form.organizacion.length}/100
-              </span>
-              <input
-                required
-                maxLength="100"
-                autoCapitalize="characters"
-                className={field}
-                value={form.organizacion}
-                onChange={(e) =>
-                  set("organizacion", upperLetters(e.target.value, 100))
-                }
-              />
-            </label>
-            {event.camposPersonalizados.map((custom) => (
-              <label key={custom.clave} className="block text-sm font-semibold">
-                {custom.etiqueta}
-                {custom.requerido && " *"}
-                {custom.tipo === "textarea" ? (
-                  <textarea
-                    required={custom.requerido}
-                    className={field}
-                    value={form.respuestas[custom.clave] || ""}
-                    onChange={(e) =>
-                      set("respuestas", {
-                        ...form.respuestas,
-                        [custom.clave]: e.target.value,
-                      })
-                    }
-                  />
-                ) : custom.tipo === "seleccion" ? (
-                  <select
-                    required={custom.requerido}
-                    className={field}
-                    value={form.respuestas[custom.clave] || ""}
-                    onChange={(e) =>
-                      set("respuestas", {
-                        ...form.respuestas,
-                        [custom.clave]: e.target.value,
-                      })
-                    }
+          ) : recovering ? (
+            <Recovery
+              slug={slug}
+              available={event.recoveryAvailable}
+              onRecovered={(data) => {
+                setDone(data);
+                setRecovering(false);
+                requestAnimationFrame(() => resultHeading.current?.focus());
+              }}
+              onBack={() => setRecovering(false)}
+            />
+          ) : (
+            <>
+              <div className={styles.panelTop}>
+                <span>
+                  <Check size={14} />
+                  Inscripción sin cuenta
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setRecovering(true)}
+                  className={styles.recoveryLink}
+                >
+                  Ya me inscribí
+                  <KeyRound size={14} />
+                </button>
+              </div>
+              {!event.abierta ? (
+                <section className={styles.closedState}>
+                  <CalendarDays size={32} strokeWidth={1.5} />
+                  <h2>Las inscripciones están cerradas.</h2>
+                  <p>
+                    {event.motivoCierre ||
+                      "Por ahora no estamos recibiendo nuevas inscripciones para este evento."}
+                  </p>
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={() => setRecovering(true)}
                   >
-                    <option value="">Selecciona una opción</option>
-                    {custom.opciones?.map((option) => (
-                      <option key={option}>{option}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    required={custom.requerido}
-                    type={custom.tipo === "numero" ? "number" : "text"}
-                    className={field}
-                    value={form.respuestas[custom.clave] || ""}
-                    onChange={(e) =>
-                      set("respuestas", {
-                        ...form.respuestas,
-                        [custom.clave]: e.target.value,
-                      })
-                    }
+                    <QrCode size={17} />
+                    Recuperar mi inscripción
+                  </button>
+                </section>
+              ) : event.formulario ? (
+                <>
+                  {error && (
+                    <div className={styles.submitError} role="alert">
+                      <p>{error}</p>
+                      <button
+                        className={styles.textButton}
+                        type="button"
+                        onClick={() => setRecovering(true)}
+                      >
+                        Si ya te inscribiste, recupera tu confirmación
+                        <ArrowRight size={14} />
+                      </button>
+                    </div>
+                  )}
+                  <EventFormRunner
+                    key={`${event._id}-${event.version}`}
+                    form={event.formulario}
+                    onSubmit={submit}
+                    submitting={submitting}
+                    serverErrors={fieldErrors}
+                    qrEnabled={event.qrHabilitado}
                   />
-                )}
-              </label>
-            ))}
-            <label className="flex items-start gap-2 text-xs text-white/75">
-              <input required className="mt-0.5" type="checkbox" />
-              <span>
-                Autorizo el tratamiento de mis datos para gestionar mi
-                participación en este evento.
-              </span>
-            </label>
-            <button
-              disabled={saving}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#672577] px-4 py-3 font-bold text-white shadow-lg shadow-[#672577]/25 transition hover:bg-[#541e61] disabled:opacity-60"
-            >
-              <ShieldCheck size={18} />
-              {saving ? "Registrando…" : "Confirmar inscripción y generar QR"}
-            </button>
-          </form>
-        </Surface>
-      )}
-    </main>
+                </>
+              ) : (
+                <section className={styles.closedState}>
+                  <h2>Estamos preparando el formulario.</h2>
+                  <p>
+                    La organización publicará las inscripciones próximamente.
+                  </p>
+                </section>
+              )}
+            </>
+          )}
+        </div>
+      </main>
+      <div className={`${styles.landingFooter} ${footerSans.variable} ${footerStory.variable}`}>
+        <ElasticSection surface="#141020" previous="#f7f5f9" revealBackground pronounced>
+          <HomeFooterFrame><PublicFooter socialShowcase /></HomeFooterFrame>
+        </ElasticSection>
+      </div>
+    </div>
   );
 }

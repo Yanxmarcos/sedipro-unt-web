@@ -34,9 +34,9 @@ export function PageTransition({ children, logo }) {
     clearTimeout(openTimer.current);
     openTimer.current = setTimeout(finish, reducedMotion() ? 180 : 950);
   }, [changePhase, finish]);
-  const prepare = useCallback(async controller => {
+  const prepare = useCallback(async (controller, maximumWait = 10000) => {
     try {
-      await waitForView(content.current, () => {}, controller.signal);
+      await waitForView(content.current, () => {}, controller.signal, maximumWait);
     } catch {
       // A readiness failure must still release the curtain.
     }
@@ -63,9 +63,24 @@ export function PageTransition({ children, logo }) {
       active.current = controller; pending.current = null;
       clearTimeout(navigationTimer.current); clearTimeout(openTimer.current);
       changePhase("loading");
-      void prepare(controller);
+      void prepare(controller, destination.startsWith("/eventos/") ? 20000 : 10000);
     });
     return () => cancelAnimationFrame(frame);
+  }, [pathname, prepare, changePhase]);
+
+  useEffect(() => {
+    if (!pathname.startsWith("/eventos/")) return;
+    const root = content.current;
+    const observer = new MutationObserver(() => {
+      if (phaseRef.current !== "idle" || !root.querySelector('[data-page-ready="false"]')) return;
+      active.current?.abort();
+      const controller = new AbortController();
+      active.current = controller;
+      changePhase("loading");
+      void prepare(controller, 20000);
+    });
+    observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-page-ready"] });
+    return () => observer.disconnect();
   }, [pathname, prepare, changePhase]);
 
   useEffect(() => {

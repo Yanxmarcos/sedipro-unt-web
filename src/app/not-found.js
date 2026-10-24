@@ -11,7 +11,7 @@ import styles from "@/components/public-site/not-found.module.css";
 
 export default function NotFound() {
   const pathname = usePathname();
-  const content = <main id="main-content">
+  const content = <main id="main-content" data-public-scrollbar="true">
     <section className={styles.hero} data-nav-surface="ink" aria-labelledby="not-found-title">
       <div className={styles.wordmark} aria-hidden="true"><span>SEDIPRO</span><span>UNT</span></div>
       <div className={styles.center}>

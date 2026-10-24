@@ -1,0 +1,10 @@
+html:has([data-public-scrollbar]) {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #304d90 transparent;
+}
+
+html:has([data-public-scrollbar])::-webkit-scrollbar { width: 6px; height: 6px; }
+html:has([data-public-scrollbar])::-webkit-scrollbar-track { background: transparent; }
+html:has([data-public-scrollbar])::-webkit-scrollbar-thumb { background: #304d90; border-radius: 6px; }
+html:has([data-public-scrollbar])::-webkit-scrollbar-thumb:hover { background: #29295d; }

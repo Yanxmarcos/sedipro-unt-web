@@ -666,10 +666,14 @@ const SidebarLayout = () => {
           }))
       : isMember
         ? [
+            {
+              groupLabel: "EVENTOS",
+              items: [{ icon: "CalendarDays" as MenuItem["icon"], label: "Eventos", href: "/panel/eventos" }],
+            },
             ...(hasAttendanceAssignments
               ? [
                   {
-                    groupLabel: "ASISTENCIA",
+                    groupLabel: "ASISTENCIA INTERNA",
                     items: [
                       {
                         icon: "ClipboardCheck" as MenuItem["icon"],

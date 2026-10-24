@@ -13,8 +13,8 @@ export function SmoothScroll({ children }) {
   const rafRef = useRef(null);
   const reducedMotion = useReducedMotion();
 
-  // Verificar si estamos en el landing
-  const isLanding = isLandingPath(pathname) && pathname !== "/tecnologias-de-la-informacion";
+  // Reutilizar el desplazamiento público en landing e inscripciones por evento.
+  const isLanding = (isLandingPath(pathname) || /^\/eventos\/[^/]+\/?$/.test(pathname)) && pathname !== "/tecnologias-de-la-informacion";
 
   useEffect(() => {
     // Si NO estamos en landing, NO activar Lenis
@@ -51,6 +51,9 @@ export function SmoothScroll({ children }) {
     }
 
     const lenis = new Lenis({
+      // The html box is fixed to h-full. Observe the body's growing content
+      // so async event forms update the scroll limit without a window resize.
+      content: document.body,
       duration: 1.6,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
