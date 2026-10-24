@@ -1,5 +1,5 @@
 .content { display: contents; }
-.screen { --loader-blue: #304d90; --loader-paper: #f6f1fa; position: fixed; inset: 0; width: 100vw; z-index: 10000; overflow: hidden; isolation: isolate; touch-action: none; color: var(--loader-paper); font-family: var(--font-geist-sans), Arial, sans-serif; }
+.screen { --loader-blue: #304d90; --loader-paper: #f6f1fa; position: fixed; inset: 0; width: 100%; z-index: 10000; overflow: hidden; isolation: isolate; touch-action: none; color: var(--loader-paper); font-family: var(--font-geist-sans), Arial, sans-serif; }
 .sheet { position: absolute; inset: 0; background: var(--loader-blue); will-change: transform; }
 .upper { z-index: 2; }
 .lower { z-index: 1; }

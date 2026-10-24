@@ -14,7 +14,7 @@ import {
   PanelSessionProvider,
   usePanelSession,
 } from "@/components/admin/panel-session";
-import { PageError, PageLoading } from "@/components/admin/page-state";
+import { AccountLoading, PageError } from "@/components/admin/page-state";
 import { canOpenPanelPage } from "@/lib/panel-permissions.mjs";
 
 function PanelContent({ children }) {
@@ -41,7 +41,7 @@ function PanelContent({ children }) {
     user?.mustChangePassword,
   ]);
 
-  if (loading) return <PageLoading label="Verificando tu cuenta…" />;
+  if (loading) return <AccountLoading />;
   if (error)
     return (
       <div className="mx-auto max-w-xl p-6">
@@ -49,7 +49,7 @@ function PanelContent({ children }) {
       </div>
     );
   if (!authenticated || (user?.mustChangePassword && !changingPassword))
-    return <PageLoading />;
+    return <AccountLoading />;
 
   const allowed = canOpenPanelPage(pathname, user, assignments);
   return (

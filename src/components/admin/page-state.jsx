@@ -2,6 +2,23 @@
 
 import { AlertCircle, Inbox, LoaderCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+
+export function AccountLoading({ pending = false }) {
+  return (
+    <div role="status" aria-live="polite" data-page-ready={pending ? "false" : undefined}
+      className="flex min-h-svh w-full flex-col items-center justify-center gap-6 bg-background px-6 py-12 text-center text-foreground">
+      <div className="flex items-center justify-center gap-4">
+        <LoaderCircle className="size-6 shrink-0 animate-spin text-[#304d90] motion-reduce:animate-none dark:text-blue-300" aria-hidden="true" />
+        <Image src="/logos/sedi-logo.svg" alt="SEDIPRO UNT" width={224} height={80} priority
+          className="h-auto w-44 dark:brightness-0 dark:invert sm:w-56" />
+      </div>
+      <p className="max-w-xs text-sm leading-6 text-muted-foreground sm:max-w-md sm:text-base">
+        Verificando y cargando tu cuenta…
+      </p>
+    </div>
+  );
+}
 
 export function PageLoading({ label = "Cargando información…" }) {
   return (
