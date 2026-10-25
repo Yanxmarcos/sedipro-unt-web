@@ -78,6 +78,11 @@ export const navItems: NavItem[] = [
         label: "Eventos",
         href: "/panel/eventos",
       },
+      {
+        icon: "Mail",
+        label: "Suscripciones",
+        href: "/panel/eventos/comunicaciones",
+      },
     ],
   },
   {

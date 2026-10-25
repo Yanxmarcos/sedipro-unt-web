@@ -94,15 +94,27 @@ export default function EventosPage() {
             Crea una inscripción a la medida de tu próximo encuentro.
           </p>
         </div>
-        {permissions.canManageEvents && <div className="flex flex-wrap gap-2">{permissions.canViewEventAudit && <Link href="/panel/eventos/auditoria" className={buttonVariants({ variant: "outline" })}>Auditoría</Link>}<Link href="/panel/eventos/comunicaciones" className={buttonVariants({ variant: "outline" })}>Suscripciones</Link><Button
-          onClick={() => {
-            setError("");
-            setOpen(true);
-          }}
-        >
-          <Plus />
-          Crear evento
-        </Button></div>}
+        {permissions.canManageEvents && (
+          <div className="flex flex-wrap gap-2">
+            {permissions.canViewEventAudit && (
+              <Link
+                href="/panel/eventos/auditoria"
+                className={buttonVariants({ variant: "outline" })}
+              >
+                Auditoría
+              </Link>
+            )}
+            <Button
+              onClick={() => {
+                setError("");
+                setOpen(true);
+              }}
+            >
+              <Plus />
+              Crear evento
+            </Button>
+          </div>
+        )}
       </header>
       {error && !open && (
         <div
