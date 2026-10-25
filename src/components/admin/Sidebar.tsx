@@ -694,6 +694,10 @@ const SidebarLayout = () => {
                 },
               ],
             },
+            {
+              groupLabel: "HERRAMIENTAS",
+              items: navItems.flatMap((group) => group.items).filter((item) => item.href === "/panel/certificados"),
+            },
           ]
         : [];
 

@@ -157,6 +157,12 @@ tiempos con MindMarket.
 
 Este documento conserva el sistema implementado en `/`, `/proyectos`, `/nosotros` y el entorno público de `/login`, con una actualización actual limitada a `/`. El cuadro de acceso conserva su lenguaje original. El panel, las páginas de eventos y `/tecnologias-de-la-informacion` mantienen sus sistemas existentes; estas reglas no autorizan rediseñarlos. La composición y la evidencia de HOME se registran en `.impeccable/surfaces/public-site.md`.
 
+La extensión de `/panel/certificados` del 24 de octubre de 2026 documentada aquí
+pertenece al panel existente y conserva su sistema visual. Su contrato local
+está en `.impeccable/surfaces/certificates.md`. Los tokens del frontmatter
+siguen describiendo el sitio público; no se trasladan al generador ni se
+introduce una identidad o escala de tokens nueva para esta herramienta.
+
 **Key Characteristics:**
 
 - Tipografía sans monumental con acentos serif editoriales.
@@ -211,6 +217,10 @@ permanece a 17px. No aplicar el peso 550 del enfoque a esta extensión.
 El display de portada histórico ajustaba su tamaño al ancho y a la altura visible. Los títulos de secciones y subpáginas tienen roles distintos, según el frontmatter; los números de impacto usan cifras tabulares. El texto corrido hereda la escala base, mientras descripciones, notas y etiquetas tienen tamaños locales. No imponer un tamaño global a todos los párrafos.
 
 El cuadro de acceso mantiene Geist/Arial y sus utilidades sans y mono originales. No aplicar Manrope ni Instrument Serif a su tipografía interna.
+
+El generador de certificados hereda Geist del panel: título `text-2xl`
+semibold y descripción `text-sm`. Las ocho fuentes elegibles del editor solo
+afectan al documento dibujado; no cambian la tipografía de la interfaz.
 
 ## Layout
 
@@ -283,6 +293,12 @@ paneles al 100%. El scroll es vertical nativo, con anclas entre capítulos y
 acción final a `/nosotros`. Nuestro enfoque conserva su comportamiento y
 recibe el papel lavanda como color anterior de su separador.
 
+En `/panel/certificados`, conservar sidebar y cabecera del panel. La primera
+vista ofrece dos opciones de audiencia; el flujo sigue Participantes,
+Plantilla y firmas, y Editor y descarga. En escritorio, la vista previa queda
+sticky junto a los controles; en móvil se apila con ellos. La tabla permite
+revisar participantes y escoger todos, selección o rango para el lote.
+
 ## Elevation & Depth
 
 La profundidad pública proviene del humo, del scrim, de capas tonales y de fotografías que se apilan. Las acciones tienen una sombra púrpura suave que se intensifica al pasar el puntero; no es una receta de sombra para todas las superficies. El acceso original conserva bordes negros gruesos y sombras duras desplazadas. Los valores completos de sombra están en `.impeccable/design.json`.
@@ -351,6 +367,17 @@ Las secuencias incluyen fotos insertadas en títulos, historia fijada con fotos 
 
 Hito conserva sus sprites, rig, arte raster y marcha existentes. En las páginas públicas rediseñadas `greetOnMount={false}` solamente difiere su saludo inicial; no modifica el arte ni la marcha. La mascota animada no se monta en `/login`, donde permanece la ilustración original de bienvenida.
 
+### Generador de certificados · panel
+
+Reutilizar botones, campos, tabs, tablas, diálogos y colores semánticos del
+panel, con sus temas claro y oscuro, foco y estados de error. La interfaz
+debe explicar la sesión temporal y distinguir los datos del padrón que sí se
+guardan. El documento conserva el nombre en una línea, variables en negrita,
+firmas transparentes sobre líneas negras y nombres/cargos centrados. Los
+avisos de ajuste y superposición deben resolverse antes de descargar.
+La imagen base aportada por el usuario se conserva sin retoque y sirve de
+referencia descargable; el fondo de trabajo se carga explícitamente.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -359,6 +386,7 @@ Hito conserva sus sprites, rig, arte raster y marcha existentes. En las páginas
 - **Do** reutilizar el logotipo, fotografías, posters y Hito registrados en la procedencia de recursos.
 - **Do** conservar contenido visible, navegación por teclado y alternativas de movimiento reducido.
 - **Do** preservar el cuadro de acceso y su tipografía, campos y autenticación existentes.
+- **Do** extender Certificados con los componentes del panel y limitar la tipografía del certificado a su lienzo.
 
 ### Don't:
 

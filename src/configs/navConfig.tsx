@@ -92,12 +92,7 @@ export const navItems: NavItem[] = [
       {
         icon: "Award",
         label: "Certificados",
-        childItems: [
-          {
-            label: "Generador de certificados",
-            href: "/panel/certificados",
-          },
-        ],
+        href: "/panel/certificados",
       },
     ],
   },

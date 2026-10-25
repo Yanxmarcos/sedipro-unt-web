@@ -62,6 +62,25 @@ import { UNT_CAREERS, canonicalCareer } from "@/lib/unt-careers";
 import { formatPersonName } from "@/lib/person-name";
 
 const AREAS = ["TI", "PMO", "LTK Y FNZ", "GTH", "MKT", "DIRECTIVA"];
+const SEX_LABELS = {
+  NO_ESPECIFICADO: "No especificado",
+  MASCULINO: "Masculino",
+  FEMENINO: "Femenino",
+};
+const BOARD_POSITION_LABELS = {
+  PRESIDENCIA: "Presidencia",
+  VICEPRESIDENCIA: "Vicepresidencia",
+  DIRECCION_AREA: "Dirección de área",
+};
+const BOARD_AREAS = AREAS.filter((area) => area !== "DIRECTIVA");
+function boardPositionLabel(row) {
+  if (!row.cargoDirectiva) return "";
+  return [
+    BOARD_POSITION_LABELS[row.cargoDirectiva],
+    row.areaDirectiva,
+    row.periodoDirectiva,
+  ].filter(Boolean).join(" · ");
+}
 const AREA_TEXT_CLASSES = {
   TI: "text-orange-700 dark:text-orange-300",
   PMO: "text-amber-800 dark:text-amber-300",
@@ -116,12 +135,17 @@ function MemberEditor({ row, user, onClose, onSaved }) {
     correoInstitucional: row?.correoInstitucional || "",
     carrera: canonicalCareer(row?.carrera),
     codigoMatricula: row?.codigoMatricula || "",
+    sexo: row?.sexo || "NO_ESPECIFICADO",
+    cargoDirectiva: row?.cargoDirectiva || "",
+    areaDirectiva: row?.areaDirectiva || "",
+    periodoDirectiva: row?.periodoDirectiva ?? "",
     ...(!row ? { rol: "SEDIPRANO" } : {}),
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [created, setCreated] = useState(false);
   const areas = [...new Set([...AREAS, row?.area].filter(Boolean))];
+  const isDirectiva = form.area.trim().toUpperCase() === "DIRECTIVA";
 
   async function save(event) {
     event.preventDefault();
@@ -133,7 +157,14 @@ function MemberEditor({ row, user, onClose, onSaved }) {
         memberId ? "/api/sedipranos/" + memberId : "/api/sedipranos",
         {
           method: memberId ? "PUT" : "POST",
-          body: form,
+          body: {
+            ...form,
+            cargoDirectiva: isDirectiva ? form.cargoDirectiva : "",
+            areaDirectiva: isDirectiva && form.cargoDirectiva === "DIRECCION_AREA" ? form.areaDirectiva : "",
+            periodoDirectiva: isDirectiva && form.cargoDirectiva && form.periodoDirectiva !== ""
+              ? Number(form.periodoDirectiva)
+              : null,
+          },
         },
       );
       const next = memberRow(result.data);
@@ -203,7 +234,10 @@ function MemberEditor({ row, user, onClose, onSaved }) {
                   value={form.rol}
                   disabled={saving}
                   onChange={(event) =>
-                    setForm((current) => ({ ...current, rol: event.target.value }))
+                    setForm((current) => ({
+                      ...current,
+                      rol: event.target.value,
+                    }))
                   }
                 >
                   {assignableRoles(user).map((role) => (
@@ -243,6 +277,19 @@ function MemberEditor({ row, user, onClose, onSaved }) {
               </div>
             ))}
             <div className="space-y-2">
+              <Label htmlFor="member-sexo">Sexo</Label>
+              <AdminSelect
+                id="member-sexo"
+                value={form.sexo}
+                disabled={saving}
+                onChange={(event) => setForm((current) => ({ ...current, sexo: event.target.value }))}
+              >
+                {Object.entries(SEX_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </AdminSelect>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="member-area">Área</Label>
               <AdminSelect
                 id="member-area"
@@ -253,6 +300,9 @@ function MemberEditor({ row, user, onClose, onSaved }) {
                   setForm((current) => ({
                     ...current,
                     area: event.target.value,
+                    ...(event.target.value !== "DIRECTIVA"
+                      ? { cargoDirectiva: "", areaDirectiva: "", periodoDirectiva: "" }
+                      : {}),
                   }))
                 }
               >
@@ -328,6 +378,66 @@ function MemberEditor({ row, user, onClose, onSaved }) {
               </AdminSelect>
             </div>
           </div>
+          {isDirectiva && (
+            <fieldset className="space-y-4 rounded-lg border p-4">
+              <legend className="px-1 text-sm font-medium">Cargo institucional</legend>
+              <p className="text-sm text-muted-foreground">
+                Disponible para integrantes del área Directiva, cualquiera sea su rol del sistema. Registra el cargo y período para las firmas de certificados.
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="member-board-position">Cargo</Label>
+                  <AdminSelect
+                    id="member-board-position"
+                    value={form.cargoDirectiva}
+                    disabled={saving}
+                    onChange={(event) => setForm((current) => ({
+                      ...current,
+                      cargoDirectiva: event.target.value,
+                      areaDirectiva: event.target.value === "DIRECCION_AREA" ? current.areaDirectiva : "",
+                      periodoDirectiva: event.target.value ? current.periodoDirectiva : "",
+                    }))}
+                  >
+                    <option value="">Sin cargo registrado</option>
+                    {Object.entries(BOARD_POSITION_LABELS).map(([value, label]) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </AdminSelect>
+                </div>
+                {form.cargoDirectiva === "DIRECCION_AREA" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="member-board-area">Área que dirige</Label>
+                    <AdminSelect
+                      id="member-board-area"
+                      value={form.areaDirectiva}
+                      required
+                      disabled={saving}
+                      onChange={(event) => setForm((current) => ({ ...current, areaDirectiva: event.target.value }))}
+                    >
+                      <option value="">Selecciona un área</option>
+                      {BOARD_AREAS.map((area) => <option key={area} value={area}>{area}</option>)}
+                    </AdminSelect>
+                  </div>
+                )}
+                {form.cargoDirectiva && (
+                  <div className="space-y-2">
+                    <Label htmlFor="member-board-period">Período (año)</Label>
+                    <Input
+                      id="member-board-period"
+                      type="number"
+                      min={1900}
+                      max={2200}
+                      step={1}
+                      required
+                      value={form.periodoDirectiva}
+                      disabled={saving}
+                      onChange={(event) => setForm((current) => ({ ...current, periodoDirectiva: event.target.value }))}
+                    />
+                  </div>
+                )}
+              </div>
+            </fieldset>
+          )}
           {error && (
             <p role="alert" className="text-sm text-destructive">
               {error}
@@ -386,6 +496,8 @@ function MemberDetails({ row, onClose }) {
           {[
             ["DNI / usuario", row.dni],
             ["Área", row.area],
+            ["Sexo", SEX_LABELS[row.sexo] || SEX_LABELS.NO_ESPECIFICADO],
+            ["Cargo institucional", boardPositionLabel(row)],
             ["Teléfono", row.telefono],
             ["Correo institucional", row.correoInstitucional],
             ["Carrera", row.carrera],
@@ -614,6 +726,8 @@ export default function MemberDirectory({ mode = "members" }) {
             row.correoInstitucional,
             row.carrera,
             row.codigoMatricula,
+            SEX_LABELS[row.sexo],
+            boardPositionLabel(row),
           ].some((value) =>
             String(value || "")
               .toLocaleLowerCase("es-PE")
@@ -843,7 +957,14 @@ export default function MemberDirectory({ mode = "members" }) {
                       </div>
                     </TableCell>
                     <TableCell>{row.dni}</TableCell>
-                    <TableCell>{row.area || "—"}</TableCell>
+                    <TableCell>
+                      {row.area || "—"}
+                      {row.cargoDirectiva && (
+                        <p className="mt-1 max-w-52 text-xs text-muted-foreground">
+                          {boardPositionLabel(row)}
+                        </p>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="whitespace-normal">
                         {row.rol === "SUPERADMINISTRADOR" ? (
