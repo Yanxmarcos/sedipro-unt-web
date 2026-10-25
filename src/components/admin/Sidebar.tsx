@@ -668,7 +668,9 @@ const SidebarLayout = () => {
         ? [
             {
               groupLabel: "EVENTOS",
-              items: [{ icon: "CalendarDays" as MenuItem["icon"], label: "Eventos", href: "/panel/eventos" }],
+              items:
+                navItems.find((group) => group.groupLabel === "EVENTOS")
+                  ?.items || [],
             },
             ...(hasAttendanceAssignments
               ? [
