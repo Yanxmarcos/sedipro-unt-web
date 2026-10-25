@@ -48,6 +48,11 @@ export function canOpenPanelPage(pathname, user, assignments = []) {
   if (pathname === "/panel/sesiones" || pathname.startsWith("/panel/sesiones/"))
     return panelPermissions(user).isSuperadmin;
   if (pathname === "/panel/votaciones/votar") return true;
+  if (
+    pathname === "/panel/certificados" ||
+    pathname.startsWith("/panel/certificados/")
+  )
+    return Boolean(ROLE_LABELS[normalizeRole(user?.rol)]);
   if (pathname === "/panel/eventos/comunicaciones")
     return panelPermissions(user).canManageEvents;
   if (pathname === "/panel/eventos/auditoria")

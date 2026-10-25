@@ -1,0 +1,7 @@
+.certificate {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: white;
+  box-shadow: 0 4px 16px #00000014;
+}

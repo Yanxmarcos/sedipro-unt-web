@@ -6,7 +6,8 @@
     "/",
     "/proyectos",
     "/nosotros",
-    "/login"
+    "/login",
+    "/panel/certificados"
   ],
   "pathBase": "frontend/",
   "statement": "Original raster assets retained; user-supplied local JPG copied unchanged. HOME preserves institutional cover and ScrollStory before the added ProjectJourney photo/video collage. CSS windows, transforms and masks preserve source image pixels.",
@@ -355,6 +356,18 @@
       "origin": "IMG_0417 2.MOV, user-supplied local video",
       "width": 1280,
       "height": 720
+    },
+    {
+      "path": "public/certificados/plantilla-base.png",
+      "publicUrl": "/certificados/plantilla-base.png",
+      "role": "certificate-background-reference",
+      "provenance": "User-supplied Crown Night PNG copied unchanged, without image generation or raster retouching.",
+      "origin": "C:/Users/Marcos/Downloads/plantilla-certificado.png",
+      "sha256": "293f0eb7a21fdb9360cb3fa090ff2fc7880727db85661d6e67efd491785cbd33",
+      "width": 2000,
+      "height": 1414,
+      "currentUsage": "Downloadable design reference in /panel/certificados. The working background must be uploaded explicitly; it is not selected automatically.",
+      "originalLicensing": "Not asserted; user-supplied institutional reference."
     }
   ],
   "instagramRecognitions": [
