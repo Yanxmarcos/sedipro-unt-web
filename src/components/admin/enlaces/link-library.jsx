@@ -374,6 +374,7 @@ export default function LinkLibrary({ trash = false }) {
                 <TableHead>Enlace</TableHead>
                 <TableHead>Destino y campaña</TableHead>
                 <TableHead>Estado</TableHead>
+                <TableHead className="text-right">Clics</TableHead>
                 <TableHead>Responsable y fecha</TableHead>
                 <TableHead>
                   <span className="sr-only">Acciones</span>
@@ -422,6 +423,9 @@ export default function LinkLibrary({ trash = false }) {
                         ? `Vence: ${formatDate(row.venceAt)}`
                         : "Sin vencimiento"}
                     </p>
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {new Intl.NumberFormat("es-PE").format(row.clics ?? 0)}
                   </TableCell>
                   <TableCell className="min-w-44 max-w-60 whitespace-normal">
                     <p className="text-sm">{row.creadorNombre}</p>
