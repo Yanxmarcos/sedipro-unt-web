@@ -29,7 +29,6 @@ const MODULES = {
   asistencias: "Asistencias",
   eventos: "Eventos",
   enlaces: "Enlaces",
-  certificados: "Certificados",
   padron: "Padrón",
   cuentas: "Accesos",
   votaciones: "Votaciones",

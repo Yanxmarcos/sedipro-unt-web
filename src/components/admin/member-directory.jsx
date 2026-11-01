@@ -728,7 +728,9 @@ export default function MemberDirectory({ mode = "members" }) {
               .includes(query),
           )) &&
         (!area || row.area === area) &&
-        (!role || row.rol === role) &&
+        (!role ||
+          row.rol === role ||
+          (role === "ADMINISTRADOR" && row.rol === "SUPERADMINISTRADOR")) &&
         (!status || (status === "active") === row.active),
     );
   }, [rows, search, area, role, status]);
@@ -790,9 +792,9 @@ export default function MemberDirectory({ mode = "members" }) {
       )}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
-          ["Total", rows.length, Users],
           ["Activos", rows.filter((row) => row.active).length, UserCheck],
           ["Inactivos", rows.filter((row) => !row.active).length, UserX],
+          ["Total registrados (activos e inactivos)", rows.length, Users],
         ].map(([label, count, Icon]) => (
           <Card key={label}>
             <CardContent className="flex items-center justify-between">
@@ -868,11 +870,13 @@ export default function MemberDirectory({ mode = "members" }) {
             aria-label="Filtrar por rol"
           >
             <option value="">Todos los roles</option>
-            {Object.entries(ROLE_LABELS).map(([key, label]) => (
-              <option key={key} value={key}>
-                {label}
-              </option>
-            ))}
+            {Object.entries(ROLE_LABELS)
+              .filter(([key]) => key !== "SUPERADMINISTRADOR")
+              .map(([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
           </AdminSelect>
           <AdminSelect
             value={status}

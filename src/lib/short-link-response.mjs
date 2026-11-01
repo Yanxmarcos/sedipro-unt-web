@@ -36,10 +36,14 @@ export async function shortLinkResponse(
   if (!PREFIXES.includes(prefix) || !/^[a-z0-9]{3}$/.test(code))
     return unavailable(404);
   try {
+    const prefetch = /\bprefetch\b/i.test(
+      `${request.headers.get("purpose") || ""} ${request.headers.get("sec-purpose") || ""}`,
+    );
     const upstream = await fetcher(
       new URL(`/api/enlaces/public/${prefix}/${code}`, origin),
       {
         method: request.method,
+        ...(prefetch ? { headers: { Purpose: "prefetch" } } : {}),
         redirect: "manual",
         cache: "no-store",
         signal: AbortSignal.timeout(8000),

@@ -27,8 +27,9 @@ profile updates. Project summary-only fields, preserve account/certificate detai
 permissions. Paginated searchable module-filtered list. Only Superadmin can delete
 a source history record after confirmation; pending-operation guards remain.
 Deleting history never changes business entities or certificate usage counts.
-The recent-activity table excludes actions performed as Superadministrador for
-every viewer; source audits retain those records. The filter precedes pagination.
+The recent-activity table excludes certificate activity and actions performed as
+Superadministrador for every viewer; source audits retain those records. These
+filters precede pagination. Certificates are absent from the module selector.
 Activity has its own search/module filters and request lifecycle. A failed load
 clears rows and pagination metadata, hides the table and pagination, and exposes
 the existing retry state. Retry keeps the active filters; stale results must not

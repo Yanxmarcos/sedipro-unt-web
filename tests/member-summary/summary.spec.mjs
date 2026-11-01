@@ -121,6 +121,187 @@ async function setup(
 }
 
 // Synthetic management data, independent of the user's MongoDB.
+test("T-017 fix member totals and administrator filter preserve real roles; link clicks refresh", async ({
+  page,
+}) => {
+  test.setTimeout(180000);
+  await setup(page, { role: "SUPERADMINISTRADOR" });
+  const members = [
+    {
+      _id: "1234567890abcdef12345671",
+      nombres: "ANA",
+      apellidos: "ACTIVA",
+      dni: "11111111",
+      area: "GTH",
+      activo: true,
+      account: {
+        id: "1234567890abcdef12345681",
+        rol: "SEDIPRANO",
+        active: true,
+      },
+    },
+    {
+      _id: "1234567890abcdef12345672",
+      nombres: "MARCOS",
+      apellidos: "PRUEBA",
+      dni: "22222222",
+      area: "TI",
+      activo: true,
+      account: {
+        id: "1234567890abcdef12345682",
+        rol: "SUPERADMINISTRADOR",
+        active: true,
+      },
+    },
+    {
+      _id: "1234567890abcdef12345673",
+      nombres: "LUIS",
+      apellidos: "INACTIVO",
+      dni: "33333333",
+      area: "PMO",
+      activo: false,
+      account: {
+        id: "1234567890abcdef12345683",
+        rol: "ADMINISTRADOR",
+        active: false,
+      },
+    },
+  ];
+  await page.route("**/api/sedipranos", (route) =>
+    route.fulfill({ json: { data: members } }),
+  );
+  let clicks = 1234;
+  await page.route("**/api/enlaces?**", (route) =>
+    route.fulfill({
+      json: {
+        data: [
+          {
+            _id: id,
+            titulo: "Enlace con clics QA",
+            prefijo: "fm",
+            tipoDestino: "formulario",
+            urlCorta: "https://sediprount.org/fm/9xz",
+            urlDestino: "https://forms.gle/example",
+            dominioDestino: "forms.gle",
+            estadoEfectivo: "activo",
+            estado: "activo",
+            creadorNombre: "Ana QA",
+            createdAt: "2026-11-01T15:00Z",
+            revision: 0,
+            clics: clicks,
+          },
+          {
+            _id: "1234567890abcdef12345670",
+            titulo: "Enlace anterior QA",
+            prefijo: "ig",
+            tipoDestino: "publicacion",
+            urlCorta: "https://sediprount.org/ig/2rs",
+            urlDestino: "https://www.instagram.com/sediprount",
+            dominioDestino: "www.instagram.com",
+            estadoEfectivo: "activo",
+            estado: "activo",
+            creadorNombre: "Ana QA",
+            createdAt: "2026-11-01T15:00Z",
+            revision: 0,
+          },
+        ],
+        pagination: { page: 1, pages: 1, total: 2 },
+      },
+    }),
+  );
+  await mkdir(".impeccable/review/t-017-fix", { recursive: true });
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const theme of ["light", "dark"]) {
+      await page.addInitScript(
+        (value) => localStorage.setItem("theme", value),
+        theme,
+      );
+      await page.goto("/panel/sedipranos");
+      await expect(
+        page.getByText("MARCOS PRUEBA", { exact: true }),
+      ).toBeVisible();
+      const stats = page.locator('[data-slot="card-content"] p');
+      expect((await stats.allTextContents()).slice(0, 6)).toEqual([
+        "Activos",
+        "2",
+        "Inactivos",
+        "1",
+        "Total registrados (activos e inactivos)",
+        "3",
+      ]);
+      await page.getByRole("combobox", { name: "Filtrar por rol" }).click();
+      await expect(
+        page.getByRole("option", { name: "Superadministrador", exact: true }),
+      ).toHaveCount(0);
+      await page
+        .getByRole("option", { name: "Administrador", exact: true })
+        .click();
+      await expect(
+        page.getByText("MARCOS PRUEBA", { exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByText("LUIS INACTIVO", { exact: true }),
+      ).toBeVisible();
+      await expect(page.getByText("ANA ACTIVA", { exact: true })).toHaveCount(
+        0,
+      );
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await page.screenshot({
+        path: `.impeccable/review/t-017-fix/members-${width}-${theme}.png`,
+        fullPage: true,
+        animations: "disabled",
+      });
+      await page.goto("/panel/enlaces");
+      await expect(
+        page.getByRole("columnheader", { name: "Clics", exact: true }),
+      ).toBeVisible();
+      const counted = page
+        .getByRole("row")
+        .filter({ hasText: "Enlace con clics QA" });
+      const previous = page
+        .getByRole("row")
+        .filter({ hasText: "Enlace anterior QA" });
+      await expect(
+        counted.getByRole("cell", {
+          name: new Intl.NumberFormat("es-PE").format(clicks),
+          exact: true,
+        }),
+      ).toBeVisible();
+      await expect(
+        previous.getByRole("cell", { name: "0", exact: true }),
+      ).toBeVisible();
+      await page
+        .getByRole("columnheader", { name: "Clics", exact: true })
+        .scrollIntoViewIfNeeded();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await page.screenshot({
+        path: `.impeccable/review/t-017-fix/links-${width}-${theme}.png`,
+        fullPage: true,
+        animations: "disabled",
+      });
+      clicks++;
+      await page
+        .getByRole("button", { name: "Actualizar", exact: true })
+        .click();
+      await expect(
+        counted.getByRole("cell", {
+          name: new Intl.NumberFormat("es-PE").format(clicks),
+          exact: true,
+        }),
+      ).toBeVisible();
+    }
+  }
+});
+
 const managementFixture = {
   comunidad: {
     total: 104,
