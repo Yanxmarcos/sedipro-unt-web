@@ -1,4 +1,5 @@
 import * as XLSX from "xlsx";
+import { attendanceScopeLabel } from "./attendance-scope.mjs";
 
 const ESTADO_LABELS = {
   presente: "Presente",
@@ -39,7 +40,7 @@ function formatTime(iso) {
   });
 }
 
-export function exportAttendanceToExcel(attendance, records = []) {
+export function buildAttendanceWorkbook(attendance, records = []) {
   const groupedByArea = records.reduce((groups, record) => {
     const area = record.sediprano?.area || "Sin área";
     if (!groups[area]) groups[area] = [];
@@ -68,7 +69,7 @@ export function exportAttendanceToExcel(attendance, records = []) {
       `ASISTENCIA: ${attendance.descripcion?.toUpperCase() || "SIN DESCRIPCIÓN"}`,
     ],
     [`FECHA: ${formatDate(attendance.fecha).toUpperCase()}`],
-    [],
+    [`ALCANCE: ${attendanceScopeLabel(attendance)}`],
     ["RESUMEN GENERAL"],
     [
       `TOTAL: ${records.length}`,
@@ -129,11 +130,17 @@ export function exportAttendanceToExcel(attendance, records = []) {
   });
 
   const worksheet = XLSX.utils.aoa_to_sheet(rows);
+  // Scope belongs to the workbook metadata without shifting the established report layout.
   worksheet["!cols"] = [15, 30, 30, 25, 18, 20, 20].map((wch) => ({ wch }));
 
   const workbook = XLSX.utils.book_new();
+  workbook.Props = { Subject: attendanceScopeLabel(attendance) };
   XLSX.utils.book_append_sheet(workbook, worksheet, "Asistencia");
+  return workbook;
+}
 
+export function exportAttendanceToExcel(attendance, records = []) {
+  const workbook = buildAttendanceWorkbook(attendance, records);
   const safeDescription =
     attendance.descripcion?.replace(/\s+/g, "_") || "sin_descripcion";
   const date = new Date(attendance.fecha).toISOString().slice(0, 10);

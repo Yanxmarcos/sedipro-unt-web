@@ -1,4 +1,5 @@
 "use client";
+import { AREA_TEXT_CLASSES } from "@/lib/member-areas.mjs";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -81,13 +82,6 @@ function boardPositionLabel(row) {
     row.periodoDirectiva,
   ].filter(Boolean).join(" · ");
 }
-const AREA_TEXT_CLASSES = {
-  TI: "text-orange-700 dark:text-orange-300",
-  PMO: "text-amber-800 dark:text-amber-300",
-  "LTK Y FNZ": "text-sky-700 dark:text-sky-300",
-  GTH: "text-green-700 dark:text-green-300",
-  MKT: "text-red-700 dark:text-red-300",
-};
 const date = (value) =>
   value ? new Date(value).toLocaleDateString("es-PE") : "—";
 const fullName = (row) => formatPersonName(row.nombres, row.apellidos);

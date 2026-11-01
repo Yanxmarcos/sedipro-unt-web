@@ -76,6 +76,7 @@ export default function CertificateSetup({
   value,
   onChange,
   onContinue,
+  onTemplateDownload,
   onBack,
   onDirectoryLoaded,
 }) {
@@ -708,6 +709,7 @@ export default function CertificateSetup({
                 const link = document.createElement("a");
                 link.href = `/certificados/plantilla-${kind === "sedipranos" ? "sedipranos" : "externos"}.xlsx`;
                 link.download = `Plantilla-Excel-Certificados-${kind === "sedipranos" ? "Sedipranos" : "Externos"}.xlsx`;
+                onTemplateDownload?.();
                 link.click();
               }}
             >

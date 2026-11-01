@@ -8,8 +8,10 @@ import { PublicFooter } from "@/components/public-site/footer";
 import { ElasticSection } from "@/components/public-site/elastic-section";
 import { PUBLIC_REDESIGN_PATHS } from "@/components/public-site/content";
 import styles from "@/components/public-site/not-found.module.css";
+import { useSmoothScrollPage } from "@/components/layout/smooth-scroll";
 
 export default function NotFound() {
+  useSmoothScrollPage();
   const pathname = usePathname();
   const content = <main id="main-content" data-public-scrollbar="true">
     <section className={styles.hero} data-nav-surface="ink" aria-labelledby="not-found-title">

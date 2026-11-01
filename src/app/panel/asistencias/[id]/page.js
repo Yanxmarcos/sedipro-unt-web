@@ -23,6 +23,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { formatPersonName } from "@/lib/person-name";
 import { exportAttendanceToExcel } from "@/lib/export-attendance";
+import { AdminConfirm } from "@/components/admin/form-controls";
+import { attendanceScopeLabel } from "@/lib/attendance-scope.mjs";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 const ESTADOS = {
@@ -117,13 +119,42 @@ export default function AsistenciaDetallePage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") ?? "view";
-  const isEdit = mode === "edit";
+  const requestedEdit = mode === "edit";
   const [asistencia, setAsistencia] = useState(null);
   const [registro, setRegistro] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
   const [toast, setToast] = useState(null);
+  const [lifecycleConfirm, setLifecycleConfirm] = useState(false);
+  const isEdit = requestedEdit && asistencia?.estadoRegistro !== "cerrada";
+  async function changeLifecycle() {
+    if (saving) return;
+    setSaving(true);
+    try {
+      const response = await fetch(`/api/asistencias/${params.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          estadoRegistro:
+            asistencia.estadoRegistro === "cerrada" ? "en_registro" : "cerrada",
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message);
+      setAsistencia(result.asistencia);
+      setLifecycleConfirm(false);
+      showToast(
+        result.asistencia.estadoRegistro === "cerrada"
+          ? "Asistencia cerrada."
+          : "Registro reabierto.",
+      );
+    } catch (error) {
+      showToast(error.message, "error");
+    } finally {
+      setSaving(false);
+    }
+  }
   function showToast(msg, type = "success") {
     setToast({
       msg,
@@ -216,6 +247,24 @@ export default function AsistenciaDetallePage() {
   return (
     <div className="space-y-6">
       {toast && <AdminToast type={toast.type} message={toast.msg} />}
+      <AdminConfirm
+        show={lifecycleConfirm}
+        title={
+          asistencia?.estadoRegistro === "cerrada"
+            ? "Reabrir asistencia"
+            : "Cerrar asistencia"
+        }
+        message={
+          asistencia?.estadoRegistro === "cerrada"
+            ? "Se habilitarán las marcaciones y esta sesión quedará fuera de las métricas hasta volver a cerrarla."
+            : "Confirma que terminaste de registrar la asistencia. Se bloquearán las marcaciones y la sesión se incluirá en las métricas."
+        }
+        confirmText={saving ? "Guardando…" : "Confirmar"}
+        onConfirm={changeLifecycle}
+        onCancel={() => {
+          if (!saving) setLifecycleConfirm(false);
+        }}
+      />
 
       <div className="flex items-start justify-between mb-6 gap-3 flex-wrap">
         <div className="flex items-center gap-3">
@@ -235,12 +284,37 @@ export default function AsistenciaDetallePage() {
             {asistencia && (
               <p className="text-sm text-muted-foreground mt-0.5 mb-0">
                 {asistencia.descripcion} · {formatDate(asistencia.fecha)}
+                <span className="mt-1 block">
+                  {attendanceScopeLabel(asistencia)}
+                </span>
               </p>
             )}
           </div>
         </div>
 
         <div className="flex gap-2 items-center flex-wrap">
+          {!loading && asistencia && (
+            <>
+              <Badge variant="outline">
+                {asistencia.estadoRegistro === "cerrada"
+                  ? "Cerrada"
+                  : asistencia.estadoRegistro === "en_registro"
+                    ? "En registro"
+                    : "Histórica"}
+              </Badge>
+              {!isEdit && (
+                <Button
+                  variant="outline"
+                  disabled={saving}
+                  onClick={() => setLifecycleConfirm(true)}
+                >
+                  {asistencia.estadoRegistro === "cerrada"
+                    ? "Reabrir registro"
+                    : "Cerrar asistencia"}
+                </Button>
+              )}
+            </>
+          )}
           {!loading && asistencia && (
             <Button
               onClick={() => exportAttendanceToExcel(asistencia, registro)}
@@ -282,7 +356,11 @@ export default function AsistenciaDetallePage() {
       </div>
 
       {!loading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+        <div
+          role="group"
+          aria-label="Resumen de asistencia"
+          className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5"
+        >
           {[
             {
               label: "Total",
@@ -305,22 +383,14 @@ export default function AsistenciaDetallePage() {
               value: summary.ausentes,
             },
           ].map((c) => (
-            <Card key={c.label} className="text-center p-6">
-              <div
-                style={{
-                  width: "36px",
-                  height: "36px",
-                }}
-                className="rounded-full bg-muted mx-auto flex items-center justify-center"
-              >
-                <span className="text-sm font-semibold text-foreground">
-                  {c.value}
-                </span>
-              </div>
-              <p className="text-xs font-semibold text-muted-foreground m-0">
-                {c.label}
-              </p>
-            </Card>
+            <Badge
+              key={c.label}
+              variant="outline"
+              className="h-auto w-full justify-center gap-2 bg-card px-3 py-1 text-sm"
+            >
+              <span>{c.label}</span>
+              <span className="font-semibold tabular-nums">{c.value}</span>
+            </Badge>
           ))}
         </div>
       )}

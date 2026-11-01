@@ -1,26 +1,52 @@
 // src/components/layout/smooth-scroll.jsx
 "use client";
 
-import { useEffect, useRef } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { isLandingPath } from "@/lib/landing-paths";
 import { useReducedMotion } from "@/lib/motion";
+
+const SmoothScrollPageContext = createContext(null);
+
+// Error pages are selected by Next.js at runtime, not by their visible URL.
+export function useSmoothScrollPage() {
+  const register = useContext(SmoothScrollPageContext);
+  useEffect(() => register?.(), [register]);
+}
 
 export function SmoothScroll({ children }) {
   const pathname = usePathname();
   const lenisRef = useRef(null);
   const rafRef = useRef(null);
   const reducedMotion = useReducedMotion();
+  const [registeredPages, setRegisteredPages] = useState(0);
+  const registerPage = useCallback(() => {
+    setRegisteredPages((count) => count + 1);
+    return () => setRegisteredPages((count) => count - 1);
+  }, []);
 
   // Reutilizar el desplazamiento público en landing e inscripciones por evento.
-  const isLanding = (isLandingPath(pathname) || /^\/eventos\/[^/]+\/?$/.test(pathname)) && pathname !== "/tecnologias-de-la-informacion";
+  const isLanding =
+    (isLandingPath(pathname) || /^\/eventos\/[^/]+\/?$/.test(pathname)) &&
+    pathname !== "/tecnologias-de-la-informacion";
+  const enabled = isLanding || registeredPages > 0;
 
   useEffect(() => {
-    // Si NO estamos en landing, NO activar Lenis
-    if (!isLanding) {
+    // Activar solo en rutas públicas habilitadas o páginas que lo soliciten.
+    if (!enabled) {
       // Limpiar cualquier resto de Lenis
       if (lenisRef.current) {
+        // Reset pending motion before destroy; delayed scroll callbacks must not
+        // restore Lenis classes after this page has released smooth scrolling.
+        lenisRef.current.stop();
         lenisRef.current.destroy();
         lenisRef.current = null;
       }
@@ -37,7 +63,7 @@ export function SmoothScroll({ children }) {
       return;
     }
 
-    // Estamos en landing, activar Lenis
+    // Reutilizar la misma configuración de la landing, respetando accesibilidad.
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -46,6 +72,7 @@ export function SmoothScroll({ children }) {
 
     // Destruir instancia anterior si existe
     if (lenisRef.current) {
+      lenisRef.current.stop();
       lenisRef.current.destroy();
       lenisRef.current = null;
     }
@@ -97,6 +124,7 @@ export function SmoothScroll({ children }) {
       }
 
       if (lenisRef.current) {
+        lenisRef.current.stop();
         lenisRef.current.destroy();
         lenisRef.current = null;
       }
@@ -108,12 +136,11 @@ export function SmoothScroll({ children }) {
       document.body.style.overflow = "";
       document.body.style.height = "";
     };
-  }, [isLanding, pathname, reducedMotion]);
+  }, [enabled, pathname, reducedMotion]);
 
-  // Si NO estamos en landing, renderizar sin wrapper
-  if (!isLanding) {
-    return <>{children}</>;
-  }
-
-  return <>{children}</>;
+  return (
+    <SmoothScrollPageContext.Provider value={registerPage}>
+      {children}
+    </SmoothScrollPageContext.Provider>
+  );
 }

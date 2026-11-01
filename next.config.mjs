@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ['192.168.1.*'],
+  // Isolate local verification from an already running development session.
+  distDir: process.env.ENLACES_QA_DIST_DIR || '.next',
+  allowedDevOrigins: ['localhost', '127.0.0.1', '192.168.1.*'],
   productionBrowserSourceMaps: false,
   async headers() {
     const noindex = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];

@@ -14,6 +14,9 @@
 /coverage
 /tests/*
 !/tests/mascot/
+!/tests/enlaces/
+!/tests/public-scroll/
+!/tests/member-summary/
 /playwright.config.mjs
 /test-results/
 /playwright-report/
@@ -21,6 +24,7 @@
 
 # next.js
 /.next/
+/.next-enlaces-*/
 /out/
 
 # production

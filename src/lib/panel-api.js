@@ -33,6 +33,8 @@ export async function panelApi(path, options = {}) {
       result.message || result.error || "No se pudo completar la operación.",
     );
     error.status = response.status;
+    error.fields = result.fields;
+    error.code = result.code;
     throw error;
   }
 

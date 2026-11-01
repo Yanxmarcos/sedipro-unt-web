@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
@@ -16,7 +17,13 @@ import {
   RotateCcw,
   UsersRound,
   UserRound,
+  History,
 } from "lucide-react";
+import { usePanelSession } from "@/components/admin/panel-session";
+import {
+  startCertificateActivity,
+  finishCertificateActivity,
+} from "@/lib/certificate-audit.mjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -222,6 +229,9 @@ function LayoutControl({
 }
 
 export default function CertificateWorkspace() {
+  const { permissions } = usePanelSession();
+  const [auditError, setAuditError] = useState("");
+  const openedRef = useRef(false);
   const [kind, setKind] = useState(null);
   const [step, setStep] = useState(0);
   const [session, setSession] = useState(initialSession);
@@ -263,6 +273,43 @@ export default function CertificateWorkspace() {
   const participants = session.participants;
   const currentIndex = Math.min(selected, Math.max(0, participants.length - 1));
   const current = participants[currentIndex];
+
+  const activityDetails = (extra = {}) => ({
+    ...(kind ? { tipo: kind } : {}),
+    proyecto: session.project.trim().slice(0, 160),
+    cantidad: participants.length,
+    fuente: session.source,
+    ...extra,
+  });
+  function auditFailure() {
+    if (mounted.current)
+      setAuditError(
+        "No se pudo registrar una actividad de certificados. Revisa tu conexión y vuelve a intentarlo.",
+      );
+  }
+  function recordUsage(action, extra = {}) {
+    void startCertificateActivity(action, activityDetails(extra)).catch(
+      auditFailure,
+    );
+  }
+  async function finishUsage(entry, result, generated) {
+    if (!entry?.id) return;
+    try {
+      await finishCertificateActivity(entry.id, result, generated);
+    } catch {
+      auditFailure();
+    }
+  }
+  useEffect(() => {
+    if (openedRef.current) return;
+    openedRef.current = true;
+    void startCertificateActivity("abrir_modulo").catch(() => {
+      if (mounted.current)
+        setAuditError(
+          "No se pudo registrar la entrada a certificados. Revisa tu conexión.",
+        );
+    });
+  }, []);
 
   useEffect(() => {
     mounted.current = true;
@@ -334,9 +381,12 @@ export default function CertificateWorkspace() {
 
   const officials = useMemo(() => {
     const member = (id, cargo, area = "") => {
-      const found = institutionCandidates(directory.rows, cargo, session.year, area).find(
-        (person) => String(person._id) === String(id),
-      );
+      const found = institutionCandidates(
+        directory.rows,
+        cargo,
+        session.year,
+        area,
+      ).find((person) => String(person._id) === String(id));
       return found
         ? {
             ...found,
@@ -349,7 +399,10 @@ export default function CertificateWorkspace() {
         member(signatureConfig.presidentId, "PRESIDENCIA"),
         "president",
       ),
-      pmo: officialSigner(member(signatureConfig.pmoId, "DIRECCION_AREA", "PMO"), "pmo"),
+      pmo: officialSigner(
+        member(signatureConfig.pmoId, "DIRECCION_AREA", "PMO"),
+        "pmo",
+      ),
     };
   }, [directory.rows, signatureConfig, session.year]);
   const getSigners = useCallback(
@@ -509,6 +562,7 @@ export default function CertificateWorkspace() {
       if (mounted.current) {
         setTemplate(image);
         setTemplateName(file.name);
+        recordUsage("cargar_plantilla");
       }
     } catch (failure) {
       if (mounted.current) setNotice({ type: "error", text: failure.message });
@@ -525,6 +579,7 @@ export default function CertificateWorkspace() {
     setNotice(null);
     setStep(2);
     setSelected(0);
+    recordUsage("abrir_editor");
   }
   async function exportCurrent(extension) {
     if (workingRef.current || !current) return;
@@ -536,7 +591,13 @@ export default function CertificateWorkspace() {
     workingRef.current = true;
     setBusy(extension);
     setNotice(null);
+    let activity;
+    let generated = 0;
     try {
+      activity = await startCertificateActivity(
+        "descargar_certificado",
+        activityDetails({ cantidad: 1, formato: extension }),
+      );
       const canvas = document.createElement("canvas");
       renderTo(canvas, current);
       const blob =
@@ -546,14 +607,19 @@ export default function CertificateWorkspace() {
               name: current.name,
             })
           : await canvasToPng(canvas);
+      generated = 1;
       if (mounted.current) {
         downloadBlob(blob, exportNames([current], extension)[0]);
         setNotice({
           type: "success",
           text: `Se inició la descarga de ${current.name}.`,
         });
+        await finishUsage(activity, "descarga_iniciada", generated);
+      } else {
+        await finishUsage(activity, "cancelada", generated);
       }
     } catch (failure) {
+      await finishUsage(activity, "fallida", generated);
       if (mounted.current)
         setNotice({
           type: "error",
@@ -592,7 +658,14 @@ export default function CertificateWorkspace() {
       total: exportRecords.length,
       stage: "Generando certificados",
     });
+    let activity;
+    let generated = 0;
+    let downloaded = false;
     try {
+      activity = await startCertificateActivity(
+        "descargar_lote",
+        activityDetails({ cantidad: exportRecords.length, formato: format }),
+      );
       const { default: JSZip } = await import("jszip");
       const zip = new JSZip();
       const canvas = document.createElement("canvas");
@@ -616,6 +689,7 @@ export default function CertificateWorkspace() {
           );
         if (cancelRef.current) break;
         zip.file(filenames[index], await blob.arrayBuffer());
+        generated = index + 1;
         if (mounted.current)
           setProgress({
             current: index + 1,
@@ -636,18 +710,25 @@ export default function CertificateWorkspace() {
             blob,
             `Certificados-${safeFilename(session.project)}-${format.toUpperCase()}.zip`,
           );
+          downloaded = true;
           setNotice({
             type: "success",
             text: `Se inició la descarga del ZIP con ${exportRecords.length} certificados ${format.toUpperCase()}.`,
           });
         }
       }
-      if (cancelRef.current && mounted.current)
+      await finishUsage(
+        activity,
+        downloaded ? "descarga_iniciada" : "cancelada",
+        generated,
+      );
+      if (!downloaded && cancelRef.current && mounted.current)
         setNotice({
           type: "info",
           text: "Generación cancelada. No se descargó el ZIP; puedes volver a intentarlo.",
         });
     } catch (failure) {
+      await finishUsage(activity, "fallida", generated);
       if (mounted.current)
         setNotice({
           type: "error",
@@ -662,6 +743,7 @@ export default function CertificateWorkspace() {
   }
 
   function resetSession() {
+    recordUsage("reiniciar_sesion");
     setKind(null);
     setStep(0);
     setSession(initialSession());
@@ -703,6 +785,16 @@ export default function CertificateWorkspace() {
             recargar.
           </p>
         </div>
+        {permissions.canViewCertificateAudit && (
+          <Button
+            variant="outline"
+            nativeButton={false}
+            render={<Link href="/panel/certificados/auditoria" />}
+            disabled={Boolean(busy)}
+          >
+            <History /> Auditoría
+          </Button>
+        )}
         {kind && (
           <Button
             type="button"
@@ -715,6 +807,14 @@ export default function CertificateWorkspace() {
           </Button>
         )}
       </header>
+      {auditError && (
+        <p
+          role="alert"
+          className="rounded-lg border border-destructive/30 px-4 py-3 text-sm text-destructive"
+        >
+          {auditError}
+        </p>
+      )}
       {!kind ? (
         <section className="space-y-5">
           <div>
@@ -749,6 +849,11 @@ export default function CertificateWorkspace() {
                 className="flex w-full items-center gap-4 px-5 py-5 text-left transition-colors hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-ring"
                 onClick={() => {
                   setKind(option.kind);
+                  recordUsage("seleccionar_tipo", {
+                    tipo: option.kind,
+                    fuente:
+                      option.kind === "sedipranos" ? "directory" : "excel",
+                  });
                   setSession((value) => ({
                     ...value,
                     source:
@@ -813,7 +918,14 @@ export default function CertificateWorkspace() {
               value={session}
               onChange={updateSession}
               onDirectoryLoaded={receiveDirectory}
+              onTemplateDownload={() =>
+                recordUsage("descargar_plantilla", {
+                  formato: "xlsx",
+                  cantidad: 0,
+                })
+              }
               onContinue={() => {
+                recordUsage("preparar_participantes");
                 setNotice(null);
                 setStep(1);
               }}
@@ -1539,6 +1651,12 @@ export default function CertificateWorkspace() {
               <a
                 href={BASE_TEMPLATE_URL}
                 download="Plantilla-base-certificados.png"
+                onClick={() =>
+                  recordUsage("descargar_plantilla", {
+                    formato: "png",
+                    cantidad: 0,
+                  })
+                }
               />
             }
           >

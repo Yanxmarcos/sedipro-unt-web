@@ -94,6 +94,7 @@ export const navItems: NavItem[] = [
   {
     groupLabel: "HERRAMIENTAS",
     items: [
+      { icon: "Link2", label: "Acortador de enlaces", href: "/panel/enlaces" },
       {
         icon: "Award",
         label: "Certificados",
