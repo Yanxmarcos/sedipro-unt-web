@@ -615,9 +615,8 @@ const SidebarLayout = () => {
   // icon-mode flyout — collapsing and re-expanding the sidebar keeps the tree as it was.
   // Anything absent from this map falls back to "open if it holds the active route".
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
-  const { user, assignments } = usePanelSession();
+  const { user } = usePanelSession();
   const role = user?.rol;
-  const hasAttendanceAssignments = assignments.length > 0;
 
   useEffect(() => {
     let mounted = true;
@@ -667,25 +666,19 @@ const SidebarLayout = () => {
       : isMember
         ? [
             {
+              groupLabel: "GENERAL",
+              items: [{ icon: "LayoutDashboard" as MenuItem["icon"], label: "Resumen", href: "/panel" }],
+            },
+            {
               groupLabel: "EVENTOS",
               items:
                 navItems.find((group) => group.groupLabel === "EVENTOS")
                   ?.items || [],
             },
-            ...(hasAttendanceAssignments
-              ? [
-                  {
-                    groupLabel: "ASISTENCIA INTERNA",
-                    items: [
-                      {
-                        icon: "ClipboardCheck" as MenuItem["icon"],
-                        label: "Tomar asistencia",
-                        href: "/panel/asistencias/tomar",
-                      },
-                    ],
-                  },
-                ]
-              : []),
+            {
+              groupLabel: "ASISTENCIA INTERNA",
+              items: [{ icon: "ClipboardCheck" as MenuItem["icon"], label: "Tomar asistencia", href: "/panel/asistencias/tomar" }],
+            },
             {
               groupLabel: "VOTACIÓN",
               items: [
@@ -698,7 +691,7 @@ const SidebarLayout = () => {
             },
             {
               groupLabel: "HERRAMIENTAS",
-              items: navItems.flatMap((group) => group.items).filter((item) => item.href === "/panel/certificados"),
+              items: navItems.flatMap((group) => group.items).filter((item) => item.href === "/panel/certificados" || item.href === "/panel/enlaces"),
             },
           ]
         : [];
@@ -710,7 +703,7 @@ const SidebarLayout = () => {
             : item,
         )
       : visibleItems;
-  }, [externalApps, role, hasAttendanceAssignments, user?.mustChangePassword]);
+  }, [externalApps, role, user?.mustChangePassword]);
 
   const activeBranchKeys = useMemo(
     () => getActiveBranchKeys(navGroups, pathname, searchParams),

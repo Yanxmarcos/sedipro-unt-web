@@ -163,6 +163,28 @@ está en `.impeccable/surfaces/certificates.md`. Los tokens del frontmatter
 siguen describiendo el sitio público; no se trasladan al generador ni se
 introduce una identidad o escala de tokens nueva para esta herramienta.
 
+La extensión de `/panel/enlaces` del 30 de octubre de 2026 conserva también el
+sistema del panel, en modo Operate: biblioteca institucional compartida,
+papelera y auditoría con eliminación individual para administración. Su contrato
+y evidencia están en
+`.impeccable/surfaces/enlaces.md`. Hereda la plantilla interna y no incorpora
+tokens, fuentes, assets ni una identidad nueva; el frontmatter público y
+`.impeccable/design.json` conservan su alcance.
+
+La extensión de `/panel` para Sediprano conserva el sistema interno existente.
+Su contrato local está en `.impeccable/surfaces/resumen-sediprano.md`: Resumen
+es una vista personal de trabajo, sin métricas administrativas. Solo las cuentas
+Sediprano (incluido USER legado) reciben esta vista; Directiva, Administrador y
+Superadministrador conservan `OrdersDashboard`. No introduce identidad, tokens,
+fuentes, recursos gráficos ni cambios en `.impeccable/design.json`.
+
+La extensión de Asistencias por áreas conserva el módulo interno existente en
+modo Operate. Su contrato está en
+`.impeccable/surfaces/asistencias-por-areas.md`; reutiliza campos, tablas,
+acciones, temas y permisos del panel. No introduce identidad, paleta, fuentes,
+imágenes, movimiento ni tokens nuevos. El frontmatter público y
+`.impeccable/design.json` conservan su alcance.
+
 **Key Characteristics:**
 
 - Tipografía sans monumental con acentos serif editoriales.
@@ -189,6 +211,11 @@ ProjectJourney usa el papel `public-paper` como hoja y fondo de lectura principa
 del cruce combina azul e índigo existentes; no incorpora un nuevo color de marca.
 
 **The Scope Rule.** Las variables públicas viven en el contenedor público, no en la raíz global; conservar esa frontera evita transferir esta paleta al panel y a las páginas excluidas.
+
+Enlaces usa los colores semánticos existentes del panel (`bg-card`,
+`text-muted-foreground`, `primary`, `destructive`, bordes y foco) en claro y
+oscuro. Las etiquetas de estado nombran Activo, Pausado, Vencido y En papelera;
+la información no depende únicamente del color.
 
 ## Typography
 
@@ -221,6 +248,11 @@ El cuadro de acceso mantiene Geist/Arial y sus utilidades sans y mono originales
 El generador de certificados hereda Geist del panel: título `text-2xl`
 semibold y descripción `text-sm`. Las ocho fuentes elegibles del editor solo
 afectan al documento dibujado; no cambian la tipografía de la interfaz.
+
+Enlaces hereda Geist del panel, con título `text-2xl` semibold y tracking
+ajustado, descripción `text-sm` y metadatos secundarios compactos. Las fechas
+de auditoría usan cifras tabulares; URLs y cambios largos se truncan o parten
+según su contexto sin alterar el texto copiable.
 
 ## Layout
 
@@ -299,6 +331,23 @@ Plantilla y firmas, y Editor y descarga. En escritorio, la vista previa queda
 sticky junto a los controles; en móvil se apila con ellos. La tabla permite
 revisar participantes y escoger todos, selección o rango para el lote.
 
+En `/panel/enlaces`, `/panel/enlaces/papelera` y `/panel/enlaces/auditoria`,
+conservar sidebar y cabecera del panel. La biblioteca concentra búsqueda,
+filtros, tabla paginada y acciones; no añade un dashboard de métricas. La
+cabecera y acciones admiten salto de línea; los filtros pasan de una columna
+en móvil a dos y después a la grilla de escritorio. Las tablas desplazan su
+contenido horizontalmente dentro del contenedor. El formulario usa el diálogo
+existente, limitado a `90dvh`, con scroll vertical interno y ancho `sm:max-w-xl`.
+
+En el Resumen de `/panel`, el saludo y área proceden de la ficha real; Mi perfil
+y Actualizar resumen acompañan la cabecera. Desde el breakpoint `xl`, la zona
+de trabajo y la columna de utilidades guardan proporción 1.5:1, con separación
+de 24px. Por debajo se apilan Para atender, Próximos eventos, Herramientas y
+Enlaces que creaste. Los textos largos permiten salto de línea y las acciones
+se redistribuyen dentro de su contenedor. Se conservan la cabecera y sidebar
+internas; solo para Sediprano, la cabecera identifica Resumen y la navegación
+lo incluye bajo GENERAL.
+
 ## Elevation & Depth
 
 La profundidad pública proviene del humo, del scrim, de capas tonales y de fotografías que se apilan. Las acciones tienen una sombra púrpura suave que se intensifica al pasar el puntero; no es una receta de sombra para todas las superficies. El acceso original conserva bordes negros gruesos y sombras duras desplazadas. Los valores completos de sombra están en `.impeccable/design.json`.
@@ -307,6 +356,10 @@ La cinta obtiene profundidad de un bucle, una pasada sombreada azul/índigo
 y la continuación del segundo capítulo. Los paneles blancos son planos; los
 marcos Polaroid tienen sombra `0 16px 32px rgb(27 16 45 / .16)` para distinguir
 sus fotografías superpuestas. El cruce y las sombras son locales al colaje.
+
+Enlaces conserva la profundidad de los componentes internos existentes:
+contenedores tonales con borde, menús y diálogos del panel. No traslada humo,
+líquido, parallax ni sombras editoriales del sitio público.
 
 ## Shapes
 
@@ -317,6 +370,10 @@ frontmatter), paneles blancos de radio 16px y acciones de radio 12px.
 Los marcos Polaroid tienen esquinas rectas, borde blanco y pie de leyenda;
 rotan como piezas completas y conservan los píxeles originales. La cinta
 tiene extremos y uniones redondos. La mascota Hito pequeña permanece intacta.
+
+Los contenedores de Enlaces usan `rounded-xl` y borde del panel; campos,
+botones, badges, menús y confirmaciones conservan sus formas compartidas.
+No se introducen radios ni una familia de componentes nuevos.
 
 ## Components
 
@@ -367,6 +424,26 @@ Las secuencias incluyen fotos insertadas en títulos, historia fijada con fotos 
 
 Hito conserva sus sprites, rig, arte raster y marcha existentes. En las páginas públicas rediseñadas `greetOnMount={false}` solamente difiere su saludo inicial; no modifica el arte ni la marcha. La mascota animada no se monta en `/login`, donde permanece la ilustración original de bienvenida.
 
+### Scroll público y 404
+
+El 404 solicita el scroll público al proveedor compartido mediante
+`useSmoothScrollPage`, porque su URL puede ser cualquier ruta inexistente o un
+enlace corto reescrito. Reutiliza exactamente la configuración Lenis de la
+landing y respeta movimiento reducido. Al salir libera el registro y detiene la
+animación antes de destruir la instancia, sin activar inercia en el panel.
+Verificación: tres pruebas Playwright dedicadas, con posiciones reales de scroll
+por fotograma en escritorio y ancho móvil, accesibilidad y navegación al login.
+Ejecutar `node node_modules/@playwright/test/cli.js test --config=playwright.public-scroll.config.mjs`;
+usa un servidor de prueba separado, sin API real ni MongoDB.
+
+### Pie del panel interno
+
+Conservar el copyright de SEDIPRO UNT a la izquierda y los enlaces a la derecha
+en una sola fila. Por debajo de `md`, Documentación y Reportar un problema usan
+los iconos BookOpen y Bug de Lucide, con nombres accesibles y áreas táctiles de
+44×44px. Desde `md` se muestran los textos originales. Los destinos de los enlaces
+se conservan; este comportamiento no afecta al footer público.
+
 ### Generador de certificados · panel
 
 Reutilizar botones, campos, tabs, tablas, diálogos y colores semánticos del
@@ -378,6 +455,182 @@ avisos de ajuste y superposición deben resolverse antes de descargar.
 La imagen base aportada por el usuario se conserva sin retoque y sirve de
 referencia descargable; el fondo de trabajo se carga explícitamente.
 
+### Acortador de enlaces · panel
+
+Reutilizar botones, campos, selectores, badges, tablas, menús, diálogos,
+confirmaciones y estados de página del panel. La biblioteca es institucional:
+todos los roles del panel gestionan cualquier enlace; el creador aporta
+atribución, no propiedad. Crear enlace es la acción principal; Papelera y,
+para Administración/Superadmin, Auditoría son accesos secundarios.
+
+YouTube se integra en esa detección y en los filtros existentes con prefijo `yt`;
+sus tipos se presentan como Video, Short, Transmisión en vivo, Canal de YouTube
+y Lista de reproducción, sin nuevos componentes ni cambios visuales.
+
+El formulario detecta plataforma y tipo mediante el servidor, admite campaña,
+nota y vencimiento opcionales y presenta la URL copiable solo después de
+guardar. El código definitivo usa tres caracteres base36 con al menos un dígito en cualquier posición; prefijo y código
+son inmutables. La edición explica el efecto sobre
+la URL publicada y confirma los cambios de destino; los conflictos ofrecen
+recargar. Copiar informa éxito o fallo y permite la copia manual. Mantener
+mensajes en español, etiquetas accesibles y los estados de carga, vacío,
+sin resultados, validación, guardado y error con recuperación.
+
+Mover a papelera requiere confirmar que los enlaces publicados dejarán de
+funcionar. Solo Superadministrador ve el botón de eliminación definitiva en
+cada fila de la papelera. Usa AdminConfirm con el título del enlace, explica
+que no podrá restaurarse y que se conservan la reserva del código y su auditoría.
+El backend aplica el permiso, revisión y confirmación del ID; el enlace desaparece
+de las vistas y no se puede recuperar. Restaurar conserva URL, estado manual y vencimiento, y comunica
+el estado resultante. La auditoría muestra persona, fecha en hora de Lima,
+enlace, acción, cambios antes/después y resultado. Por petición posterior del
+usuario, cada fila incorpora Eliminar para administración con el botón y la
+confirmación destructiva existentes, que explica que el borrado es definitivo
+y no modifica el enlace. No permite editar contenido ni limpieza masiva. Las
+intenciones iniciadas sin finalizar de menos de quince minutos permanecen
+protegidas; la paginación se ajusta al eliminar la última fila. La redirección
+pública ocurre en el proxy del frontend: los enlaces activos responden con
+HTTP 302 antes de React, sin exigir sesión ni montar la interfaz pública.
+Por petición del usuario, los enlaces no disponibles reutilizan la página 404
+institucional existente mediante reescritura interna, manteniendo la URL original.
+No se dibuja otra pantalla de «Enlace no disponible». Los fallos temporales
+reutilizan ese mismo componente con estado HTTP 503 y `Retry-After: 60`, sin
+modificar el diseño del 404. El resolver compartido centraliza este comportamiento
+para los ocho prefijos.
+
+La revisión vigente del resolver y reutilización del 404 emitió `ship` sin
+hallazgos materiales tras abrir `public-404-desktop.png` y
+`public-404-mobile.png` en `.impeccable/review/enlaces/`; conserva el diseño
+institucional existente. La evidencia de implementación actual registra
+24 pruebas relevantes y cuatro pruebas Playwright aprobadas con MongoDB local
+aislado y API real: Instagram GET/HEAD sin sesión, los ocho prefijos con 404,
+pausa/reactivación conservando URL y fallo temporal 503 con backend caído.
+El build de producción del frontend y el lint de archivos modificados aprobaron.
+
+Como evidencia histórica, la revisión inicial emitió `ship` sobre 13 capturas
+de biblioteca, formulario, auditoría y papelera; la actualización de códigos
+de tres caracteres y eliminación individual emitió otro `ship` sobre seis
+capturas de auditoría y confirmación. Esta última registró 24 pruebas relevantes,
+tres Playwright y ambos builds aprobados. El contrato local conserva el detalle
+y la secuencia de revisiones. Las revisiones visuales no sustituyen las pruebas
+funcionales ni aportan mediciones instrumentales de contraste. El detector Windows no se ejecutó por
+`cache_directory_failed`; no se registran mediciones de ese detector ni se
+extiende esta revisión al resto del panel o del sitio público.
+
+### Resumen Sediprano · panel
+
+`src/components/admin/member-summary.jsx` compone tarjetas, botones, badges y
+estados de página existentes; hereda Geist, colores semánticos, bordes, foco y
+temas claro/oscuro del panel. No añade una gramática de animación. El saludo usa
+un título compacto semibold con tracking ajustado (24px). El nombre y
+el área comparten el tamaño y peso del saludo «Hola, Eliaser, miembro del área
+de TI». Solo el área usa AREA_TEXT_CLASSES de `src/lib/member-areas.mjs`, compartido
+con el padrón: TI naranja, MKT rojo, GTH verde, LTK Y FNZ celeste y PMO amarillo
+dorado (`#887400` en claro, conservando su tono existente en oscuro). La paleta
+mantiene al menos 4.5:1 de contraste sobre los fondos de ambas vistas.
+Las descripciones y filas mantienen la escala interna. `src/app/panel/page.js` selecciona esta vista
+para miembros y conserva el dashboard de gestión para quienes pueden gestionar.
+
+Para atender reutiliza `/api/mi/votaciones` y las asignaciones de la sesión.
+Solo una votación elegible sin voto registrado ofrece Participar. Voto registrado
+no revela la opción elegida; la participación no habilitada muestra su motivo.
+Asistencias a tu cargo significa responsabilidad de tomar asistencia, con hasta
+tres asignaciones y acceso a la lista completa; no informa asistencia personal.
+
+Tomar asistencia permanece visible para Sediprano incluso sin asignaciones;
+crear sesiones y asignar encargados conserva sus permisos de gestión. La vista
+indica «Estás encargado de…» o «Actualmente no tienes asistencias a tu cargo».
+Los fallos al consultar asignaciones se exponen como `assignmentsError` en la
+sesión y admiten reintento tanto en esta vista como en Resumen; nunca se
+presentan como ausencia de encargos ni bloquean las otras herramientas del panel.
+
+Próximos eventos presenta hasta tres eventos futuros publicados y no archivados,
+en orden de inicio, con fechas en hora de Lima. Enlaces que creaste presenta
+hasta tres enlaces recientes del creador autenticado, sin papelera ni reservas
+de códigos; la biblioteca institucional sigue siendo compartida. La procedencia
+es el endpoint del backend `src/app/api/mi/resumen/route.js`: comprueba cuenta,
+rol persistido, cambio obligatorio de contraseña y ficha activa; usa proyecciones
+limitadas y respuesta privada sin caché. El área viene de la ficha y no del rol.
+No se añaden colecciones ni selector de otro creador.
+
+Herramientas ofrece Crear enlace, Generar certificado, Gestionar eventos y
+Suscripciones. Crear enlace abre el `LinkForm` existente y actualiza el resumen
+al guardar; `CopyLink` mantiene su feedback y la URL visible permite copiarla
+manualmente. Mi perfil, los eventos y las asignaciones enlazan sus rutas actuales.
+Carga, vacío y error tienen texto específico. Los fallos de resumen o votaciones
+se presentan por sección con reintento; las herramientas y la fuente independiente
+que siga disponible permanecen utilizables.
+
+La revisión final de esta extensión emitió `ship` sin hallazgos materiales.
+La evidencia recibida registra tres pruebas Playwright aprobadas con APIs
+simuladas, con escritorio/móvil, temas claro/oscuro, vacío/error y conservación
+del dashboard de los roles de gestión. Las cuatro capturas
+`.impeccable/review/member-summary/{desktop,mobile}-{light,dark}.png` fueron
+abiertas y validadas en la revisión. Son viewports emulados, sin validación en
+hardware físico ni medición instrumental de contraste. Las comprobaciones de
+API usaron MongoDB local desechable para privacidad, rol actual, cuenta activa,
+proyección limitada y orden; no constituyen prueba de datos de producción.
+El detector no pudo ejecutarse por `cache_directory_failed`; no se le atribuyen
+resultados ni se extiende el alcance de esta revisión al resto del panel.
+
+### Asistencias por áreas · panel
+
+`src/components/admin/attendance-scope-fields.jsx` añade el grupo Convocados al
+formulario existente de Nueva asistencia. Reutiliza `AdminSelect`, colores
+semánticos y casillas nativas con etiquetas asociadas; las etiquetas tienen una
+altura mínima de 44px y se distribuyen en filas que se envuelven al reducir el
+ancho. Las áreas comparten `AREA_TEXT_CLASSES` con el padrón. Se conservan las
+tarjetas, campos de fecha y descripción, tabla con desplazamiento horizontal,
+acción Guardar asistencia y estados de carga y error existentes.
+
+Todo SEDIPRO es el valor inicial e incluye a todos los miembros activos y la
+directiva. Por áreas muestra TI, PMO, LTK Y FNZ, GTH y MKT, permite seleccionar
+una o varias y explica la inclusión automática de sus directores activos.
+Presidencia y Vicepresidencia tienen casillas opcionales independientes. Elegir
+las cinco áreas no equivale a Todo SEDIPRO: las dos casillas siguen siendo
+opcionales. Cambiar el tipo reinicia áreas y casillas; guardar sin áreas muestra
+«Selecciona al menos un área.». Durante el guardado se bloquea este grupo y la
+acción muestra Guardando….
+
+La nota del formulario comunica que los convocados quedan fijados al crear.
+La procedencia es el padrón activo consultado por el backend: los directores
+se identifican por cargo y área directiva, y Presidencia/Vicepresidencia por
+cargo, sin inferir personas por nombre o sexo. Cada sesión nueva conserva su
+registro de convocados y una ficha reducida con nombre, DNI, área y cargo/área
+directiva. Los cambios posteriores del padrón no sustituyen personas ni sus
+etiquetas históricas. Editar conserva alcance y miembros originales; la toma
+mantiene los cuatro estados existentes. El contrato de datos y
+despliegue se documenta en `../backend/ASISTENCIAS-POR-AREAS.md`.
+
+`src/lib/attendance-scope.mjs` centraliza el texto de alcance para listado,
+detalle administrativo, asignaciones y toma. Una sesión sin alcance se presenta
+como Todo SEDIPRO, sin migrar, reconstruir ni recalcular sus registros.
+Crear sesiones y asignar encargados conserva los permisos actuales; tomar
+asistencia mantiene la comprobación de asignación y pertenencia al registro.
+Un DNI no convocado se rechaza sin alterar los totales.
+
+`src/lib/export-attendance.js` exporta exclusivamente las filas del registro de
+esa sesión y calcula sobre ellas presentes, tardanzas, justificados y ausentes.
+El alcance ocupa la tercera fila existente y la propiedad Subject del libro,
+sin desplazar las demás filas. Los directores conservan DIRECTIVA como área
+institucional; esa agrupación no incorpora a otros directivos. Se conserva la
+fórmula anterior del porcentaje de asistencia. El reporte no consulta de nuevo
+el padrón para completar convocados.
+
+La revisión final independiente emitió `ship` sin hallazgos materiales y abrió
+las capturas válidas `.impeccable/review/attendance-scope/desktop.png` y
+`mobile.png`. La evidencia recibida registra pruebas aprobadas sobre MongoDB
+temporal y API real: sesión histórica sin cambios, alcance general y una/dos/
+tres áreas, directores automáticos, ambas presidencias opcionales, validación,
+rechazo de no convocados, protección de miembros, los cuatro estados, captura
+histórica tras cambiar el padrón y filas/totales del Excel real. La prueba de
+creación en navegador aprobó en escritorio y móvil con API simulada; los builds
+finales de frontend y backend aprobaron. No hubo migración ni escrituras en la
+nube. El detector no estuvo disponible por `cache_directory_failed`, por lo
+que no se le atribuyen mediciones. Las capturas y el código no constituyen
+validación táctil en hardware físico ni una auditoría instrumental completa de
+accesibilidad; esta revisión se limita a la extensión de Asistencias.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -387,6 +640,7 @@ referencia descargable; el fondo de trabajo se carga explícitamente.
 - **Do** conservar contenido visible, navegación por teclado y alternativas de movimiento reducido.
 - **Do** preservar el cuadro de acceso y su tipografía, campos y autenticación existentes.
 - **Do** extender Certificados con los componentes del panel y limitar la tipografía del certificado a su lienzo.
+- **Do** extender Enlaces con la plantilla y componentes internos, respetando ambos temas, permisos y estados de recuperación.
 
 ### Don't:
 
@@ -395,3 +649,4 @@ referencia descargable; el fondo de trabajo se carga explícitamente.
 - **Don't** convertir las filas editoriales en una grilla general de tarjetas.
 - **Don't** generalizar los cuatro paneles blancos de ProjectJourney: son una excepción local requerida por la composición MindMarket fijada por el usuario.
 - **Don't** tratar la referencia como certificación de equivalencia: estas notas describen el código implementado.
+- **Don't** trasladar la identidad pública a Enlaces, mostrar códigos provisionales como enlaces guardados ni exponer la eliminación de auditoría a roles no administrativos.

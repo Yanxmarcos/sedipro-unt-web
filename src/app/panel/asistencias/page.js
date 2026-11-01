@@ -14,10 +14,13 @@ import {
   Eye as AdminEyeIcon,
   Pencil as AdminPencilIcon,
   FileSpreadsheet as AdminFileSpreadsheetIcon,
+  History,
+  Lock,
+  LockOpen,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { AdminToast } from "@/components/admin/form-controls";
+import { AdminToast, AdminConfirm } from "@/components/admin/form-controls";
 import { Label } from "@/components/ui/label";
 import {
   TableCell,
@@ -33,7 +36,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatPersonName } from "@/lib/person-name";
 import { exportAttendanceToExcel } from "@/lib/export-attendance";
-import { useState, useEffect, useCallback } from "react";
+import { AttendanceScopeFields } from "@/components/admin/attendance-scope-fields";
+import { attendanceScopeLabel } from "@/lib/attendance-scope.mjs";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 function formatDate(iso) {
   if (!iso) return "—";
@@ -530,6 +535,7 @@ function SkeletonRows({ dark, count = 5 }) {
   ));
 }
 export default function AsistenciasPage() {
+  const { permissions } = usePanelSession();
   const router = useRouter();
   const [asistencias, setAsistencias] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -542,6 +548,9 @@ export default function AsistenciasPage() {
   const [formError, setFormError] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [lifecycleTarget, setLifecycleTarget] = useState(null);
+  const [lifecycleSaving, setLifecycleSaving] = useState(false);
+  const lifecycleBusy = useRef(false);
   const [exportingId, setExportingId] = useState(null);
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState("");
@@ -575,6 +584,8 @@ export default function AsistenciasPage() {
     if (!formData.fecha) return setFormError("La fecha es requerida");
     if (!formData.descripcion.trim())
       return setFormError("La descripción es requerida");
+    if (formData.alcance?.tipo === "areas" && !formData.alcance.areas.length)
+      return setFormError("Selecciona al menos un área.");
     setCreating(true);
     try {
       const res = await fetch("/api/asistencias", {
@@ -605,6 +616,8 @@ export default function AsistenciasPage() {
     try {
       const res = await fetch(`/api/asistencias/${deleteTarget._id}`, {
         method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmacion: deleteTarget._id }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
@@ -616,6 +629,48 @@ export default function AsistenciasPage() {
       setDeleteTarget(null);
     } finally {
       setDeleting(false);
+    }
+  }
+  async function changeLifecycle() {
+    if (!lifecycleTarget || lifecycleBusy.current || !permissions.canManage)
+      return;
+    lifecycleBusy.current = true;
+    setLifecycleSaving(true);
+    const estadoRegistro =
+      lifecycleTarget.estadoRegistro === "cerrada" ? "en_registro" : "cerrada";
+    try {
+      const response = await fetch(`/api/asistencias/${lifecycleTarget._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estadoRegistro }),
+      });
+      const result = await response.json();
+      if (!response.ok)
+        throw new Error(
+          result.message || "No se pudo actualizar el estado de la asistencia.",
+        );
+      setAsistencias((previous) =>
+        previous.map((asistencia) =>
+          asistencia._id === lifecycleTarget._id
+            ? {
+                ...asistencia,
+                estadoRegistro: result.asistencia.estadoRegistro,
+                cerradaAt: result.asistencia.cerradaAt,
+              }
+            : asistencia,
+        ),
+      );
+      setLifecycleTarget(null);
+      showToast(
+        estadoRegistro === "cerrada"
+          ? "Asistencia cerrada."
+          : "Registro reabierto.",
+      );
+    } catch (error) {
+      showToast(error.message, "error");
+    } finally {
+      lifecycleBusy.current = false;
+      setLifecycleSaving(false);
     }
   }
   async function handleExport(asistencia) {
@@ -707,11 +762,29 @@ export default function AsistenciasPage() {
   return (
     <div className="space-y-6">
       {toast && <AdminToast type={toast.type} message={toast.msg} />}
+      <AdminConfirm
+        show={Boolean(lifecycleTarget)}
+        title={
+          lifecycleTarget?.estadoRegistro === "cerrada"
+            ? "Reabrir asistencia"
+            : "Cerrar asistencia"
+        }
+        message={
+          lifecycleTarget?.estadoRegistro === "cerrada"
+            ? `Se reabrirá «${lifecycleTarget.descripcion}». Se habilitarán las marcaciones y esta sesión quedará fuera de las métricas hasta volver a cerrarla.`
+            : `¿Terminaste de registrar «${lifecycleTarget?.descripcion}»? Se bloquearán las marcaciones y la sesión se incluirá en las métricas.`
+        }
+        confirmText={lifecycleSaving ? "Guardando…" : "Confirmar"}
+        onConfirm={changeLifecycle}
+        onCancel={() => {
+          if (!lifecycleBusy.current) setLifecycleTarget(null);
+        }}
+      />
 
       {deleteTarget && (
         <ConfirmDialog
           title="Eliminar asistencia"
-          message={`¿Retirar "${deleteTarget.descripcion}" de la lista? Se conservarán sus registros y su historial.`}
+          message={`¿Eliminar definitivamente «${deleteTarget.descripcion}» y sus registros de asistencia? Se retirarán también sus encargados. No se puede deshacer. Si tiene una votación vinculada, no podrá eliminarse.`}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
         />
@@ -751,6 +824,14 @@ export default function AsistenciasPage() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        {permissions.canViewAttendanceAudit && (
+          <Button
+            variant="outline"
+            onClick={() => router.push("/panel/asistencias/auditoria")}
+          >
+            <History /> Auditoría
+          </Button>
+        )}
         <Button
           onClick={() => {
             setShowForm((v) => !v);
@@ -830,6 +911,18 @@ export default function AsistenciasPage() {
               />
             </div>
           </div>
+          <AttendanceScopeFields
+            disabled={creating}
+            value={formData.alcance}
+            onChange={(alcance) => {
+              setFormData((current) => ({ ...current, alcance }));
+              if (
+                formError === "Selecciona al menos un área." &&
+                (alcance.tipo === "general" || alcance.areas.length > 0)
+              )
+                setFormError("");
+            }}
+          />
           {formError && (
             <div className="flex items-center gap-2 bg-muted border rounded-xl pt-2 pr-3 pb-2 pl-3 text-destructive text-sm mb-3">
               <svg
@@ -953,6 +1046,16 @@ export default function AsistenciasPage() {
                       </TableCell>
                       <TableCell className="w-72 min-w-72 max-w-72 whitespace-normal break-words">
                         {a.descripcion}
+                        <Badge variant="outline" className="ml-2">
+                          {a.estadoRegistro === "cerrada"
+                            ? "Cerrada"
+                            : a.estadoRegistro === "en_registro"
+                              ? "En registro"
+                              : "Histórica"}
+                        </Badge>
+                        <p className="mt-1 text-xs font-normal text-muted-foreground">
+                          {attendanceScopeLabel(a)}
+                        </p>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1.5 flex-wrap">
@@ -996,6 +1099,9 @@ export default function AsistenciasPage() {
                           </ActionBtn>
                           <ActionBtn
                             title="Editar"
+                            disabled={
+                              a.estadoRegistro === "cerrada" || lifecycleSaving
+                            }
                             onClick={() =>
                               router.push(
                                 `/panel/asistencias/${a._id}?mode=edit`,
@@ -1004,6 +1110,23 @@ export default function AsistenciasPage() {
                           >
                             <AdminPencilIcon className="size-4" />
                           </ActionBtn>
+                          {permissions.canManage && (
+                            <ActionBtn
+                              title={
+                                a.estadoRegistro === "cerrada"
+                                  ? "Reabrir registro"
+                                  : "Cerrar asistencia"
+                              }
+                              disabled={lifecycleSaving}
+                              onClick={() => setLifecycleTarget(a)}
+                            >
+                              {a.estadoRegistro === "cerrada" ? (
+                                <LockOpen className="size-4" />
+                              ) : (
+                                <Lock className="size-4" />
+                              )}
+                            </ActionBtn>
+                          )}
                           <ActionBtn
                             title="Exportar"
                             onClick={() => handleExport(a)}

@@ -16,6 +16,7 @@ const PanelSessionContext = createContext(null);
 export function PanelSessionProvider({ children }) {
   const [user, setUser] = useState(null);
   const [assignments, setAssignments] = useState([]);
+  const [assignmentsError, setAssignmentsError] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
@@ -43,7 +44,11 @@ export function PanelSessionProvider({ children }) {
       if (!response.ok)
         throw new Error(result.message || "No se pudo verificar la sesión.");
 
-      const nextDeadline = sessionDeadline(result.session, startedAt, Date.now());
+      const nextDeadline = sessionDeadline(
+        result.session,
+        startedAt,
+        Date.now(),
+      );
       if (nextDeadline !== null && nextDeadline <= Date.now()) {
         setUser(null);
         setAuthenticated(false);
@@ -57,19 +62,32 @@ export function PanelSessionProvider({ children }) {
       setAuthenticated(true);
       setError("");
       if (result.user?.sedipranoId && !result.user.mustChangePassword) {
-        const assignedResponse = await fetch("/api/mi/asistencias", {
-          cache: "no-store",
-        });
-        if (version !== refreshVersion.current) return;
-        if (assignedResponse.ok) {
-          const assigned = await assignedResponse.json();
+        try {
+          const assignedResponse = await fetch("/api/mi/asistencias", {
+            cache: "no-store",
+          });
           if (version !== refreshVersion.current) return;
-          setAssignments(assigned.data || []);
-        } else {
+          if (assignedResponse.ok) {
+            const assigned = await assignedResponse.json();
+            if (version !== refreshVersion.current) return;
+            setAssignments(assigned.data || []);
+            setAssignmentsError("");
+          } else {
+            setAssignments([]);
+            setAssignmentsError(
+              "No se pudieron cargar tus asignaciones. Inténtalo nuevamente.",
+            );
+          }
+        } catch {
+          if (version !== refreshVersion.current) return;
           setAssignments([]);
+          setAssignmentsError(
+            "No se pudieron cargar tus asignaciones. Revisa tu conexión e inténtalo nuevamente.",
+          );
         }
       } else {
         setAssignments([]);
+        setAssignmentsError("");
       }
     } catch (failure) {
       if (version === refreshVersion.current)
@@ -91,15 +109,18 @@ export function PanelSessionProvider({ children }) {
 
   useEffect(() => {
     if (!authenticated || deadline === null) return;
-    const timer = window.setTimeout(() => {
-      ++refreshVersion.current;
-      setAuthenticated(false);
-      setUser(null);
-      setAssignments([]);
-      setDeadline(null);
-      setError("");
-      setLoading(false);
-    }, Math.max(0, deadline - Date.now()));
+    const timer = window.setTimeout(
+      () => {
+        ++refreshVersion.current;
+        setAuthenticated(false);
+        setUser(null);
+        setAssignments([]);
+        setDeadline(null);
+        setError("");
+        setLoading(false);
+      },
+      Math.max(0, deadline - Date.now()),
+    );
     return () => window.clearTimeout(timer);
   }, [authenticated, deadline]);
 
@@ -148,6 +169,7 @@ export function PanelSessionProvider({ children }) {
       value={{
         user,
         assignments,
+        assignmentsError,
         loading,
         error,
         authenticated,

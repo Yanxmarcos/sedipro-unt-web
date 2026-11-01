@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { BookOpen, Bug } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -7,38 +6,33 @@ import {
 } from "@/components/ui/tooltip";
 
 const Footer = () => (
-  <footer className="text-muted-foreground mx-auto flex w-full max-w-360 flex-col gap-2 border-t px-4 py-4 text-sm sm:px-6 md:flex-row md:items-center md:justify-between">
-    <span>© {new Date().getFullYear()} SEDIPRO UNT</span>
+  <footer className="text-muted-foreground mx-auto flex w-full max-w-360 items-center justify-between gap-2 border-t px-4 py-2 text-sm sm:px-6 md:py-4">
+    <span className="whitespace-nowrap">© {new Date().getFullYear()} SEDIPRO UNT</span>
 
     <nav
       aria-label="Enlaces del pie del panel"
-      className="flex flex-wrap items-center gap-x-4 gap-y-2"
+      className="flex shrink-0 items-center md:gap-x-4"
     >
-      <Link
-        href="/tecnologias-de-la-informacion"
-        target="_blank"
-        className="hover:text-foreground transition-colors"
-      >
-        TI
-      </Link>
       <a
         href="https://api-sediprount.vercel.app"
         target="_blank"
         rel="noopener noreferrer"
-        className="hover:text-foreground transition-colors"
+        className="hover:text-foreground focus-visible:ring-ring inline-flex size-11 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 md:size-auto"
       >
-        Documentación
+        <BookOpen aria-hidden="true" className="size-5 md:hidden" />
+        <span className="sr-only md:not-sr-only">Documentación</span>
       </a>
       <Tooltip>
         <TooltipTrigger
           render={
             <a
               href="mailto:ti.sedipro@unitru.edu.pe"
-              className="hover:text-foreground transition-colors"
+              className="hover:text-foreground focus-visible:ring-ring inline-flex size-11 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 md:size-auto"
             />
           }
         >
-          Reportar un problema
+          <Bug aria-hidden="true" className="size-5 md:hidden" />
+          <span className="sr-only md:not-sr-only">Reportar un problema</span>
         </TooltipTrigger>
         <TooltipContent>
           Escríbenos a ti.sedipro@unitru.edu.pe
