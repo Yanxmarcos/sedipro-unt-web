@@ -113,15 +113,16 @@ function loadImage(url) {
 
 export async function renderShortLinkQrFiles(shortUrl) {
   const url = validateUrl(shortUrl);
-  const [{ default: QRCode }, paths, decoder] = await Promise.all([
-    import("qrcode"),
-    loadSymbol(),
-    import("@zxing/library"),
-  ]);
-  // Scheme/host case is immaterial; preserve the case-sensitive path exactly.
-  // Alphanumeric origin encoding reduces density for the single fluid design.
-  const parsed = new URL(url);
-  const payload = parsed.origin.toUpperCase() + parsed.pathname;
+  const [{ default: QRCode }, paths, decoder, compatibility] =
+    await Promise.all([
+      import("qrcode"),
+      loadSymbol(),
+      import("@zxing/library"),
+      import("html5-qrcode/third_party/zxing-js.umd.js"),
+    ]);
+  // Encode the displayed URL literally. Uppercasing the scheme can make phone
+  // scanners offer a text search instead of opening the institutional link.
+  const payload = url;
   // Prefer the encoder's standard penalty-scored mask (balanced runs/patterns),
   // then try the others deterministically. The emblem never shrinks on failure.
   const preferred = QRCode.create(payload, {
@@ -143,6 +144,10 @@ export async function renderShortLinkQrFiles(shortUrl) {
     try {
       const image = await loadImage(imageUrl);
       if (!readable(image, url, decoder)) continue;
+      if (
+        !readableCompatible(image, url, compatibility.default || compatibility)
+      )
+        continue;
       return { png: await imageToPng(image, 1024), svg };
     } finally {
       URL.revokeObjectURL(imageUrl);
@@ -151,6 +156,35 @@ export async function renderShortLinkQrFiles(shortUrl) {
   throw new Error(
     "No se pudo verificar la lectura del QR. Vuelve a intentarlo.",
   );
+}
+
+function readableCompatible(image, expected, decoder) {
+  const canvas = document.createElement("canvas");
+  const hints = new Map([
+    [decoder.DecodeHintType.POSSIBLE_FORMATS, [decoder.BarcodeFormat.QR_CODE]],
+    [decoder.DecodeHintType.TRY_HARDER, false],
+  ]);
+  try {
+    // Use the file-scanner's exported decoder directly: no camera, hidden DOM
+    // scanner or additional Blob URLs. The package version is pinned.
+    for (const size of [192, 256, 288, 320, 512, 1024]) {
+      canvas.width = canvas.height = size + 200;
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      context.drawImage(image, 100, 100, size, size);
+      const bitmap = new decoder.BinaryBitmap(
+        new decoder.HybridBinarizer(
+          new decoder.HTMLCanvasElementLuminanceSource(canvas),
+        ),
+      );
+      const result = new decoder.MultiFormatReader(false, hints).decode(bitmap);
+      if (result.text !== expected) return false;
+    }
+    return true;
+  } catch {
+    return false;
+  } finally {
+    canvas.width = canvas.height = 1;
+  }
 }
 
 function readable(
@@ -199,7 +233,7 @@ function readable(
           const result = new QRCodeReader().decode(
             new BinaryBitmap(new HybridBinarizer(source)),
           );
-          if (validateUrl(result.getText()) !== expected) return false;
+          if (result.getText() !== expected) return false;
         }
       }
     return true;
