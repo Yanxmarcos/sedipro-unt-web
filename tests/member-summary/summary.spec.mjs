@@ -2574,3 +2574,488 @@ test("certificate audit history supports mobile themes, search and confirmed row
     expect(rows).toHaveLength(0);
   }
 });
+
+test("QR download styles preserve the same matrix, exact URL, opaque backgrounds and current export", async ({
+  page,
+}) => {
+  test.setTimeout(240000);
+  await setup(page, { role: "SEDIPRANO" });
+  const { writeFile } = await import("node:fs/promises");
+  const reviewDir = ".impeccable/review/qr-download-styles";
+  await mkdir(reviewDir, { recursive: true });
+  const link = {
+    _id: id,
+    prefijo: "ig",
+    codigo: "332",
+    titulo: "QR institucional QA",
+    urlCorta: "https://sediprount.org/ig/332",
+    estadoEfectivo: "activo",
+    estado: "activo",
+    createdAt: "2026-11-06T10:00:00.000Z",
+    creadorNombre: "Persona QA",
+    revision: 0,
+  };
+  const options = [
+    ["institutional", "Institucional", ""],
+    ["black-white", "Negro sobre blanco", "-negro-blanco"],
+    ["white-black", "Blanco sobre negro", "-blanco-negro"],
+  ];
+  await page.addInitScript(() => {
+    window.__qrCreated = [];
+    window.__qrRevoked = [];
+    const create = URL.createObjectURL.bind(URL),
+      revoke = URL.revokeObjectURL.bind(URL);
+    URL.createObjectURL = (blob) => {
+      const url = create(blob);
+      window.__qrCreated.push(url);
+      return url;
+    };
+    URL.revokeObjectURL = (url) => {
+      window.__qrRevoked.push(url);
+      revoke(url);
+    };
+    const toBlob = HTMLCanvasElement.prototype.toBlob;
+    HTMLCanvasElement.prototype.toBlob = function (callback, ...args) {
+      if (this.width === 4096 && window.__holdQrExport) {
+        return toBlob.call(
+          this,
+          (blob) =>
+            setTimeout(() => {
+              callback(blob);
+              window.__exportCallbackDelivered = true;
+            }, 200),
+          ...args,
+        );
+      }
+      return toBlob.call(this, callback, ...args);
+    };
+  });
+  let detailReads = 0;
+  const writes = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/api/enlaces") && request.method() !== "GET")
+      writes.push(request.method());
+  });
+  await page.route("**/api/enlaces?**", (route) =>
+    route.fulfill({
+      json: { data: [link], pagination: { page: 1, pages: 1, total: 1 } },
+    }),
+  );
+  await page.route(`**/api/enlaces/${id}`, (route) => {
+    detailReads++;
+    return route.fulfill({ json: { data: link } });
+  });
+  const samples = [],
+    matrices = [];
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
+    for (const theme of ["light", "dark"]) {
+      await page.addInitScript(
+        (value) => localStorage.setItem("theme", value),
+        theme,
+      );
+      await page.goto("/panel/enlaces");
+      await page
+        .getByRole("button", {
+          name: `Ver código QR de ${link.titulo}`,
+          exact: true,
+        })
+        .click();
+      const dialog = page.getByRole("dialog");
+      await expect(dialog.getByRole("img")).toBeVisible();
+      await expect(
+        dialog.getByRole("radio", { name: "Institucional", exact: true }),
+      ).toBeChecked();
+      await expect(dialog.getByRole("radio")).toHaveCount(3);
+      await expect(
+        dialog.getByRole("radio", { name: "Transparente", exact: true }),
+      ).toHaveCount(0);
+      const readCount = detailReads;
+      for (const [style, label, suffix] of options) {
+        const previous = await dialog.getByRole("img").getAttribute("src");
+        await dialog.getByRole("radio", { name: label, exact: true }).click();
+        await expect(
+          dialog.getByRole("radio", { name: label, exact: true }),
+        ).toBeChecked();
+        await expect(dialog.getByRole("img")).toBeVisible();
+        await dialog.getByRole("img").evaluate((image) => image.decode());
+        if (style !== "institutional")
+          await expect
+            .poll(() =>
+              page.evaluate(
+                (url) => window.__qrRevoked.includes(url),
+                previous,
+              ),
+            )
+            .toBe(true);
+        expect(detailReads).toBe(readCount);
+        if (style === "white-black")
+          await expect(
+            dialog.getByText(
+              /Algunos lectores no reconocen códigos invertidos/,
+            ),
+          ).toBeVisible();
+        await dialog.evaluate((element) => {
+          element.scrollTop = 0;
+        });
+        await page.screenshot({
+          path: `${reviewDir}/${style}-${width}-${theme}.png`,
+          animations: "disabled",
+        });
+        if (width === 1440 && theme === "light") {
+          const pngPromise = page.waitForEvent("download");
+          await dialog
+            .getByRole("button", { name: "Descargar PNG", exact: true })
+            .click();
+          const png = await pngPromise;
+          expect(png.suggestedFilename()).toBe(
+            `sedipro-ig-332-qr${suffix}.png`,
+          );
+          const pngBytes = await readFile(await png.path());
+          expect(pngBytes.readUInt32BE(16)).toBe(4096);
+          expect(pngBytes.readUInt32BE(20)).toBe(4096);
+          await writeFile(`${reviewDir}/${style}.png`, pngBytes);
+          samples.push({
+            style,
+            type: "image/png",
+            data: pngBytes.toString("base64"),
+          });
+          const svgPromise = page.waitForEvent("download");
+          await dialog
+            .getByRole("link", { name: "Descargar SVG", exact: true })
+            .click();
+          const svgDownload = await svgPromise;
+          expect(svgDownload.suggestedFilename()).toBe(
+            `sedipro-ig-332-qr${suffix}.svg`,
+          );
+          const svg = await readFile(await svgDownload.path(), "utf8");
+          expect(svg).not.toMatch(
+            /<image|conic-gradient|https?:\/\/(?!www.w3.org)/,
+          );
+          await writeFile(`${reviewDir}/${style}.svg`, svg);
+          samples.push({
+            style,
+            type: "image/svg+xml",
+            data: Buffer.from(svg).toString("base64"),
+          });
+          matrices.push(
+            await page.evaluate(
+              (text) =>
+                [
+                  ...new DOMParser()
+                    .parseFromString(text, "image/svg+xml")
+                    .querySelectorAll("path"),
+                ].map((path) => path.getAttribute("d")),
+              svg,
+            ),
+          );
+        }
+      }
+      await dialog
+        .getByRole("button", { name: "Descargar PNG", exact: true })
+        .scrollIntoViewIfNeeded();
+      if (width === 390)
+        await page.screenshot({
+          path: `${reviewDir}/mobile-downloads-${theme}.png`,
+          animations: "disabled",
+        });
+      // Keyboard selection and a pending PNG export must not download a stale style.
+      if (width === 1440 && theme === "dark") {
+        await dialog
+          .getByRole("radio", { name: "Institucional", exact: true })
+          .focus();
+        await page.keyboard.press("ArrowRight");
+        await expect(
+          dialog.getByRole("radio", {
+            name: "Negro sobre blanco",
+            exact: true,
+          }),
+        ).toBeChecked();
+        await expect(dialog.getByRole("img")).toBeVisible();
+        const downloads = [];
+        page.on("download", (download) =>
+          downloads.push(download.suggestedFilename()),
+        );
+        await page.evaluate(() => {
+          window.__holdQrExport = true;
+          window.__exportCallbackDelivered = false;
+        });
+        await dialog
+          .getByRole("button", { name: "Descargar PNG", exact: true })
+          .click();
+        await expect(
+          dialog.getByRole("button", { name: "Preparando PNG…", exact: true }),
+        ).toBeVisible();
+        await dialog
+          .getByRole("radio", { name: "Institucional", exact: true })
+          .click();
+        await expect(dialog.getByRole("img")).toBeVisible();
+        await expect
+          .poll(() => page.evaluate(() => window.__exportCallbackDelivered))
+          .toBe(true);
+        expect(downloads).toEqual([]);
+        await page.evaluate(() => {
+          window.__holdQrExport = false;
+        });
+      }
+      await dialog
+        .getByRole("button", { name: "Cerrar", exact: true })
+        .last()
+        .click();
+      await expect(dialog).toHaveCount(0);
+      await expect
+        .poll(() =>
+          page.evaluate(() =>
+            window.__qrCreated.every((url) => window.__qrRevoked.includes(url)),
+          ),
+        )
+        .toBe(true);
+    }
+  }
+  for (const matrix of matrices) expect(matrix).toEqual(matrices[0]);
+  expect(writes).toEqual([]);
+  const scannerScript = await readFile(
+    "node_modules/html5-qrcode/html5-qrcode.min.js",
+    "utf8",
+  );
+  await page.route("**/__qa/qr-style-decoder.js", (route) =>
+    route.fulfill({
+      contentType: "application/javascript",
+      body: scannerScript,
+    }),
+  );
+  await page.addScriptTag({ url: "/__qa/qr-style-decoder.js" });
+  const checks = await page.evaluate(
+    async ({ samples, expected }) => {
+      const host = document.createElement("div");
+      host.id = "qa-qr-style-decoder";
+      host.style.width = "400px";
+      document.body.append(host);
+      const scanner = new Html5Qrcode(host.id, {
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        verbose: false,
+      });
+      const checks = [];
+      try {
+        for (const sample of samples) {
+          const image = new Image();
+          image.src = `data:${sample.type};base64,${sample.data}`;
+          await image.decode();
+          for (const size of [192, 256, 288, 320, 512, 1024]) {
+            const canvas = document.createElement("canvas");
+            canvas.width = canvas.height = size;
+            const context = canvas.getContext("2d", {
+              willReadFrequently: true,
+            });
+            context.drawImage(image, 0, 0, size, size);
+            const pixels = context.getImageData(0, 0, size, size);
+            if (size === 512) {
+              const corner = [...pixels.data.slice(0, 4)];
+              if (corner[3] !== 255)
+                throw new Error("Opaque export lost background");
+              if (
+                sample.style === "white-black" &&
+                corner.slice(0, 3).some((value) => value !== 0)
+              )
+                throw new Error("Inverted export is not black");
+              if (
+                sample.style === "black-white" &&
+                corner.slice(0, 3).some((value) => value !== 255)
+              )
+                throw new Error("Monochrome export background is not white");
+              if (["black-white", "white-black"].includes(sample.style))
+                for (let i = 0; i < pixels.data.length; i += 4) {
+                  if (
+                    pixels.data[i] !== pixels.data[i + 1] ||
+                    pixels.data[i + 1] !== pixels.data[i + 2]
+                  )
+                    throw new Error(
+                      "Monochrome export contains colored pixels",
+                    );
+                }
+            }
+            // Inverted payload checks simulate an inversion-capable reader.
+            if (sample.style === "white-black") {
+              for (let i = 0; i < pixels.data.length; i += 4) {
+                pixels.data[i] = 255 - pixels.data[i];
+                pixels.data[i + 1] = 255 - pixels.data[i + 1];
+                pixels.data[i + 2] = 255 - pixels.data[i + 2];
+              }
+              context.putImageData(pixels, 0, 0);
+            }
+            const blob = await new Promise((resolve) => canvas.toBlob(resolve));
+            const value = await scanner
+              .scanFile(
+                new File([blob], "qr.png", { type: "image/png" }),
+                false,
+              )
+              .catch((error) => {
+                throw new Error(
+                  `${sample.style} ${sample.type} ${size}: ${error}`,
+                );
+              });
+            if (value !== expected)
+              throw new Error("Export changed the literal short URL");
+            checks.push({
+              style: sample.style,
+              size,
+              type: sample.type,
+              value,
+            });
+          }
+        }
+      } finally {
+        scanner.clear();
+        host.remove();
+      }
+      return checks;
+    },
+    { samples, expected: link.urlCorta },
+  );
+  expect(checks).toHaveLength(36);
+  await writeFile(
+    `${reviewDir}/decode-results.json`,
+    JSON.stringify(checks, null, 2),
+  );
+});
+
+test("panel release history is accessible to every role through the version footer", async ({
+  page,
+}) => {
+  test.setTimeout(150000);
+  for (const role of [
+    "SEDIPRANO",
+    "DIRECTIVA",
+    "ADMINISTRADOR",
+    "SUPERADMINISTRADOR",
+  ]) {
+    await setup(page, { role });
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto("/panel");
+    const footer = page.locator("footer");
+    const version = footer.getByRole("link", {
+      name: "Versión 2.4.0",
+      exact: true,
+    });
+    await version.scrollIntoViewIfNeeded();
+    await expect(
+      footer.getByRole("link", { name: "Reportar", exact: true }),
+    ).toHaveAttribute("href", "mailto:ti.sedipro@unitru.edu.pe");
+    await expect(
+      footer.getByRole("link", { name: "Reportar un problema", exact: true }),
+    ).toHaveCount(0);
+    await version.click();
+    await expect(page).toHaveURL(/\/panel\/versiones$/, { timeout: 30000 });
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: "Versión 2.4.0 · Sistema web de SEDIPRO UNT",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        level: 2,
+        name: "Versión 0.0.1",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/Talonarios|encuestas de satisfacción|votación externa/i),
+    ).toHaveCount(0);
+    const oldestLink = page
+      .getByRole("navigation", { name: "Índice de versiones", exact: true })
+      .getByRole("link", { name: "v0.0.1", exact: true });
+    await oldestLink.click();
+    await expect(page).toHaveURL(/#version-0-0-1$/);
+    await expect(page.locator("#version-0-0-1")).toBeInViewport();
+    await expect(
+      page
+        .locator("footer")
+        .getByRole("link", { name: "Versión 2.4.0", exact: true }),
+    ).toHaveAttribute("href", "/panel/versiones");
+  }
+});
+
+test("panel release footer keeps three mobile icons and a responsive readable history", async ({
+  page,
+}) => {
+  test.setTimeout(180000);
+  await setup(page, { role: "SEDIPRANO" });
+  const review = ".impeccable/review/panel-versions";
+  await mkdir(review, { recursive: true });
+  for (const width of [1440, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: width < 768 ? 844 : 1000 });
+    for (const theme of ["light", "dark"]) {
+      await page.addInitScript(
+        (value) => localStorage.setItem("theme", value),
+        theme,
+      );
+      await page.goto("/panel/versiones");
+      await expect(
+        page.getByRole("heading", {
+          level: 1,
+          name: "Versión 2.4.0 · Sistema web de SEDIPRO UNT",
+          exact: true,
+        }),
+      ).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await page.screenshot({
+        path: `${review}/top-${width}-${theme}.png`,
+        animations: "disabled",
+      });
+      if (width < 1024) {
+        await page.getByText("Explorar versiones", { exact: true }).click();
+        await page
+          .getByRole("navigation", {
+            name: "Índice de versiones móvil",
+            exact: true,
+          })
+          .getByRole("link", { name: "v0.0.1", exact: true })
+          .click();
+        await expect(page.locator("#version-0-0-1")).toBeInViewport();
+      }
+      const footer = page.locator("footer");
+      await footer.scrollIntoViewIfNeeded();
+      const boxes = [];
+      for (const name of ["Documentación", "Reportar", "Versión 2.4.0"]) {
+        const link = footer.getByRole("link", { name, exact: true });
+        await expect(link).toBeVisible();
+        const box = await link.boundingBox();
+        boxes.push(box);
+        const labelWidth = await link
+          .locator("span")
+          .evaluate((element) => element.getBoundingClientRect().width);
+        if (width < 768) {
+          await expect(link.locator("svg")).toBeVisible();
+          expect(box.width).toBeGreaterThanOrEqual(44);
+          expect(box.height).toBeGreaterThanOrEqual(44);
+          expect(labelWidth).toBeLessThanOrEqual(1);
+        } else {
+          await expect(link.locator("svg")).toBeHidden();
+          expect(labelWidth).toBeGreaterThan(20);
+        }
+      }
+      expect(
+        Math.max(...boxes.map((box) => box.y)) -
+          Math.min(...boxes.map((box) => box.y)),
+      ).toBeLessThanOrEqual(1);
+      const brand = await footer.locator(":scope > span").boundingBox();
+      expect(brand.x + brand.width).toBeLessThanOrEqual(boxes[0].x);
+      expect(boxes.at(-1).x + boxes.at(-1).width).toBeLessThanOrEqual(width);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await page.screenshot({
+        path: `${review}/footer-${width}-${theme}.png`,
+        animations: "disabled",
+      });
+    }
+  }
+});
