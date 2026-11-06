@@ -11,6 +11,15 @@ DATA: One current active-member count, never a duplicate account count. No
 SEDInvita figures. Events and their external registrations/attendance are a
 separate lower block. Year/month/history and area filters apply to participation;
 current community and active links are explicitly labelled current state.
+MEMBERSHIP DISTRIBUTIONS: Two shared bar charts extend the existing summary,
+with career/sex categories on X and integer counts on Y. Only active current
+members contribute. A local shared area-button group filters both charts,
+independently of attendance periods/areas. Careers with zero members are absent;
+equivalent career spelling/case is grouped. Missing career is stated separately;
+missing sex remains Sin especificar. Full career labels and internal horizontal
+scroll preserve readability on mobile; counts are also in accessible tables.
+Default X/Y ticks explicitly use the panel's semantic muted-foreground color,
+matching the existing custom career tick in both themes.
 
 RATES: P+T divided by actual stored invitations, weighted across sessions.
 Justifications stay separate. New open sessions do not enter statistics; closed
@@ -57,6 +66,16 @@ returned `ship` for that single fix. Eight existing captures are retained in
 user-1917, each in light and dark themes. This documentation pass inspected code
 and contracts only; it did not rerun tests or capture screenshots. Browser
 viewports do not establish physical-device or instrumental accessibility QA.
+
+CURRENT DISTRIBUTION REVIEW: The later `erp-enhancements` extension returned
+`ship` after resolving its sole P2, dim default chart axes in dark mode. The fresh
+reviewer opened all 16 summary/attendance/QR captures, then all four replacement
+summary captures; the other twelve retain their initial result. Received evidence
+records three unit cases, three browser feature cases, real isolated local
+MongoDB/API integration and both production builds passing. The final directed
+chart case covers areas, missing fields and computed default-tick contrast of at
+least 4.5:1 at 1440/390 in both themes. Full extension evidence and limits are in
+`erp-enhancements.md` and `../review/erp-enhancements/finish-review.md`.
 
 PRESERVATION: This extends the incumbent panel; `DESIGN.md` and
 `.impeccable/design.json` remain unchanged by this documentation pass. No new

@@ -54,6 +54,8 @@ export default function CertificateAudit() {
   const [page, setPage] = useState(1);
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const [cutoff, setCutoff] = useState("");
+  const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [target, setTarget] = useState(null);
@@ -75,6 +77,8 @@ export default function CertificateAudit() {
       }
       setData(result.data);
       setPagination(result.pagination);
+      setCutoff(result.limpiarHasta || "");
+      setTotalRecords(result.totalRegistros ?? result.pagination.total);
       setError("");
     } catch (failure) {
       if (current === version.current) setError(failure.message);
@@ -98,11 +102,26 @@ export default function CertificateAudit() {
     deletingRef.current = true;
     setDeleting(true);
     try {
-      await panelApi(`/api/certificados/auditoria/${target._id}`, {
-        method: "DELETE",
-        body: { confirmacion: target._id },
-      });
-      toast.success("Registro de auditoría eliminado.");
+      const result = await panelApi(
+        target.all
+          ? "/api/certificados/auditoria"
+          : `/api/certificados/auditoria/${target._id}`,
+        {
+          method: "DELETE",
+          body: target.all
+            ? {
+                modo: "limpiar",
+                hasta: target.cutoff,
+                confirmacion: "LIMPIAR AUDITORIA",
+              }
+            : { confirmacion: target._id },
+        },
+      );
+      toast.success(
+        target.all
+          ? `${result.eliminados} registros de auditoría eliminados.`
+          : "Registro de auditoría eliminado.",
+      );
       setTarget(null);
       await load();
     } catch (failure) {
@@ -141,16 +160,33 @@ export default function CertificateAudit() {
         aria-label="Actividad de certificados"
       >
         <div className="space-y-4 border-b p-4 sm:p-5">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-sm font-semibold">Historial de uso</h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={loading || deleting}
-              onClick={load}
-            >
-              <RefreshCw /> Actualizar
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={loading || deleting}
+                onClick={load}
+              >
+                <RefreshCw /> Actualizar
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-destructive hover:text-destructive"
+                disabled={
+                  loading ||
+                  deleting ||
+                  Boolean(error) ||
+                  !cutoff ||
+                  !totalRecords
+                }
+                onClick={() => setTarget({ all: true, cutoff })}
+              >
+                <Trash2 /> Limpiar toda la auditoría
+              </Button>
+            </div>
           </div>
           <form
             className="flex gap-2"
@@ -330,13 +366,25 @@ export default function CertificateAudit() {
       </p>
       <AdminConfirm
         show={Boolean(target)}
-        title="Eliminar registro de auditoría"
-        message={
-          target
-            ? `Se eliminará definitivamente la actividad «${ACTIONS[target.accion]}» de ${capitalizePersonName(target.actor.nombre)}. Los archivos descargados no se modifican. Esta acción no se puede deshacer.`
-            : ""
+        title={
+          target?.all
+            ? "Limpiar toda la auditoría"
+            : "Eliminar registro de auditoría"
         }
-        confirmText={deleting ? "Eliminando…" : "Eliminar registro"}
+        message={
+          target?.all
+            ? "Se eliminarán definitivamente todos los registros de certificados anteriores a la última carga del historial, aunque hayas aplicado filtros. Las operaciones en curso y los registros nuevos o modificados después de esa carga se conservan. Los archivos descargados y los contadores de uso no se modifican. Esta acción no se puede deshacer."
+            : target
+              ? `Se eliminará definitivamente la actividad «${ACTIONS[target.accion]}» de ${capitalizePersonName(target.actor.nombre)}. Los archivos descargados no se modifican. Esta acción no se puede deshacer.`
+              : ""
+        }
+        confirmText={
+          deleting
+            ? "Eliminando…"
+            : target?.all
+              ? "Eliminar definitivamente"
+              : "Eliminar registro"
+        }
         type="error"
         onConfirm={remove}
         onCancel={() => {

@@ -21,6 +21,7 @@ import { PageError, PageLoading } from "@/components/admin/page-state";
 import { AREA_TEXT_CLASSES } from "@/lib/member-areas.mjs";
 import { panelApi } from "@/lib/panel-api";
 import ManagementActivity from "@/components/admin/management-activity";
+import MemberDistributionCharts from "@/components/admin/member-distribution-charts";
 const AREAS = ["TI", "PMO", "LTK Y FNZ", "GTH", "MKT", "DIRECTIVA"];
 const number = (value) => new Intl.NumberFormat("es-PE").format(value || 0);
 const percentage = (value) =>
@@ -469,6 +470,9 @@ export default function OrdersDashboard() {
                 </CardContent>
               </Card>
             </div>
+            <MemberDistributionCharts
+              distributions={stats.comunidad.distribuciones}
+            />
             <div className="grid gap-6 lg:grid-cols-2">
               <Card>
                 <CardHeader>

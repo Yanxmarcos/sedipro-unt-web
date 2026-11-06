@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 const id = "1234567890abcdef12345678";
 const summary = {
@@ -346,6 +346,703 @@ const managementFixture = {
   },
   pendientes: { asistenciasSinEncargado: 2 },
 };
+
+test("ERP enhancements dashboard distributions filter current active membership by area", async ({
+  page,
+}) => {
+  test.setTimeout(180000);
+  await setup(page, { role: "SUPERADMINISTRADOR" });
+  const areas = ["TI", "PMO", "LTK Y FNZ", "GTH", "MKT", "DIRECTIVA"];
+  const counts = { TI: 3, PMO: 1, GTH: 2 };
+  const group = (area) => ({
+    area,
+    total: area ? counts[area] || 0 : 6,
+    sinCarrera: area === "PMO" || !area ? 1 : 0,
+    carreras:
+      area === "TI"
+        ? [
+            { carrera: "INGENIERÍA DE SISTEMAS", cantidad: 2 },
+            { carrera: "DERECHO", cantidad: 1 },
+          ]
+        : area === "GTH"
+          ? [
+              {
+                carrera:
+                  "EDUCACIÓN SECUNDARIA: MENCIÓN EN CIENCIAS NATURALES, FÍSICA, QUÍMICA Y BIOLOGÍA",
+                cantidad: 1,
+              },
+              { carrera: "MEDICINA", cantidad: 1 },
+            ]
+          : area
+            ? []
+            : [
+                { carrera: "INGENIERÍA DE SISTEMAS", cantidad: 2 },
+                { carrera: "DERECHO", cantidad: 1 },
+                {
+                  carrera:
+                    "EDUCACIÓN SECUNDARIA: MENCIÓN EN CIENCIAS NATURALES, FÍSICA, QUÍMICA Y BIOLOGÍA",
+                  cantidad: 1,
+                },
+                { carrera: "MEDICINA", cantidad: 1 },
+              ],
+    sexos: [
+      {
+        sexo: "MASCULINO",
+        cantidad: area === "TI" ? 2 : area === "GTH" ? 1 : area ? 0 : 3,
+      },
+      {
+        sexo: "FEMENINO",
+        cantidad: area === "TI" || area === "GTH" ? 1 : area ? 0 : 2,
+      },
+      { sexo: "NO_ESPECIFICADO", cantidad: area === "PMO" || !area ? 1 : 0 },
+    ],
+  });
+  await page.route("**/api/dashboard?**", (route) =>
+    route.fulfill({
+      json: {
+        ...managementFixture,
+        comunidad: {
+          total: 6,
+          areas: areas.map((area) => ({ area, total: counts[area] || 0 })),
+          distribuciones: ["", ...areas].map(group),
+        },
+      },
+    }),
+  );
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await mkdir(".impeccable/review/erp-enhancements", { recursive: true });
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const theme of ["light", "dark"]) {
+      await page.addInitScript(
+        (value) => localStorage.setItem("theme", value),
+        theme,
+      );
+      await page.goto("/panel");
+      const section = page.getByRole("region", {
+        name: "Distribución del padrón activo",
+        exact: true,
+      });
+      await expect(
+        section.getByRole("heading", { name: "Distribución por carrera" }),
+      ).toBeVisible();
+      await expect(
+        section
+          .getByRole("table", {
+            name: "Cantidad de sedipranos por carrera",
+            exact: true,
+          })
+          .getByRole("row"),
+      ).toHaveCount(5);
+      await expect(
+        section.getByRole("table", {
+          name: "Cantidad de sedipranos por sexo",
+          exact: true,
+        }),
+      ).toContainText("Sin especificar");
+      await expect(
+        section.locator('[data-slot="chart"] .recharts-bar').first(),
+      ).toBeVisible();
+      const contrasts = await section.evaluate((element) => {
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = 1;
+        const context = canvas.getContext("2d");
+        const luminance = (color) => {
+          context.clearRect(0, 0, 1, 1);
+          context.fillStyle = color;
+          context.fillRect(0, 0, 1, 1);
+          const values = [...context.getImageData(0, 0, 1, 1).data]
+            .slice(0, 3)
+            .map((value) => {
+              const channel = value / 255;
+              return channel <= 0.04045
+                ? channel / 12.92
+                : ((channel + 0.055) / 1.055) ** 2.4;
+            });
+          return values[0] * 0.2126 + values[1] * 0.7152 + values[2] * 0.0722;
+        };
+        return [
+          ...element.querySelectorAll(".recharts-cartesian-axis-tick-value"),
+        ].map((tick) => {
+          const foreground = luminance(getComputedStyle(tick).fill);
+          const background = luminance(
+            getComputedStyle(tick.closest('[data-slot="card"]'))
+              .backgroundColor,
+          );
+          return (
+            (Math.max(foreground, background) + 0.05) /
+            (Math.min(foreground, background) + 0.05)
+          );
+        });
+      });
+      expect(contrasts.length).toBeGreaterThan(0);
+      for (const contrast of contrasts)
+        expect(contrast).toBeGreaterThanOrEqual(4.5);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await page.evaluate(() => scrollTo(0, 0));
+      await page.screenshot({
+        path: `.impeccable/review/erp-enhancements/summary-${width}-${theme}.png`,
+        fullPage: true,
+        animations: "disabled",
+      });
+      const filters = section.getByRole("group", {
+        name: "Área de la distribución",
+      });
+      await filters.getByRole("button", { name: "TI", exact: true }).click();
+      await expect(
+        filters.getByRole("button", { name: "TI", exact: true }),
+      ).toHaveAttribute("aria-pressed", "true");
+      const table = section.getByRole("table", {
+        name: "Cantidad de sedipranos por carrera",
+        exact: true,
+      });
+      await expect(table.getByRole("row")).toHaveCount(3);
+      await expect(table).not.toContainText("MEDICINA");
+      await filters.getByRole("button", { name: "PMO", exact: true }).click();
+      await expect(
+        section.getByText("Sin carreras para mostrar", { exact: true }),
+      ).toBeVisible();
+      await expect(
+        section.getByRole("table", {
+          name: "Cantidad de sedipranos por sexo",
+          exact: true,
+        }),
+      ).toContainText("Sin especificar");
+      await filters.getByRole("button", { name: "MKT", exact: true }).click();
+      await expect(
+        section.getByText("Sin integrantes para mostrar", { exact: true }),
+      ).toBeVisible();
+    }
+  }
+  expect(errors).toEqual([]);
+});
+
+test("ERP enhancements attendance filters preserve the full roster when editing and saving", async ({
+  page,
+}) => {
+  test.setTimeout(180000);
+  await setup(page, { role: "DIRECTIVA" });
+  let rows = ["presente", "tardanza", "justificado", "ausente"].map(
+    (estado, index) => ({
+      sedipranoId: `1234567890abcdef1234567${index}`,
+      estado,
+      sediprano: {
+        nombres: ["ANA", "BRUNO", "CARLA", "DIEGO"][index],
+        apellidos: "QA",
+        dni: `1111111${index}`,
+        area: "TI",
+      },
+    }),
+  );
+  const writes = [];
+  await page.route(`**/api/asistencias/${id}`, async (route) => {
+    if (route.request().method() === "PUT") {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      rows = rows.map((row) => ({
+        ...row,
+        estado: body.registro.find(
+          (value) => value.sedipranoId === row.sedipranoId,
+        ).estado,
+      }));
+    }
+    return route.fulfill({
+      json: {
+        asistencia: {
+          _id: id,
+          descripcion: "Reunión de coordinación QA",
+          fecha: "2026-11-05T05:00Z",
+          estadoRegistro: "en_registro",
+          registro: rows,
+        },
+      },
+    });
+  });
+  await mkdir(".impeccable/review/erp-enhancements", { recursive: true });
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const theme of ["light", "dark"]) {
+      await page.addInitScript(
+        (value) => localStorage.setItem("theme", value),
+        theme,
+      );
+      await page.goto(`/panel/asistencias/${id}?mode=view`);
+      const filters = page.getByRole("group", {
+        name: "Filtrar asistencia por estado",
+      });
+      await filters
+        .getByRole("button", { name: "Tardanzas 1", exact: true })
+        .click();
+      await expect(page.locator("tbody tr")).toHaveCount(1);
+      await expect(page.getByText("BRUNO QA", { exact: true })).toBeVisible();
+      await page
+        .getByRole("textbox", { name: "Buscar integrante en la asistencia" })
+        .fill("ANA");
+      await expect(
+        page.getByText(
+          "No hay integrantes que coincidan con el estado y la búsqueda seleccionados.",
+          { exact: true },
+        ),
+      ).toBeVisible();
+      await page
+        .getByRole("textbox", { name: "Buscar integrante en la asistencia" })
+        .clear();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await page.screenshot({
+        path: `.impeccable/review/erp-enhancements/attendance-view-${width}-${theme}.png`,
+        fullPage: true,
+        animations: "disabled",
+      });
+      await page
+        .getByRole("button", { name: "Editar asistencia", exact: true })
+        .click();
+      await expect(
+        page.getByRole("heading", { name: "Editar asistencia", exact: true }),
+      ).toBeVisible();
+      await expect(
+        filters.getByRole("button", { name: "Tardanzas 1", exact: true }),
+      ).toHaveAttribute("aria-pressed", "true");
+      await page.screenshot({
+        path: `.impeccable/review/erp-enhancements/attendance-edit-${width}-${theme}.png`,
+        fullPage: true,
+        animations: "disabled",
+      });
+    }
+  }
+  const row = page.locator("tbody tr").filter({ hasText: "BRUNO QA" });
+  await row.getByRole("button", { name: "Presente", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Tardanzas 0", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText("BRUNO QA", { exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Todos 4", exact: true }).click();
+  await expect(page.locator("tbody tr")).toHaveCount(4);
+  await page
+    .getByRole("button", { name: "Justificados 1", exact: true })
+    .click();
+  await expect(page.locator("tbody tr")).toHaveCount(1);
+  await page.getByRole("button", { name: "Guardar", exact: true }).click();
+  await expect(page).toHaveURL(/\/panel\/asistencias$/, { timeout: 30000 });
+  expect(writes).toHaveLength(1);
+  expect(writes[0].registro).toEqual(
+    rows.map(({ sedipranoId, estado }) => ({ sedipranoId, estado })),
+  );
+  expect(writes[0].registro).toHaveLength(4);
+  expect(rows.map((row) => row.estado)).toEqual([
+    "presente",
+    "presente",
+    "justificado",
+    "ausente",
+  ]);
+  await page.goto(`/panel/asistencias/${id}?mode=view&estado=presente`);
+  await expect(page.locator("tbody tr")).toHaveCount(2);
+  await expect(
+    page.getByRole("button", { name: "Presentes 2", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+});
+
+test("ERP enhancements branded QR downloads decode one fluid design and normalize legacy links without uploads", async ({
+  page,
+}) => {
+  test.setTimeout(360000);
+  await setup(page, { role: "SEDIPRANO" });
+  await page.addInitScript(() => {
+    window.__qrRevoked = [];
+    const revoke = URL.revokeObjectURL.bind(URL);
+    URL.revokeObjectURL = (url) => {
+      window.__qrRevoked.push(url);
+      revoke(url);
+    };
+  });
+  const link = {
+    _id: id,
+    codigo: "9xz",
+    prefijo: "fm",
+    titulo: "Inscripciones QA",
+    urlCorta: "https://sediprount.org/fm/9xz",
+    urlDestino: "https://forms.gle/example",
+    dominioDestino: "forms.gle",
+    tipoDestino: "formulario",
+    estado: "activo",
+    estadoEfectivo: "activo",
+    creadorNombre: "Ana QA",
+    createdAt: "2026-11-05T15:00Z",
+    revision: 0,
+    clics: 17,
+    qrDiseno: "fluido",
+  };
+  let unavailable = false,
+    requestFailure = false;
+  const writes = [];
+  page.on("request", (request) => {
+    if (
+      /\/api\/(enlaces|uploadthing)|uploadthing\.com|utfs\.io/.test(
+        request.url(),
+      ) &&
+      request.method() !== "GET"
+    )
+      writes.push({
+        method: request.method(),
+        path: new URL(request.url()).pathname,
+      });
+  });
+  await page.route("**/api/enlaces?**", (route) =>
+    route.fulfill({
+      json: { data: [link], pagination: { page: 1, pages: 1, total: 1 } },
+    }),
+  );
+  await page.route(`**/api/enlaces/${id}`, (route) =>
+    route.fulfill(
+      requestFailure
+        ? { status: 503, json: { error: "QR temporalmente no disponible" } }
+        : {
+            json: {
+              data: {
+                ...link,
+                estadoEfectivo: unavailable ? "pausado" : "activo",
+              },
+            },
+          },
+    ),
+  );
+  const reviewDir = ".impeccable/review/qr-single-fluid";
+  await mkdir(reviewDir, { recursive: true });
+  const images = [];
+  let referencePreview;
+  for (const design of ["fluido"]) {
+    link.qrDiseno = design;
+    let png, preview;
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      for (const theme of ["light", "dark"]) {
+        await page.addInitScript(
+          (value) => localStorage.setItem("theme", value),
+          theme,
+        );
+        await page.goto("/panel/enlaces");
+        await page
+          .getByRole("button", {
+            name: "Ver código QR de Inscripciones QA",
+            exact: true,
+          })
+          .click();
+        const dialog = page.getByRole("dialog");
+        await expect(
+          dialog.getByRole("img", {
+            name: "Código QR de Inscripciones QA",
+            exact: true,
+          }),
+        ).toBeVisible();
+        await expect(
+          dialog.getByText(link.urlCorta, { exact: true }),
+        ).toBeVisible();
+        await dialog.getByRole("img").evaluate((image) => image.decode());
+        await page.screenshot({
+          path: `${reviewDir}/solid-${design}-${width}-${theme}.png`,
+          animations: "disabled",
+        });
+        if (!png) {
+          preview = await dialog.getByRole("img").evaluate(async (element) => {
+            const blob = await (await fetch(element.src)).blob();
+            return new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result.split(",")[1]);
+              reader.readAsDataURL(blob);
+            });
+          });
+          referencePreview = preview;
+          const downloadPromise = page.waitForEvent("download", {
+            timeout: 15000,
+          });
+          await dialog
+            .getByRole("button", { name: "Descargar PNG", exact: true })
+            .click();
+          const download = await downloadPromise;
+          expect(download.suggestedFilename()).toBe("sedipro-fm-9xz-qr.png");
+          png = await readFile(await download.path());
+          expect([...png.subarray(0, 8)]).toEqual([
+            137, 80, 78, 71, 13, 10, 26, 10,
+          ]);
+          expect(png.readUInt32BE(16)).toBe(4096);
+          expect(png.readUInt32BE(20)).toBe(4096);
+          images.push({
+            data: png.toString("base64"),
+            url: link.urlCorta,
+            design,
+          });
+          const svgDownload = page.waitForEvent("download");
+          await dialog
+            .getByRole("link", { name: "Descargar SVG", exact: true })
+            .click();
+          const svg = await svgDownload;
+          expect(svg.suggestedFilename()).toBe("sedipro-fm-9xz-qr.svg");
+          const vector = await readFile(await svg.path(), "utf8");
+          expect(vector).toContain("<svg");
+          expect(vector).not.toMatch(/<image|https?:\/\/(?!www.w3.org)/);
+          images.push({
+            data: Buffer.from(vector).toString("base64"),
+            url: link.urlCorta,
+            design,
+            svg: true,
+          });
+          const { writeFile } = await import("node:fs/promises");
+          await writeFile(`${reviewDir}/${design}.png`, png);
+          await writeFile(`${reviewDir}/${design}.svg`, vector);
+        }
+        const previous = await dialog.getByRole("img").getAttribute("src");
+        await dialog
+          .getByRole("button", { name: "Regenerar código QR", exact: true })
+          .click();
+        await expect(dialog.getByRole("img")).toBeVisible();
+        await expect
+          .poll(() => dialog.getByRole("img").getAttribute("src"))
+          .not.toBe(previous);
+        await expect
+          .poll(() =>
+            page.evaluate((url) => window.__qrRevoked.includes(url), previous),
+          )
+          .toBe(true);
+        const regenerated = await dialog.getByRole("img").getAttribute("src");
+        const samePng = await page.evaluate(async (url) => {
+          const blob = await (await fetch(url)).blob();
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(",")[1]);
+            reader.readAsDataURL(blob);
+          });
+        }, regenerated);
+        expect(samePng).toBe(preview);
+        await dialog
+          .getByRole("button", { name: "Cerrar", exact: true })
+          .last()
+          .click();
+        await expect(page.getByRole("dialog")).toHaveCount(0);
+      }
+    }
+  }
+  // Existing responses with a retired design or no metadata use the same QR.
+  for (const legacyDesign of ["origami", undefined]) {
+    link.qrDiseno = legacyDesign;
+    await page
+      .getByRole("button", {
+        name: "Ver código QR de Inscripciones QA",
+        exact: true,
+      })
+      .click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("img")).toBeVisible();
+    const legacyPreview = await dialog
+      .getByRole("img")
+      .evaluate(async (element) => {
+        const blob = await (await fetch(element.src)).blob();
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(",")[1]);
+          reader.readAsDataURL(blob);
+        });
+      });
+    expect(legacyPreview).toBe(referencePreview);
+    await dialog
+      .getByRole("button", { name: "Cerrar", exact: true })
+      .last()
+      .click();
+  }
+  link.qrDiseno = "fluido";
+  // Exercise different matrix masks, platforms and the longer local origin.
+  const sampleUrls = ["fb", "ig", "lk", "tk", "wa", "fm", "yt", "go"].map(
+    (prefix, index) =>
+      `${index > 5 ? "http://localhost:7000" : "https://sediprount.org"}/${prefix}/${["0a9", "x2r", "v6q", "8sn", "m0t", "2rs", "4ds", "z7a"][index]}`,
+  );
+  sampleUrls.push(
+    "http://localhost:7000/fb/c6l",
+    "https://sediprount.org/ig/w95",
+  );
+  for (const url of sampleUrls) {
+    for (const design of ["fluido"]) {
+      link.qrDiseno = design;
+      link.urlCorta = url;
+      await page
+        .getByRole("button", {
+          name: "Ver código QR de Inscripciones QA",
+          exact: true,
+        })
+        .click();
+      const image = page.getByRole("dialog").getByRole("img");
+      await expect(image).toBeVisible();
+      const data = await image.evaluate(async (element) => {
+        const blob = await (await fetch(element.src)).blob();
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(",")[1]);
+          reader.readAsDataURL(blob);
+        });
+      });
+      images.push({ data, url: link.urlCorta, design: link.qrDiseno });
+      await page
+        .getByRole("dialog")
+        .getByRole("button", { name: "Cerrar", exact: true })
+        .last()
+        .click();
+    }
+  }
+  unavailable = true;
+  await page
+    .getByRole("button", {
+      name: "Ver código QR de Inscripciones QA",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("dialog").getByText(/Este enlace no está activo/),
+  ).toBeVisible();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Cerrar", exact: true })
+    .last()
+    .click();
+  expect(writes).toEqual([]);
+  requestFailure = true;
+  await page
+    .getByRole("button", {
+      name: "Ver código QR de Inscripciones QA",
+      exact: true,
+    })
+    .click();
+  await expect(page.getByRole("dialog").getByRole("alert")).toContainText(
+    "QR temporalmente no disponible",
+  );
+  await expect(
+    page.getByRole("button", { name: "Descargar PNG", exact: true }),
+  ).toHaveCount(0);
+  requestFailure = false;
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Reintentar", exact: true })
+    .click();
+  await expect(page.getByRole("dialog").getByRole("img")).toBeVisible();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Cerrar", exact: true })
+    .last()
+    .click();
+  const decoder = await readFile(
+    "node_modules/html5-qrcode/html5-qrcode.min.js",
+    "utf8",
+  );
+  await page.route("**/__qa/qr-decoder.js", (route) =>
+    route.fulfill({ contentType: "application/javascript", body: decoder }),
+  );
+  await page.addScriptTag({ url: "/__qa/qr-decoder.js" });
+  const decoded = await page.evaluate(async (images) => {
+    const host = document.createElement("div");
+    host.id = "qa-qr-decoder";
+    host.style.width = "400px";
+    document.body.append(host);
+    const scanner = new window.Html5Qrcode(host.id, {
+      formatsToSupport: [window.Html5QrcodeSupportedFormats.QR_CODE],
+      verbose: false,
+    });
+    try {
+      const result = [];
+      for (const image of images) {
+        const bytes = Uint8Array.from(atob(image.data), (value) =>
+          value.charCodeAt(0),
+        );
+        const file = new File([bytes], "qr", {
+          type: image.svg ? "image/svg+xml" : "image/png",
+        });
+        const src = URL.createObjectURL(file);
+        const bitmap = await new Promise((resolve, reject) => {
+          const element = new Image();
+          element.onload = () => resolve(element);
+          element.onerror = reject;
+          element.src = src;
+        });
+        for (const size of [1024, 512, 320, 288, 256, 192]) {
+          const canvas = document.createElement("canvas");
+          canvas.width = canvas.height = size;
+          canvas.getContext("2d").drawImage(bitmap, 0, 0, size, size);
+          const scaled = await new Promise((resolve) =>
+            canvas.toBlob(resolve, "image/png"),
+          );
+          const value = await scanner
+            .scanFile(
+              new File([scaled], "qr.png", { type: "image/png" }),
+              false,
+            )
+            .catch((error) => {
+              throw new Error(`${image.design} ${image.url} ${size}: ${error}`);
+            });
+          result.push({ url: image.url, value });
+        }
+        URL.revokeObjectURL(src);
+      }
+      return result;
+    } finally {
+      scanner.clear();
+      host.remove();
+    }
+  }, images);
+  expect(decoded).toHaveLength(images.length * 6);
+  for (const item of decoded) {
+    expect(new URL(item.value).href).toBe(item.url);
+    expect(new URL(item.value).pathname).toBe(new URL(item.url).pathname);
+  }
+  unavailable = false;
+  await page.route("**/api/enlaces", async (route) => {
+    expect(route.request().method()).toBe("POST");
+    const body = route.request().postDataJSON();
+    expect(body).not.toHaveProperty("qr");
+    expect(body).not.toHaveProperty("image");
+    link.titulo = body.titulo;
+    return route.fulfill({ json: { data: link } });
+  });
+  await page.route("**/api/enlaces/detectar", (route) =>
+    route.fulfill({
+      json: {
+        data: {
+          prefijo: "fm",
+          plataforma: "google_forms",
+          tipoDestino: "formulario",
+          dominioDestino: "forms.gle",
+          urlDestino: link.urlDestino,
+        },
+      },
+    }),
+  );
+  await page.getByRole("button", { name: "Crear enlace", exact: true }).click();
+  await page
+    .getByRole("textbox", { name: "Título interno", exact: true })
+    .fill("Nuevo enlace con QR QA");
+  await page
+    .getByRole("textbox", { name: "URL de destino", exact: true })
+    .fill(link.urlDestino);
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Crear enlace", exact: true })
+    .click();
+  await expect(
+    page
+      .getByRole("dialog")
+      .getByText("Enlace listo para compartir", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Ver QR", exact: true }).click();
+  await expect(
+    page.getByRole("dialog").getByRole("img", {
+      name: "Código QR de Nuevo enlace con QR QA",
+      exact: true,
+    }),
+  ).toBeVisible();
+});
 
 test("management summary preserves the panel layout with real metrics, filters and role-specific activity cleanup", async ({
   page,
@@ -1693,7 +2390,7 @@ test("certificate audit tracks real exports, cancellation and failures without s
     expect(events.some((item) => item.body.accion === action)).toBe(true);
 });
 
-test("certificate audit history supports mobile themes, search and confirmed row cleanup", async ({
+test("certificate audit history supports mobile themes, search and confirmed row and full cleanup", async ({
   page,
 }) => {
   test.setTimeout(120000);
@@ -1726,16 +2423,42 @@ test("certificate audit history supports mobile themes, search and confirmed row
   ];
   let rows = [...fixture];
   const deletes = [];
+  let cleanupFailure = false;
+  const cutoff = "2026-11-05T22:00:00.000Z";
   await page.route("**/api/certificados/auditoria**", async (route) => {
     if (route.request().method() === "DELETE") {
       deletes.push(route.request().postDataJSON());
+      const body = route.request().postDataJSON();
+      if (body.modo === "limpiar") {
+        expect(new URL(route.request().url()).pathname).toBe(
+          "/api/certificados/auditoria",
+        );
+        expect(body).toEqual({
+          modo: "limpiar",
+          hasta: cutoff,
+          confirmacion: "LIMPIAR AUDITORIA",
+        });
+        if (cleanupFailure)
+          return route.fulfill({
+            status: 503,
+            json: { message: "No se pudo limpiar la auditoría" },
+          });
+        const count = rows.length;
+        rows = [];
+        return route.fulfill({ json: { eliminados: count } });
+      }
       rows = rows.filter((row) => !route.request().url().endsWith(row._id));
       return route.fulfill({ json: { eliminados: 1 } });
     }
     const q = new URL(route.request().url()).searchParams.get("q");
     const data = rows.filter((row) => !q || row.proyecto?.includes(q));
     return route.fulfill({
-      json: { data, pagination: { page: 1, pages: 1, total: data.length } },
+      json: {
+        data,
+        pagination: { page: 1, pages: 1, total: data.length },
+        limpiarHasta: cutoff,
+        totalRegistros: rows.length,
+      },
     });
   });
   await mkdir(".impeccable/review/certificate-audit", { recursive: true });
@@ -1810,5 +2533,41 @@ test("certificate audit history supports mobile themes, search and confirmed row
     await expect(
       page.getByText("No hay actividades para mostrar", { exact: true }),
     ).toBeVisible();
+    const clear = page.getByRole("button", {
+      name: "Limpiar toda la auditoría",
+      exact: true,
+    });
+    await expect(clear).toBeEnabled();
+    const beforeClear = deletes.length;
+    await clear.click();
+    const confirmation = page.getByRole("dialog");
+    await expect(
+      confirmation.getByText(/aunque hayas aplicado filtros/),
+    ).toBeVisible();
+    await page.screenshot({
+      path: `.impeccable/review/certificate-audit/${device}-clear-confirm.png`,
+      animations: "disabled",
+    });
+    await confirmation
+      .getByRole("button", { name: "Cancelar", exact: true })
+      .click();
+    expect(deletes).toHaveLength(beforeClear);
+    cleanupFailure = true;
+    await clear.click();
+    await confirmation
+      .getByRole("button", { name: "Eliminar definitivamente", exact: true })
+      .click();
+    await expect(
+      page.getByText("No se pudo limpiar la auditoría", { exact: true }),
+    ).toBeVisible();
+    await expect(confirmation).toBeVisible();
+    expect(rows).toHaveLength(1);
+    cleanupFailure = false;
+    await confirmation
+      .getByRole("button", { name: "Eliminar definitivamente", exact: true })
+      .click();
+    await expect(confirmation).toHaveCount(0);
+    await expect(clear).toBeDisabled();
+    expect(rows).toHaveLength(0);
   }
 });

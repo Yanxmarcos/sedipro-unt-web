@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Check, Link2, LoaderCircle } from "lucide-react";
+import { Check, Link2, LoaderCircle, QrCode } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ import { panelApi } from "@/lib/panel-api";
 import { PLATFORMS, TYPES, limaInput, expiryFromInput } from "./link-utils.mjs";
 import { CopyLink } from "./link-shared";
 
-export function LinkForm({ link, onClose, onSaved, onReload }) {
+export function LinkForm({ link, onClose, onSaved, onReload, onQr }) {
   const [values, setValues] = useState({
     titulo: link?.titulo || "",
     urlDestino: link?.urlDestino || "",
@@ -178,6 +178,11 @@ export function LinkForm({ link, onClose, onSaved, onReload }) {
                   Cerrar
                 </Button>
                 <CopyLink url={created.urlCorta} title={created.titulo} text />
+                {onQr && (
+                  <Button variant="outline" onClick={() => onQr(created)}>
+                    <QrCode /> Ver QR
+                  </Button>
+                )}
               </DialogFooter>
             </div>
           ) : (
