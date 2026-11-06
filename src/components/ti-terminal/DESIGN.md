@@ -120,7 +120,7 @@ La paleta concentra el contraste en naranja cálido sobre negro; el frontmatter 
 
 **Body Font:** Cascadia Code; el cuerpo de las ventanas usa monospace como alternativa.
 
-**Character:** Una sola voz monoespaciada une código y contenido institucional. La ruta carga Cascadia Code mediante `next/font/google`, pesos 400, 500 y 600, con `display: swap` y variable `--font-ti-code`; esa variable precede a las alternativas en el CSS.
+**Character:** Una sola voz monoespaciada une código y contenido institucional. La ruta carga Cascadia Code mediante `next/font/local`, desde el WOFF2 latino incluido junto a la página, con pesos 400, 500 y 600, `display: swap` y variable `--font-ti-code`; esa variable precede a las alternativas en el CSS. La fuente y su licencia se conservan en `src/app/tecnologias-de-la-informacion/fonts/` para evitar la descarga de esta familia durante el build.
 
 ### Hierarchy
 
