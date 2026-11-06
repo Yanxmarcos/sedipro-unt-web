@@ -1,6 +1,22 @@
 const INK = "#29295d";
 const PURPLE = "#762477";
 let symbolPromise;
+const sources = new Map();
+export const QR_DOWNLOAD_STYLES = [
+  { id: "institutional", label: "Institucional", suffix: "" },
+  { id: "black-white", label: "Negro sobre blanco", suffix: "-negro-blanco" },
+  { id: "white-black", label: "Blanco sobre negro", suffix: "-blanco-negro" },
+];
+function palette(style) {
+  const monochrome = style === "black-white" || style === "white-black";
+  const inverted = style === "white-black";
+  return {
+    ink: monochrome ? (inverted ? "#ffffff" : "#000000") : INK,
+    paper: inverted ? "#000000" : "#ffffff",
+    modules: monochrome ? (inverted ? "#ffffff" : "#000000") : "url(#flow)",
+    monochrome,
+  };
+}
 
 async function loadSymbol() {
   if (!symbolPromise) {
@@ -67,11 +83,12 @@ function modulePath(x, y, matrix) {
 const finderCell = (x, y, size) =>
   (x < 7 && y < 7) || (x >= size - 7 && y < 7) || (x < 7 && y >= size - 7);
 
-function finder(x, y) {
-  return `<g transform="translate(${x} ${y})"><circle cx="3.5" cy="3.5" r="3.5" fill="${INK}"/><circle cx="3.5" cy="3.5" r="2.5" fill="white"/><circle cx="3.5" cy="3.5" r="1.5" fill="url(#flow)"/></g>`;
+function finder(x, y, colors) {
+  return `<g transform="translate(${x} ${y})"><circle cx="3.5" cy="3.5" r="3.5" fill="${colors.ink}"/><circle cx="3.5" cy="3.5" r="2.5" fill="${colors.paper}"/><circle cx="3.5" cy="3.5" r="1.5" fill="${colors.modules}"/></g>`;
 }
 
-function qrSvg(matrix, paths) {
+function qrSvg(matrix, paths, style = "institutional") {
+  const colors = palette(style);
   const size = matrix.size,
     edge = size + 8;
   const cells = [],
@@ -94,11 +111,14 @@ function qrSvg(matrix, paths) {
     y = (size - height) / 2;
   const halo = paths.map(({ d }) => `<path d="${d}"/>`).join("");
   const symbol = paths
-    .map(({ d, fill }) => `<path d="${d}" fill="${fill}"/>`)
+    .map(
+      ({ d, fill }) =>
+        `<path d="${d}" fill="${colors.monochrome ? colors.ink : fill}"/>`,
+    )
     .join("");
-  const art = `<path d="${cells.join("")}" fill="url(#flow)"/><g transform="translate(${x} ${y}) scale(${width / 580})"><g fill="white" stroke="white" stroke-width="${(2.6 * 580) / width}" stroke-linejoin="round">${halo}</g>${symbol}</g>`;
+  const art = `<path d="${cells.join("")}" fill="${colors.modules}"/><g transform="translate(${x} ${y}) scale(${width / 580})"><g fill="${colors.paper}" stroke="${colors.paper}" stroke-width="${(2.6 * 580) / width}" stroke-linejoin="round">${halo}</g>${symbol}</g>`;
   // Functional timing/alignment/format patterns remain intact above the artwork.
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 ${edge} ${edge}"><defs><linearGradient id="flow" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${INK}"/><stop offset=".45" stop-color="#304d90"/><stop offset="1" stop-color="${PURPLE}"/></linearGradient></defs><rect width="${edge}" height="${edge}" fill="white"/><g transform="translate(4 4)">${art}<path d="${reservedLight.join("")}" fill="white"/><path d="${reserved.join("")}" fill="${INK}"/>${finder(0, 0)}${finder(size - 7, 0)}${finder(0, size - 7)}</g></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 ${edge} ${edge}"><defs><linearGradient id="flow" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${INK}"/><stop offset=".45" stop-color="#304d90"/><stop offset="1" stop-color="${PURPLE}"/></linearGradient></defs><rect width="${edge}" height="${edge}" fill="${colors.paper}"/><g transform="translate(4 4)">${art}<path d="${reservedLight.join("")}" fill="${colors.paper}"/><path d="${reserved.join("")}" fill="${colors.ink}"/>${finder(0, 0, colors)}${finder(size - 7, 0, colors)}${finder(0, size - 7, colors)}</g></svg>`;
 }
 
 function loadImage(url) {
@@ -111,21 +131,36 @@ function loadImage(url) {
   });
 }
 
-export async function renderShortLinkQrFiles(shortUrl) {
-  const url = validateUrl(shortUrl);
-  const [{ default: QRCode }, paths, decoder, compatibility] =
+async function verifiedImage(
+  svg,
+  url,
+  decoder,
+  compatibility,
+  inverted = false,
+) {
+  const imageUrl = URL.createObjectURL(svg);
+  try {
+    const image = await loadImage(imageUrl);
+    return readable(image, url, decoder, inverted) &&
+      readableCompatible(image, url, compatibility, inverted)
+      ? image
+      : null;
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
+async function createSource(url) {
+  const [{ default: QRCode }, paths, decoder, importedCompatibility] =
     await Promise.all([
       import("qrcode"),
       loadSymbol(),
       import("@zxing/library"),
       import("html5-qrcode/third_party/zxing-js.umd.js"),
     ]);
-  // Encode the displayed URL literally. Uppercasing the scheme can make phone
-  // scanners offer a text search instead of opening the institutional link.
-  const payload = url;
-  // Prefer the encoder's standard penalty-scored mask (balanced runs/patterns),
-  // then try the others deterministically. The emblem never shrinks on failure.
-  const preferred = QRCode.create(payload, {
+  const compatibility = importedCompatibility.default || importedCompatibility;
+  // Keep the literal lowercase URL; all export styles share one verified matrix.
+  const preferred = QRCode.create(url, {
     errorCorrectionLevel: "H",
   }).maskPattern;
   const masks = [
@@ -135,30 +170,68 @@ export async function renderShortLinkQrFiles(shortUrl) {
     ),
   ];
   for (const maskPattern of masks) {
-    const matrix = QRCode.create(payload, {
+    const matrix = QRCode.create(url, {
       errorCorrectionLevel: "H",
       maskPattern,
     }).modules;
-    const svg = new Blob([qrSvg(matrix, paths)], { type: "image/svg+xml" });
-    const imageUrl = URL.createObjectURL(svg);
-    try {
-      const image = await loadImage(imageUrl);
-      if (!readable(image, url, decoder)) continue;
-      if (
-        !readableCompatible(image, url, compatibility.default || compatibility)
-      )
-        continue;
-      return { png: await imageToPng(image, 1024), svg };
-    } finally {
-      URL.revokeObjectURL(imageUrl);
+    let valid = true;
+    // Validate both contrast families before choosing their shared mask.
+    // Inverted readers normalize to the monochrome family.
+    for (const style of ["institutional", "black-white"]) {
+      const svg = new Blob([qrSvg(matrix, paths, style)], {
+        type: "image/svg+xml",
+      });
+      if (!(await verifiedImage(svg, url, decoder, compatibility))) {
+        valid = false;
+        break;
+      }
     }
+    if (valid) return { matrix, paths, decoder, compatibility };
   }
   throw new Error(
     "No se pudo verificar la lectura del QR. Vuelve a intentarlo.",
   );
 }
 
-function readableCompatible(image, expected, decoder) {
+function getSource(url) {
+  if (!sources.has(url)) {
+    const pending = createSource(url).catch((error) => {
+      if (sources.get(url) === pending) sources.delete(url);
+      throw error;
+    });
+    sources.set(url, pending);
+    // Keep only tiny matrix/decoder references, never preview/export images.
+    if (sources.size > 8) sources.delete(sources.keys().next().value);
+  }
+  return sources.get(url);
+}
+
+export async function renderShortLinkQrFiles(
+  shortUrl,
+  style = "institutional",
+) {
+  if (!QR_DOWNLOAD_STYLES.some((option) => option.id === style))
+    throw new Error("Selecciona un estilo de descarga válido.");
+  const url = validateUrl(shortUrl);
+  const { matrix, paths, decoder, compatibility } = await getSource(url);
+  const svg = new Blob([qrSvg(matrix, paths, style)], {
+    type: "image/svg+xml",
+  });
+  const image = await verifiedImage(
+    svg,
+    url,
+    decoder,
+    compatibility,
+    style === "white-black",
+  );
+  if (!image)
+    throw new Error(
+      "No se pudo verificar la lectura de este estilo. Prueba otra opción.",
+    );
+  return { png: await imageToPng(image, 1024), svg };
+}
+
+function readableCompatible(image, expected, decoder, inverted = false) {
   const canvas = document.createElement("canvas");
   const hints = new Map([
     [decoder.DecodeHintType.POSSIBLE_FORMATS, [decoder.BarcodeFormat.QR_CODE]],
@@ -170,7 +243,18 @@ function readableCompatible(image, expected, decoder) {
     for (const size of [192, 256, 288, 320, 512, 1024]) {
       canvas.width = canvas.height = size + 200;
       const context = canvas.getContext("2d", { willReadFrequently: true });
+      context.fillStyle = inverted ? "black" : "white";
+      context.fillRect(0, 0, canvas.width, canvas.height);
       context.drawImage(image, 100, 100, size, size);
+      if (inverted) {
+        const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < pixels.data.length; i += 4) {
+          pixels.data[i] = 255 - pixels.data[i];
+          pixels.data[i + 1] = 255 - pixels.data[i + 1];
+          pixels.data[i + 2] = 255 - pixels.data[i + 2];
+        }
+        context.putImageData(pixels, 0, 0);
+      }
       const bitmap = new decoder.BinaryBitmap(
         new decoder.HybridBinarizer(
           new decoder.HTMLCanvasElementLuminanceSource(canvas),
@@ -191,6 +275,7 @@ function readable(
   image,
   expected,
   { QRCodeReader, BinaryBitmap, HybridBinarizer, RGBLuminanceSource },
+  inverted = false,
 ) {
   const canvas = document.createElement("canvas");
   try {
@@ -200,7 +285,7 @@ function readable(
       for (const size of [192, 256, 288, 320, 512, 1024]) {
         canvas.width = canvas.height = size + margin * 2;
         const context = canvas.getContext("2d", { willReadFrequently: true });
-        context.fillStyle = "white";
+        context.fillStyle = inverted ? "black" : "white";
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.drawImage(image, margin, margin, size, size);
         const pixels = context.getImageData(
@@ -225,6 +310,9 @@ function readable(
                     pixels[offset + 2]) >>
                   2;
           }
+          if (inverted)
+            for (let i = 0; i < luminance.length; i++)
+              luminance[i] = 255 - luminance[i];
           const source = new RGBLuminanceSource(
             luminance,
             canvas.width,
@@ -273,6 +361,6 @@ export async function exportShortLinkQrPng(svg) {
   }
 }
 
-export async function renderShortLinkQr(shortUrl) {
-  return (await renderShortLinkQrFiles(shortUrl)).png;
+export async function renderShortLinkQr(shortUrl, style = "institutional") {
+  return (await renderShortLinkQrFiles(shortUrl, style)).png;
 }

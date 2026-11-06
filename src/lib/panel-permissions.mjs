@@ -63,6 +63,8 @@ export function canOpenPanelPage(pathname, user, assignments = []) {
   if (pathname === "/panel/enlaces" || pathname.startsWith("/panel/enlaces/"))
     return panelPermissions(user).canManageLinks;
   if (pathname === "/panel") return true;
+  if (pathname === "/panel/versiones")
+    return Boolean(ROLE_LABELS[normalizeRole(user?.rol)]);
   if (pathname === "/panel/perfil" || pathname === "/panel/cambiar-contrasena")
     return true;
   if (pathname === "/panel/usuarios" || pathname.startsWith("/panel/usuarios/"))

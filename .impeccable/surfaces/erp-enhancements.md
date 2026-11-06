@@ -60,6 +60,40 @@ inactive notice, regeneration, retry, recoverable export errors, cancellation
 and Blob URL cleanup. Existing redirect gates and click counting govern the
 short URL in every previously downloaded copy.
 
+QR DOWNLOAD STYLES — 2026-11-06. Three mutually exclusive local download styles:
+institutional (default), black-white and white-black. User explicitly removed the
+transparent option; no transparent renderer, output or checkerboard CSS remains.
+Use existing RadioGroup/Label below the preview: stacked full-width options on
+mobile, three columns on desktop. Both PNG/SVG use the current style; monochrome
+styles also recolor the three logo paths. Preserve the34% symbol and2.6-module
+clearance. The inverse uses black clearance and retains its reader compatibility
+note/instruction to test with a phone before sharing.
+
+All styles share the exact same URL/matrix. Qualify institutional and monochrome
+contrast families with the two existing readers before choosing their shared
+mask. Normalize inverse pixels for inversion-capable readers only; this does
+not establish compatibility with arbitrary scanners. Cache at most8tiny verified
+source matrices/decoder references, never images; generate the requested output.
+Fetch the current link on open/regenerate; selecting style adds no request,
+endpoint, metadata or image upload. Preserve literal lowercase URL checks,
+H correction, protected patterns and four-module outer spacing.
+
+Invalidate pending renders/downloads immediately on style changes. Revoke all
+transient BlobURLs on change/close and discard stale async PNG completions.
+Preserve keyboard radio selection, errors/retry, inactive notice, deterministic
+regen, PNG4096/SVG. Institutional filenames unchanged; monochrome exports have
+-negro-blanco or -blanco-negro suffixes. No dependency/backend/database changes.
+
+Verification after removing transparency: only3radio options are present; the
+Transparente option is explicitly absent. Six opaquePNG/SVG files yield36literal
+URL reads over6sizes (12inverse reads normalize inversion). NativePNG4096,
+opaque alpha, grayscale monochrome pixels, samepathmatrix, filenames, keyboard
+selection, cancelled stale exports, no extra styleGETs and Blob cleanup pass.
+Changed-file lint/whitespace checks pass. The production build passed for the
+removal, retaining only the existing CascadiaCode fallback-font warning. A final
+browser pass checks the slightly wider desktop dialog after the width-only tweak.
+No backend/cloud/README/dependency change, commit or deployment.
+
 QR URL RECOGNITION FIX — 2026-11-05. Production phone screenshot showed a Google
 search for HTTPS://SEDIPROUNT.ORG/ig/332. The density optimization uppercased the
 payload; canonicalizing decoded text in validation/tests hid that difference.
