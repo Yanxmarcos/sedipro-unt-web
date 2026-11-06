@@ -1,0 +1,154 @@
+# Distributions, attendance filters and institutional QR
+
+Mode: Operate. Extension of the existing management summary, attendance detail
+and link library on `feat/resumen-asistencia-qr` in both repositories. Preserve
+the panel's shared typography, components, themes, data permissions and layout.
+No new visual identity, ornamental assets or motion. The institutional symbol's
+original paths remain unchanged. READMEs contain institutional information and
+remain outside scope. Dashboard/attendance contracts below retain their original
+scope; the current QR contract uses a single fluid design and HD export.
+
+Dashboard: two vertical bar charts, career/sex on X and integer counts on Y.
+Use active current membership, as labelled beside the existing community total.
+Only careers present in the roster appear; normalize spelling case/spacing/accents
+and state missing career separately. Missing sex is Sin especificar. Shared area
+buttons filter both charts independently of attendance's date/area filters.
+Long full career labels wrap; horizontal scroll stays inside the chart on mobile.
+Use the existing ChartContainer/Recharts and Card/Button vocabulary, plus an
+accessible table of the displayed values. Only management sees this summary.
+Default X/Y ticks explicitly use the existing semantic muted-foreground color;
+custom career ticks retain that same color in both themes.
+
+Attendance: Todos/Presentes/Tardanzas/Justificados/Ausentes are compact native
+button badges with aria-pressed. Search and status combine in view/edit, with a
+brief explanation. The view-to-edit action retains status. An edited row updates
+counts and leaves a filter it no longer matches. Save sends all original invitees,
+including hidden rows; no member is added or removed. Existing lifecycle locks,
+export roster, permissions and server-side roster validation remain authoritative.
+
+CURRENT QR: Library rows and the created-link confirmation open the same shared dialog.
+Fetch the current link and encode only urlCorta, never urlDestino. There is now
+one fluid design for every link. The backend assigns qrDiseno=fluido and returns
+fluido for historical origami/missing metadata without migrating documents.
+The client no longer selects a renderer from stored metadata. No alternating
+turn or configuracion_enlaces access occurs during creation; obsolete control
+documents can remain untouched. No QR images are stored or uploaded.
+
+Visual authority: the user's 2.png. Preserve the navy/blue/purple gradient,
+joined rounded modules and circular finders. Enlarge the original central symbol
+from 24% to 34% of the matrix width. Its white clearance follows the three
+original vector paths with the approved 2.6-module total stroke; there is no rounded-square
+plate, outline or shadow. sedi-simbolo.svg contains the three unchanged paths
+extracted from sedi-logo.svg. This is a functional QR adaptation: the encoded
+URL determines the data pattern, and protected alignment/timing patterns remain.
+The discontinued giant-symbol model and its white data apertures are removed
+from the renderer. No image-generation assets are used.
+
+Use correction H and a four-module quiet zone. Prefer the encoder's standard
+penalty-scored mask, then try the remaining masks 0..7 in fixed order. Scheme
+and host are uppercased only in the encoded payload to reduce matrix density;
+the case-sensitive path is unchanged and the displayed URL remains canonical.
+Each candidate must decode to that canonical URL at 192/256/288/320/512/1024px
+with public @zxing/library APIs (pinned 0.21.3), both weighted/native grayscale
+and raw/white-padded surfaces (24 checks per candidate). No smaller logo/design is silently
+substituted on failure. Preview is 1024px; PNG export lazily renders 4096x4096px
+and releases the canvas, while SVG is self-contained vector artwork. Preserve
+inactive notice, regeneration, retry, recoverable export errors, cancellation
+and Blob URL cleanup. Existing redirect gates and click counting govern the
+short URL in every previously downloaded copy.
+
+APPROVED SILHOUETTE REFINEMENT — 2026-11-05. User approved the final right-hand
+proposal in ../review/qr-silhouette-sketch/comparativo-ampliado-2.png. White
+clearance is now a 2.6-module total stroke (1.3 outward) following the same three
+paths, with the logo still34% wide. The dedicated browser case passed again in
+26.3s:72independent canonicalURL/path comparisons across six sizes, native4096PNG,
+SVG, regeneration, historicalmetadata, inactive/error/retry/createQR and no-upload
+checks. Root opened all four regenerated desktop/mobile light/dark captures;
+no material visual issue. Existing runtime reading gates and geometry remain.
+No backend, cloud data, README, commit or deployment change in this refinement.
+
+CURRENT QR EVIDENCE — single fluid model, 2026-11-05. This supersedes all
+alternating/giant-symbol reviews below, which do not describe the current design.
+The targeted Playwright case passed (34.6s):12PNG/SVG samples at six sizes give72
+canonicalURL/path comparisons with the older independent reader. Covers all eight
+prefixes, localYT/go, reported localFB/c6l and userIG/w95; native4096PNG, vectorSVG,
+stable regeneration, historicalorigami/missing metadata equality, inactive notice,
+requestfailure/retry, create-to-QR, BlobURL cleanup and no uploads. The current
+runtime additionally checks24 latest-reader variations before showing each QR.
+Final frontend production build and changed-file ESLint pass; only the existing
+CascadiaCode fallback-font warning remains. No physical camera/print scan claimed.
+
+Independent visual review opened2.png, the user's previous QR, actual exportedPNG
+and desktop/mobile light/dark captures and returned ship without material issues.
+After mask-selection correction, root opened all four replacement captures and
+confirmed the enlarged symbol and silhouette clearance remain correct. Evidence:
+../review/qr-single-fluid/{direction,finish-review}.md and solid-fluido-* captures.
+Backend21 unit cases, isolated local service checks and focused real redirect
+checks passed, including20concurrent302 responses. The earlier broad integration
+suite was incomplete under devserver startup/load; do not describe it as passed.
+No cloud writes, migration, data cleanup, README edit, commit or deployment.
+
+HISTORICAL QR EVIDENCE — opaque A rebuild, subsequently rejected by the user: the user's rejected watermark screenshot
+supersedes the earlier transparent-A ship below. A new full review returned ship
+without material fixes after opening that screenshot, desired reference,
+before/after, actual downloaded PNG and eight solid-{origami,fluido}-{1440,390}-
+{light,dark}.png captures. The watermark is visibly resolved; white apertures are
+documented as functional adaptation. The latest browser case passed in 34.1s:
+22 PNG/SVG samples at four scales give 88 canonical exact-URL and case-sensitive
+path comparisons with an independent older reader, including the reported
+http://localhost:7000/fb/c6l and all eight prefixes. PNG IHDR confirms 4096 × 4096;
+SVG, stable regeneration, inactive/error/retry/create-to-QR, cleanup and no uploads
+pass. Frontend build passes with its pre-existing Cascadia Code fallback warning;
+changed QR files lint cleanly. Backend source was not edited or rebuilt for this
+correction; earlier integration/build results remain historical. No new DB writes,
+migration or cloud cleanup occurred. No physical camera/print or detector result
+is claimed; the session launcher was unavailable. See enlaces.md and
+../review/qr-origami-redesign/{direction,finish-review}.md.
+
+HISTORICAL QR EVIDENCE — alternating designs/HD export, transparent A superseded
+by the user's rejection and opaque rebuild above: fresh review returned ship
+with no material fixes after opening both references, eight final captures at
+1440/390 in light/dark and four
+exact dark detail crops. Pixel inspection/crops resolve a white-region image-viewer
+anomaly; it is not a product capture failure. Received implementation evidence:
+20 shortener unit cases, isolated local MongoDB/API integration (eight concurrent
+creates, alternation/rollback, forged-field rejection, lifecycle and legacy), and
+the dedicated browser case with 60 exact URL reads from 20 PNG/SVG samples at
+256/320/1024 using an independent older decoder. Native PNG IHDR is 4096 × 4096;
+SVG, stable regeneration, inactive/error/retry/create-to-QR, cleanup and no uploads
+pass. Final pinned-decoder browser/build rechecks pass, as does the backend build;
+changed QR files lint without warnings. Only the pre-existing Cascadia Code font
+fallback warning remains in the frontend build. See
+../review/qr-designs/{direction,finish-review}.md for that historical contract and
+review limits. No cloud cleanup, migration or physical camera/print scan occurred.
+
+HISTORICAL ERP EVIDENCE — original extension and single-design PNG: Three unit cases pass, including weighted summary and membership
+distributions. Three browser feature cases pass, covering filtered save with all
+four original invitees while one is visible and persistence of the changed state;
+charts/area selection/missing career/sex; PNG download and exact short-URL decoding
+at 1024 and 320px; regeneration/object-URL revocation, inactive notice, retry and
+create-to-QR flow. The final directed chart case also asserts computed contrast
+of at least 4.5:1 for every default tick at both widths in both themes.
+Isolated real local MongoDB/API integration, both production builds, changed-file
+frontend ESLint and diff checks pass. These are received implementation results;
+this documentation pass inspected code/contracts and ran no tests or captures.
+
+Historical reviewed captures in `.impeccable/review/erp-enhancements/`: summary,
+attendance-view, attendance-edit and qr, each suffixed `-1440-light.png`,
+`-1440-dark.png`, `-390-light.png`, `-390-dark.png` (16 files). Browser viewport
+heights are 1000px, full-page for summary/attendance and viewport for the modal.
+The fresh reviewer opened all 16 and found one P2: dim default chart axes in dark
+mode. After the semantic tick-color fix, the reviewer reopened all four replacement
+summary captures and returned ship, resolving P2 with no remaining material fixes.
+The other twelve captures retain their initial review result. Full disposition:
+`../review/erp-enhancements/finish-review.md`.
+
+LIMITS AND PRESERVATION: Context and detector launchers failed with
+`cache_directory_failed`; no detector QA is claimed. Viewports and directed
+contrast assertions do not establish a complete accessibility audit, screen-reader
+or physical-device test, or camera/print QR scan. No cloud writes, cleanup or
+migration occurred in the original extension or later QR extension. This
+documentation pass compared source/contracts and ran no tests or captures.
+DESIGN.md, .impeccable/design.json, README files, institutional assets and the
+existing visual world remain unchanged by this documentation pass; no new tokens
+or identity are introduced.

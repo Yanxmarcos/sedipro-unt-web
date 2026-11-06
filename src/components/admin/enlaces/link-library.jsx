@@ -14,6 +14,7 @@ import {
   RotateCcw,
   Search,
   Trash2,
+  QrCode,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -45,6 +46,7 @@ import { panelApi } from "@/lib/panel-api";
 import { PLATFORMS, TYPES, formatDate } from "./link-utils.mjs";
 import { CopyLink, StateBadge, LinkPagination } from "./link-shared";
 import { LinkForm } from "./link-form";
+import { LinkQr } from "./link-qr";
 
 const emptyFilters = {
   q: "",
@@ -67,6 +69,7 @@ export default function LinkLibrary({ trash = false }) {
   const [target, setTarget] = useState(null);
   const [action, setAction] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [qrId, setQrId] = useState(null);
   const version = useRef(0);
   const load = useCallback(async () => {
     const current = ++version.current;
@@ -435,6 +438,17 @@ export default function LinkLibrary({ trash = false }) {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end gap-1">
+                      {!trash && (
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={`Ver código QR de ${row.titulo}`}
+                          title="Ver y descargar QR"
+                          onClick={() => setQrId(row._id)}
+                        >
+                          <QrCode />
+                        </Button>
+                      )}
                       {trash && permissions.canPermanentlyDeleteLinks && (
                         <Button
                           variant="ghost"
@@ -546,12 +560,17 @@ export default function LinkLibrary({ trash = false }) {
           link={target === "new" ? null : target}
           onClose={() => setTarget(null)}
           onReload={reloadLink}
+          onQr={(row) => {
+            setTarget(null);
+            setQrId(row._id);
+          }}
           onSaved={(_row, close) => {
             if (close) setTarget(null);
             load();
           }}
         />
       )}
+      {qrId && <LinkQr linkId={qrId} onClose={() => setQrId(null)} />}
       <AdminConfirm
         show={Boolean(action)}
         title={actionCopy?.[0] || ""}

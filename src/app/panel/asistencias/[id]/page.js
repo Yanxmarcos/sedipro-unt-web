@@ -6,6 +6,7 @@ import {
   LoaderCircle as AdminLoaderCircleIcon,
   Save as AdminSaveIcon,
   Search as AdminSearchIcon,
+  Pencil,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -125,6 +126,11 @@ export default function AsistenciaDetallePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState(() =>
+    Object.hasOwn(ESTADOS, searchParams.get("estado") || "")
+      ? searchParams.get("estado")
+      : "",
+  );
   const [toast, setToast] = useState(null);
   const [lifecycleConfirm, setLifecycleConfirm] = useState(false);
   const isEdit = requestedEdit && asistencia?.estadoRegistro !== "cerrada";
@@ -180,9 +186,10 @@ export default function AsistenciaDetallePage() {
     fetchData();
   }, [fetchData]);
   const filteredRegistro = useMemo(() => {
-    if (!search.trim()) return registro;
-    const q = search.toLowerCase();
+    const q = search.trim().toLowerCase();
     return registro.filter((r) => {
+      if (statusFilter && r.estado !== statusFilter) return false;
+      if (!q) return true;
       const s = r.sediprano;
       if (!s) return false;
       return (
@@ -191,8 +198,9 @@ export default function AsistenciaDetallePage() {
         s.dni?.toLowerCase().includes(q)
       );
     });
-  }, [registro, search]);
+  }, [registro, search, statusFilter]);
   function setEstado(sedipranoId, estado) {
+    if (!isEdit || saving || !Object.hasOwn(ESTADOS, estado)) return;
     setRegistro((prev) =>
       prev.map((r) =>
         r.sedipranoId?.toString() === sedipranoId?.toString()
@@ -205,6 +213,7 @@ export default function AsistenciaDetallePage() {
     );
   }
   async function handleSave() {
+    if (!asistencia || !isEdit || saving) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/asistencias/${params.id}`, {
@@ -303,15 +312,29 @@ export default function AsistenciaDetallePage() {
                     : "Histórica"}
               </Badge>
               {!isEdit && (
-                <Button
-                  variant="outline"
-                  disabled={saving}
-                  onClick={() => setLifecycleConfirm(true)}
-                >
-                  {asistencia.estadoRegistro === "cerrada"
-                    ? "Reabrir registro"
-                    : "Cerrar asistencia"}
-                </Button>
+                <>
+                  {asistencia.estadoRegistro !== "cerrada" && (
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        router.push(
+                          `/panel/asistencias/${params.id}?mode=edit${statusFilter ? `&estado=${statusFilter}` : ""}`,
+                        )
+                      }
+                    >
+                      <Pencil /> Editar asistencia
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    disabled={saving}
+                    onClick={() => setLifecycleConfirm(true)}
+                  >
+                    {asistencia.estadoRegistro === "cerrada"
+                      ? "Reabrir registro"
+                      : "Cerrar asistencia"}
+                  </Button>
+                </>
               )}
             </>
           )}
@@ -332,7 +355,7 @@ export default function AsistenciaDetallePage() {
           {isEdit && (
             <Button
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || loading}
               type="button"
               style={{
                 opacity: saving ? 0.7 : 1,
@@ -356,42 +379,60 @@ export default function AsistenciaDetallePage() {
       </div>
 
       {!loading && (
-        <div
-          role="group"
-          aria-label="Resumen de asistencia"
-          className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5"
-        >
-          {[
-            {
-              label: "Total",
-              value: summary.total,
-            },
-            {
-              label: "Presentes",
-              value: summary.presentes,
-            },
-            {
-              label: "Tardanzas",
-              value: summary.tardanzas,
-            },
-            {
-              label: "Justificados",
-              value: summary.justificados,
-            },
-            {
-              label: "Ausentes",
-              value: summary.ausentes,
-            },
-          ].map((c) => (
-            <Badge
-              key={c.label}
-              variant="outline"
-              className="h-auto w-full justify-center gap-2 bg-card px-3 py-1 text-sm"
-            >
-              <span>{c.label}</span>
-              <span className="font-semibold tabular-nums">{c.value}</span>
-            </Badge>
-          ))}
+        <div className="space-y-2">
+          <div
+            role="group"
+            aria-label="Filtrar asistencia por estado"
+            className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5"
+          >
+            {[
+              {
+                label: "Todos",
+                estado: "",
+                value: summary.total,
+              },
+              {
+                label: "Presentes",
+                estado: "presente",
+                value: summary.presentes,
+              },
+              {
+                label: "Tardanzas",
+                estado: "tardanza",
+                value: summary.tardanzas,
+              },
+              {
+                label: "Justificados",
+                estado: "justificado",
+                value: summary.justificados,
+              },
+              {
+                label: "Ausentes",
+                estado: "ausente",
+                value: summary.ausentes,
+              },
+            ].map((c) => (
+              <Badge
+                key={c.label}
+                render={<button type="button" />}
+                variant={statusFilter === c.estado ? "default" : "outline"}
+                aria-pressed={statusFilter === c.estado}
+                disabled={saving}
+                onClick={() => setStatusFilter(c.estado)}
+                className="h-auto min-h-9 w-full cursor-pointer justify-center gap-2 px-3 py-1 text-sm hover:opacity-80 disabled:cursor-wait"
+              >
+                <span>{c.label}</span>
+                <span className="font-semibold tabular-nums">{c.value}</span>
+              </Badge>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Pulsa un estado para filtrar la lista. Puedes combinarlo con la
+            búsqueda.
+            {isEdit
+              ? " Al cambiar un estado, el integrante pasa al filtro correspondiente."
+              : ""}
+          </p>
         </div>
       )}
 
@@ -416,6 +457,7 @@ export default function AsistenciaDetallePage() {
             <Input
               type="text"
               placeholder="Buscar por nombre o DNI…"
+              aria-label="Buscar integrante en la asistencia"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-9"
@@ -445,8 +487,8 @@ export default function AsistenciaDetallePage() {
               ) : filteredRegistro.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6}>
-                    {search
-                      ? "Sin resultados para la búsqueda"
+                    {search.trim() || statusFilter
+                      ? "No hay integrantes que coincidan con el estado y la búsqueda seleccionados."
                       : "Sin registros"}
                   </TableCell>
                 </TableRow>
@@ -503,7 +545,7 @@ export default function AsistenciaDetallePage() {
                               key={estado}
                               estado={estado}
                               active={r.estado === estado}
-                              readOnly={!isEdit}
+                              readOnly={!isEdit || saving}
                               onClick={() => setEstado(r.sedipranoId, estado)}
                             />
                           ))}
@@ -517,12 +559,12 @@ export default function AsistenciaDetallePage() {
           </Table>
         </div>
 
-        {!loading && filteredRegistro.length > 0 && (
+        {!loading && (
           <div className="pt-3 pr-4 pb-3 pl-4 border-t">
-            <p className="text-sm text-muted-foreground m-0">
+            <p className="text-sm text-muted-foreground m-0" aria-live="polite">
               {filteredRegistro.length} de {registro.length} miembro
               {registro.length !== 1 ? "s" : ""}
-              {search ? ` (filtrado)` : ""}
+              {search.trim() || statusFilter ? " (filtrado)" : ""}
             </p>
           </div>
         )}
