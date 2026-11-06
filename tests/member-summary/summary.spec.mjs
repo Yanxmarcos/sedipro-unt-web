@@ -865,6 +865,7 @@ test("ERP enhancements branded QR downloads decode one fluid design and normaliz
   sampleUrls.push(
     "http://localhost:7000/fb/c6l",
     "https://sediprount.org/ig/w95",
+    "https://sediprount.org/ig/332",
   );
   for (const url of sampleUrls) {
     for (const design of ["fluido"]) {
@@ -994,7 +995,9 @@ test("ERP enhancements branded QR downloads decode one fluid design and normaliz
   }, images);
   expect(decoded).toHaveLength(images.length * 6);
   for (const item of decoded) {
-    expect(new URL(item.value).href).toBe(item.url);
+    // Normalizing through URL hides an uppercase scheme/host. Phone scanners
+    // must receive the literal lowercase http(s) URL, not just an equivalent URI.
+    expect(item.value).toBe(item.url);
     expect(new URL(item.value).pathname).toBe(new URL(item.url).pathname);
   }
   unavailable = false;

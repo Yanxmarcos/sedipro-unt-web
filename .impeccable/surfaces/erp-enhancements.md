@@ -45,17 +45,45 @@ The discontinued giant-symbol model and its white data apertures are removed
 from the renderer. No image-generation assets are used.
 
 Use correction H and a four-module quiet zone. Prefer the encoder's standard
-penalty-scored mask, then try the remaining masks 0..7 in fixed order. Scheme
-and host are uppercased only in the encoded payload to reduce matrix density;
-the case-sensitive path is unchanged and the displayed URL remains canonical.
-Each candidate must decode to that canonical URL at 192/256/288/320/512/1024px
-with public @zxing/library APIs (pinned 0.21.3), both weighted/native grayscale
-and raw/white-padded surfaces (24 checks per candidate). No smaller logo/design is silently
+penalty-scored mask, then try the remaining masks 0..7 in fixed order. Encode
+the displayed canonical URL literally, with normal lowercase http(s) scheme/host;
+never uppercase it for density optimization. Require raw decoded text equality,
+not URL-normalized equivalence (which hid the production text-search problem).
+Each candidate must decode at192/256/288/320/512/1024px using @zxing/library
+(pinned0.21.3), both weighted/native grayscale and raw/white-padded surfaces
+(24checks). Then verify the same exact text at all6sizes using the file scanner's
+exported decoder from html5-qrcode/third_party/zxing-js.umd.js (pinned2.3.8),
+without starting a camera, creating scanner DOM or additional Blob URLs. No smaller logo/design is silently
 substituted on failure. Preview is 1024px; PNG export lazily renders 4096x4096px
 and releases the canvas, while SVG is self-contained vector artwork. Preserve
 inactive notice, regeneration, retry, recoverable export errors, cancellation
 and Blob URL cleanup. Existing redirect gates and click counting govern the
 short URL in every previously downloaded copy.
+
+QR URL RECOGNITION FIX — 2026-11-05. Production phone screenshot showed a Google
+search for HTTPS://SEDIPROUNT.ORG/ig/332. The density optimization uppercased the
+payload; canonicalizing decoded text in validation/tests hid that difference.
+Encode the displayed canonicalURL literally and compare raw decoded text exactly.
+A HEAD request to the live lowercase /ig/332 returned302 with Instagram Location;
+no public GET or cloud data mutation was used for diagnosis. This does not prove
+every scanner's URL-classification behavior; no physical phone test is claimed.
+
+Canonical payloads changed the real matrix. Initial recheck caught a legacy
+reader failure at256px for IGw95, so candidate validation now also uses the exported
+file-scanner decoder at six sizes. No logo/clearance/palette changes or silent
+fallback to uppercase payloads. Pin html5-qrcode2.3.8 for the exported vendored
+module, already present in the dependency tree; no camera or hidden scanner DOM.
+The final browser case passed26.6s (33.8s total):13PNG/SVG samples, sixsizes,
+78literalURL/path comparisons including /ig/332. Native4096PNG, vectorSVG, stable
+regen, inactive/error/retry/createQR, legacy metadata and no uploads remain covered.
+Build and changed-file lint passed; only existing CascadiaCode fallback warning.
+Root opened all four final desktop/mobile light/dark captures with no material UI
+issue. The data matrix is denser when encoding the normal URL, as expected.
+
+Existing downloaded/printed QR images retain their original payload and must be
+regenerated/replaced after frontend deployment. Short-link records stay unchanged.
+No backend source, README, database cleanup, commit or deployment in this fix.
+Prior canonical-normalization QA results do not certify literalURL compatibility.
 
 APPROVED SILHOUETTE REFINEMENT — 2026-11-05. User approved the final right-hand
 proposal in ../review/qr-silhouette-sketch/comparativo-ampliado-2.png. White
