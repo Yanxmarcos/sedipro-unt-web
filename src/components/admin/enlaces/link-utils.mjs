@@ -6,6 +6,7 @@ export const PLATFORMS = {
   wa: "WhatsApp",
   fm: "Google Forms",
   yt: "YouTube",
+  gd: "Google Drive",
   go: "Sitio web",
 };
 export const TYPES = {
@@ -21,6 +22,13 @@ export const TYPES = {
   transmision: "Transmisión en vivo",
   lista_reproduccion: "Lista de reproducción",
   canal_youtube: "Canal de YouTube",
+  archivo_drive: "Archivo de Drive",
+  carpeta_drive: "Carpeta de Drive",
+  recurso_drive: "Archivo o carpeta de Drive",
+  documento_google: "Documento de Google",
+  hoja_calculo_google: "Hoja de cálculo de Google",
+  presentacion_google: "Presentación de Google",
+  dibujo_google: "Dibujo de Google",
 };
 export const STATES = {
   activo: "Activo",

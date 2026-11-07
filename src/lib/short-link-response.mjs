@@ -1,4 +1,4 @@
-const PREFIXES = ["fb", "ig", "lk", "tk", "wa", "fm", "yt", "go"];
+const PREFIXES = ["fb", "ig", "lk", "tk", "wa", "fm", "yt", "gd", "go"];
 const responseHeaders = {
   "Cache-Control": "no-store",
   "X-Robots-Tag": "noindex, nofollow",

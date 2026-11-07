@@ -2933,6 +2933,16 @@ test("panel release history is accessible to every role through the version foot
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto("/panel");
     const footer = page.locator("footer");
+    const manual = footer.getByRole("link", {
+      name: "Manual de Usuario",
+      exact: true,
+    });
+    await expect(manual).toHaveAttribute(
+      "href",
+      "https://drive.google.com/file/d/1qZdcgXCaIopkoSZVI2lcJFaIWFhOrapg/view?usp=sharing",
+    );
+    await expect(manual).toHaveAttribute("target", "_blank");
+    await expect(manual).toHaveAttribute("rel", "noopener noreferrer");
     const version = footer.getByRole("link", {
       name: "Versión 2.4.0",
       exact: true,
@@ -2977,7 +2987,7 @@ test("panel release history is accessible to every role through the version foot
   }
 });
 
-test("panel release footer keeps three mobile icons and a responsive readable history", async ({
+test("panel release footer keeps four mobile icons and a responsive readable history", async ({
   page,
 }) => {
   test.setTimeout(180000);
@@ -3022,7 +3032,12 @@ test("panel release footer keeps three mobile icons and a responsive readable hi
       const footer = page.locator("footer");
       await footer.scrollIntoViewIfNeeded();
       const boxes = [];
-      for (const name of ["Documentación", "Reportar", "Versión 2.4.0"]) {
+      for (const name of [
+        "Documentación",
+        "Manual de Usuario",
+        "Reportar",
+        "Versión 2.4.0",
+      ]) {
         const link = footer.getByRole("link", { name, exact: true });
         await expect(link).toBeVisible();
         const box = await link.boundingBox();

@@ -5,7 +5,7 @@ const protectedPrefixes = ["/panel", "/registro"];
 
 export default async function proxy(request) {
   const { pathname } = request.nextUrl;
-  const shortPath = /^\/(fb|ig|lk|tk|wa|fm|yt|go)(?:\/([^/]+))?\/?$/.exec(
+  const shortPath = /^\/(fb|ig|lk|tk|wa|fm|yt|gd|go)(?:\/([^/]+))?\/?$/.exec(
     pathname,
   );
   if (shortPath) {
@@ -64,6 +64,7 @@ export const config = {
     "/wa/:path*",
     "/fm/:path*",
     "/yt/:path*",
+    "/gd/:path*",
     "/go/:path*",
   ],
 };

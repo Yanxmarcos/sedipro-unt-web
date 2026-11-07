@@ -61,17 +61,19 @@ anclas y el desplegable funcionan sin JavaScript adicional de la página.
 Administrador y Superadministrador, respetando la normalización de los alias
 legados. El historial no es exclusivo de gestión.
 
-`src/components/admin/Footer.tsx` conserva copyright a la izquierda y tres
+`src/components/admin/Footer.tsx` conserva copyright a la izquierda y cuatro
 accesos a la derecha, en una fila:
 
 - **Documentación** mantiene `https://api-sediprount.vercel.app` y abre una pestaña nueva.
-- **Reportar** mantiene `mailto:ti.sedipro@unitru.edu.pe`; el tooltip ofrece el correo.
+- **Manual de Usuario**, junto a Documentación, abre el PDF de Drive indicado por el usuario en otra pestaña, con `noopener noreferrer`.
+- **Reportar** mantiene `mailto:ti.sedipro@unitru.edu.pe`; el tooltip indica «Si has encontrado un problema, por favor escríbenos a ti.sedipro@unitru.edu.pe para que podamos atenderlo. 🙂», con el correo en negrita.
 - **Versión 2.4.0** abre `/panel/versiones` y obtiene el número de la fuente compartida.
 
 Desde 768px se muestran las etiquetas. Por debajo se muestran los iconos
-BookOpen, Bug y Tag, cada uno con nombre accesible, foco visible y área de
+BookOpen, BookUser, Bug y Tag, cada uno con nombre accesible, foco visible y área de
 44×44px. La etiqueta Reportar se acortó para esta extensión. El copyright y
-los tres enlaces permanecen en la misma línea incluso a 320px.
+los cuatro enlaces permanecen en la misma línea incluso a 320px; bajo 360px
+el padding horizontal se reduce a 8px y la separación entre grupos a 4px.
 
 Esta página solo lee contenido local. La extensión no requiere API, estados
 de guardado, cambios del backend ni escrituras en servicios o datos de nube.

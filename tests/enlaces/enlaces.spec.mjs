@@ -28,7 +28,7 @@ test("public links redirect immediately and unavailable links use the existing 4
     if (method === "HEAD") expect(body).toBe("");
     else expect(body).not.toContain("<html");
   }
-  for (const prefix of ["fb", "ig", "lk", "tk", "wa", "fm", "yt", "go"]) {
+  for (const prefix of ["fb", "ig", "lk", "tk", "wa", "fm", "yt", "gd", "go"]) {
     const missing = await page.request.get(`/${prefix}/no-existe`, {
       maxRedirects: 0,
     });
@@ -441,4 +441,75 @@ test("YouTube is detected in the form and creates a working institutional yt lin
   );
   expect(response.status()).toBe(302);
   expect(response.headers().location).toBe(destination);
+});
+
+test("Google Drive is detected, filtered and generates a QR for its working gd link", async ({
+  page,
+}) => {
+  await login(page, "DIRECTIVA");
+  await mkdir(screenshots, { recursive: true });
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
+    await page.addInitScript(
+      (theme) => localStorage.setItem("theme", theme),
+      width === 390 ? "light" : "dark",
+    );
+    await page.goto("/panel/enlaces");
+    await page
+      .getByRole("button", { name: "Crear enlace", exact: true })
+      .click();
+    const dialog = page.getByRole("dialog");
+    const title = `QA carpeta Drive ${width}`;
+    const destination =
+      "https://drive.google.com/drive/folders/QA_folder?usp=sharing&resourcekey=0-QA";
+    await dialog.getByLabel("Título interno").fill(title);
+    await dialog.getByLabel("URL de destino").fill(destination);
+    await expect(
+      dialog.getByText(/Google Drive.*Carpeta de Drive.*Prefijo \/gd\//),
+    ).toBeVisible();
+    await page.screenshot({
+      path: path.join(screenshots, `drive-form-${width}.png`),
+      animations: "disabled",
+    });
+    await dialog
+      .getByRole("button", { name: "Crear enlace", exact: true })
+      .click();
+    await expect(
+      dialog.getByRole("heading", { name: "Enlace listo para compartir" }),
+    ).toBeVisible();
+    const shortUrl = await dialog
+      .getByLabel("Enlace institucional")
+      .inputValue();
+    expect(new URL(shortUrl).pathname).toMatch(
+      /^\/gd\/(?=[a-z0-9]*[0-9])[a-z0-9]{3}$/,
+    );
+    const redirect = await page.request.get(new URL(shortUrl).pathname, {
+      maxRedirects: 0,
+    });
+    expect(redirect.status()).toBe(302);
+    expect(redirect.headers().location).toBe(destination);
+    await dialog.getByRole("button", { name: "Ver QR", exact: true }).click();
+    await expect(
+      dialog.getByRole("heading", { name: "Código QR institucional" }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole("img", { name: `Código QR de ${title}`, exact: true }),
+    ).toBeVisible({ timeout: 60000 });
+    await expect(dialog.getByText(shortUrl, { exact: true })).toBeVisible();
+    await page.screenshot({
+      path: path.join(screenshots, `drive-qr-${width}.png`),
+      animations: "disabled",
+    });
+    await dialog
+      .getByRole("button", { name: "Cerrar", exact: true })
+      .last()
+      .click();
+    await page.getByLabel("Plataforma", { exact: true }).click();
+    await page
+      .getByRole("option", { name: "Google Drive", exact: true })
+      .click();
+    await expect(
+      page.getByRole("row").filter({ hasText: title }),
+    ).toBeVisible();
+  }
 });

@@ -51,7 +51,7 @@ function validateUrl(shortUrl) {
   const url = new URL(shortUrl);
   if (
     !["http:", "https:"].includes(url.protocol) ||
-    !/^\/(fb|ig|lk|tk|wa|fm|yt|go)\/[a-z0-9]{3}$/.test(url.pathname) ||
+    !/^\/(fb|ig|lk|tk|wa|fm|yt|gd|go)\/[a-z0-9]{3}$/.test(url.pathname) ||
     url.search ||
     url.hash ||
     url.username ||
