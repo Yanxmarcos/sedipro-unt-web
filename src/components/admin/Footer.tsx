@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, Bug, Tag } from "lucide-react";
+import { BookOpen, BookUser, Bug, Tag } from "lucide-react";
 import { CURRENT_VERSION } from "@/lib/app-version.mjs";
 import {
   Tooltip,
@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 
 const Footer = () => (
-  <footer className="text-muted-foreground mx-auto flex w-full max-w-360 items-center justify-between gap-2 border-t px-4 py-2 text-sm sm:px-6 md:py-4">
+  <footer className="text-muted-foreground mx-auto flex w-full max-w-360 items-center justify-between gap-1 border-t px-2 py-2 text-sm min-[360px]:gap-2 min-[360px]:px-4 sm:px-6 md:py-4">
     <span className="whitespace-nowrap text-xs sm:text-sm">
       © {new Date().getFullYear()} SEDIPRO UNT
     </span>
@@ -26,6 +26,15 @@ const Footer = () => (
         <BookOpen aria-hidden="true" className="size-5 md:hidden" />
         <span className="sr-only md:not-sr-only">Documentación</span>
       </a>
+      <a
+        href="https://drive.google.com/file/d/1qZdcgXCaIopkoSZVI2lcJFaIWFhOrapg/view?usp=sharing"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:text-foreground focus-visible:ring-ring inline-flex size-11 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 md:size-auto"
+      >
+        <BookUser aria-hidden="true" className="size-5 md:hidden" />
+        <span className="sr-only md:not-sr-only">Manual de Usuario</span>
+      </a>
       <Tooltip>
         <TooltipTrigger
           render={
@@ -38,7 +47,13 @@ const Footer = () => (
           <Bug aria-hidden="true" className="size-5 md:hidden" />
           <span className="sr-only md:not-sr-only">Reportar</span>
         </TooltipTrigger>
-        <TooltipContent>Escríbenos a ti.sedipro@unitru.edu.pe</TooltipContent>
+        <TooltipContent>
+          <span>
+            Si has encontrado un problema, por favor escríbenos a{" "}
+            <strong>ti.sedipro@unitru.edu.pe</strong> para que podamos
+            atenderlo. 🙂
+          </span>
+        </TooltipContent>
       </Tooltip>
       <Link
         href="/panel/versiones"

@@ -18,6 +18,24 @@ CODES: three base36 characters with at least one digit in any position for new l
 YOUTUBE: Built-in yt platform for youtube.com, www.youtube.com, m.youtube.com,
 and youtu.be. Existing automatic detection and platform filters display YouTube;
 destination labels distinguish Video, Short, live stream, channel and playlist.
+GOOGLE DRIVE: Built-in gd platform for shared resources at drive.google.com
+and the document, spreadsheets, presentation and drawings routes at
+docs.google.com. Existing detection and platform filters display Google Drive;
+types distinguish files, folders, legacy open?id resources and Workspace editors.
+Recognize file/d, folders (including account/mobile forms), legacy folderview,
+open?id, uc?id and #folders links, plus Workspace account/domain/published forms.
+Keep the complete saved query and fragment, including resourcekey, sheet IDs,
+document tabs and slide anchors. Google Forms retains fm. Exact hosts and
+recognized resource paths do not grant blanket access to Google domains.
+The same gd prefix resolves publicly, generates QR and rejects short-link chains.
+Existing prefixes, states, clicks, permissions and reserved-code rules are unchanged.
+DRIVE VALIDATION: 23 shortener unit tests and real isolated MongoDB/API integration
+pass, including saved destinations, GET/HEAD, filters, resource keys, fragments,
+click counts, editing, pause and trash/restoration. Seven Playwright tests pass
+(54.4s), including Drive form detection, creation, platform filtering and verified
+QR generation at 1440px dark and 390px light. The four drive-form/drive-qr captures
+in .impeccable/review/enlaces were opened and retain the incumbent UI. Both
+production builds and changed-source lint pass. No cloud data or env changes.
 STATES: loading, empty, no results, validation, copy failure, network/session error,
 revision conflict, paused/expired links, trash/restoration, audit and deletion confirmation.
 ACCESS: all panel roles manage all links; only Administrator and Superadministrator
@@ -39,7 +57,7 @@ Missing/paused/expired/deleted links reuse the existing native 404
 at the original URL through an internal rewrite. Temporary failures reuse that
 same component with HTTP 503 and `Retry-After: 60`. The temporary-failure page
 imports the existing `app/not-found` component without changing its design.
-All eight prefixes share this behavior; the seven duplicate route handlers
+All nine prefixes share this behavior; the seven duplicate route handlers
 were removed. No bespoke unavailable-link HTML remains.
 
 HISTORICAL REVIEW — 2026-10-30 public-resolution update. Fresh
