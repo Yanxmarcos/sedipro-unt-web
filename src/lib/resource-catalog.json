@@ -1,0 +1,1660 @@
+{
+  "categories": [
+    {
+      "id": "marca",
+      "name": "SEDIPRO UNT"
+    },
+    {
+      "id": "isotipos",
+      "name": "Isotipos"
+    },
+    {
+      "id": "areas",
+      "name": "Áreas"
+    },
+    {
+      "id": "hito",
+      "name": "Hito"
+    }
+  ],
+  "assets": [
+    {
+      "id": "logo-unt",
+      "name": "SEDIPRO UNT · Horizontal",
+      "category": "marca",
+      "tags": [
+        "logo",
+        "marca",
+        "horizontal",
+        "UNT"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/logo-unt-color.svg",
+          "pdf": "/recursos/marca/logo-unt-color.pdf",
+          "preview": "/recursos/vistas/logo-unt-color.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "blanco",
+          "name": "Blanco",
+          "src": "/recursos/marca/logo-unt-blanco.svg",
+          "pdf": null,
+          "preview": "/recursos/vistas/logo-unt-blanco.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "negro",
+          "name": "Negro",
+          "src": "/recursos/marca/logo-unt-negro.svg",
+          "pdf": null,
+          "preview": "/recursos/vistas/logo-unt-negro.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "logo-unt-vertical",
+      "name": "SEDIPRO UNT · Vertical",
+      "category": "marca",
+      "tags": [
+        "logo",
+        "vertical"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/logo-unt-vertical-color.svg",
+          "pdf": "/recursos/marca/logo-unt-vertical-color.pdf",
+          "preview": "/recursos/vistas/logo-unt-vertical-color.webp",
+          "width": 976,
+          "height": 1240,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "claro",
+          "name": "Para fondos oscuros",
+          "src": "/recursos/marca/logo-unt-vertical-claro.svg",
+          "pdf": "/recursos/marca/logo-unt-vertical-claro.pdf",
+          "preview": "/recursos/vistas/logo-unt-vertical-claro.webp",
+          "width": 976,
+          "height": 1246,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "isotipo-unt",
+      "name": "Isotipo SEDIPRO UNT",
+      "category": "isotipos",
+      "tags": [
+        "símbolo",
+        "isotipo",
+        "UNT"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/isotipo-unt-color.svg",
+          "pdf": "/recursos/marca/isotipo-unt-color.pdf",
+          "preview": "/recursos/vistas/isotipo-unt-color.webp",
+          "width": 823,
+          "height": 792,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "claro",
+          "name": "Para fondos oscuros",
+          "src": "/recursos/marca/isotipo-unt-claro.svg",
+          "pdf": "/recursos/marca/isotipo-unt-claro.pdf",
+          "preview": "/recursos/vistas/isotipo-unt-claro.webp",
+          "width": 823,
+          "height": 792,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "insignia-gth",
+      "name": "Insignia circular GTH",
+      "category": "areas",
+      "tags": [
+        "GTH",
+        "insignia",
+        "circular",
+        "redonda"
+      ],
+      "variants": [
+        {
+          "id": "restaurada",
+          "name": "Restaurada · 4K",
+          "src": "/recursos/originales/insignia-gth.webp",
+          "preview": "/recursos/vistas/insignia-gth.webp",
+          "detailPreview": "/recursos/vistas/insignia-gth-detalle.webp",
+          "width": 4096,
+          "height": 4096,
+          "sourceWidth": 1254,
+          "sourceHeight": 1254,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Versión restaurada",
+          "prepared4k": true
+        }
+      ]
+    },
+    {
+      "id": "insignia-pmo",
+      "name": "Insignia circular PMO",
+      "category": "areas",
+      "tags": [
+        "PMO",
+        "insignia",
+        "circular",
+        "redonda"
+      ],
+      "variants": [
+        {
+          "id": "restaurada",
+          "name": "Restaurada · 4K",
+          "src": "/recursos/originales/insignia-pmo.webp",
+          "preview": "/recursos/vistas/insignia-pmo.webp",
+          "detailPreview": "/recursos/vistas/insignia-pmo-detalle.webp",
+          "width": 4096,
+          "height": 4096,
+          "sourceWidth": 1254,
+          "sourceHeight": 1254,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Versión restaurada",
+          "prepared4k": true
+        }
+      ]
+    },
+    {
+      "id": "insignia-ti",
+      "name": "Insignia circular TI",
+      "category": "areas",
+      "tags": [
+        "TI",
+        "insignia",
+        "circular",
+        "redonda"
+      ],
+      "variants": [
+        {
+          "id": "restaurada",
+          "name": "Restaurada · 4K",
+          "src": "/recursos/originales/insignia-ti.webp",
+          "preview": "/recursos/vistas/insignia-ti.webp",
+          "detailPreview": "/recursos/vistas/insignia-ti-detalle.webp",
+          "width": 4096,
+          "height": 4096,
+          "sourceWidth": 1254,
+          "sourceHeight": 1254,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Versión restaurada",
+          "prepared4k": true
+        }
+      ]
+    },
+    {
+      "id": "insignia-mkt",
+      "name": "Insignia circular MKT",
+      "category": "areas",
+      "tags": [
+        "MKT",
+        "insignia",
+        "circular",
+        "redonda"
+      ],
+      "variants": [
+        {
+          "id": "restaurada",
+          "name": "Restaurada · 4K",
+          "src": "/recursos/originales/insignia-mkt.webp",
+          "preview": "/recursos/vistas/insignia-mkt.webp",
+          "detailPreview": "/recursos/vistas/insignia-mkt-detalle.webp",
+          "width": 4096,
+          "height": 4096,
+          "sourceWidth": 1254,
+          "sourceHeight": 1254,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Versión restaurada",
+          "prepared4k": true
+        }
+      ]
+    },
+    {
+      "id": "insignia-ltk-fnz",
+      "name": "Insignia circular LTK & FNZ",
+      "category": "areas",
+      "tags": [
+        "LTK & FNZ",
+        "insignia",
+        "circular",
+        "redonda"
+      ],
+      "variants": [
+        {
+          "id": "restaurada",
+          "name": "Restaurada · 4K",
+          "src": "/recursos/originales/insignia-ltk-fnz.webp",
+          "preview": "/recursos/vistas/insignia-ltk-fnz.webp",
+          "detailPreview": "/recursos/vistas/insignia-ltk-fnz-detalle.webp",
+          "width": 4096,
+          "height": 4096,
+          "sourceWidth": 1254,
+          "sourceHeight": 1254,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Versión restaurada",
+          "prepared4k": true
+        }
+      ]
+    },
+    {
+      "id": "logo-ti",
+      "name": "SEDIPRO TI",
+      "category": "areas",
+      "tags": [
+        "logo",
+        "marca",
+        "horizontal",
+        "TI"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/logo-ti-color.svg",
+          "pdf": "/recursos/marca/logo-ti-color.pdf",
+          "preview": "/recursos/vistas/logo-ti-color.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "claro",
+          "name": "Para fondos oscuros",
+          "src": "/recursos/marca/logo-ti-claro.svg",
+          "pdf": "/recursos/marca/logo-ti-claro.pdf",
+          "preview": "/recursos/vistas/logo-ti-claro.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "blanco",
+          "name": "Blanco",
+          "src": "/recursos/marca/logo-ti-blanco.svg",
+          "pdf": null,
+          "preview": "/recursos/vistas/logo-ti-blanco.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "negro",
+          "name": "Negro",
+          "src": "/recursos/marca/logo-ti-negro.svg",
+          "pdf": null,
+          "preview": "/recursos/vistas/logo-ti-negro.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "isotipo-ti",
+      "name": "Isotipo TI",
+      "category": "isotipos",
+      "tags": [
+        "símbolo",
+        "isotipo",
+        "TI"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/isotipo-ti-color.svg",
+          "pdf": "/recursos/marca/isotipo-ti-color.pdf",
+          "preview": "/recursos/vistas/isotipo-ti-color.webp",
+          "width": 823,
+          "height": 792,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "claro",
+          "name": "Para fondos oscuros",
+          "src": "/recursos/marca/isotipo-ti-claro.svg",
+          "pdf": "/recursos/marca/isotipo-ti-claro.pdf",
+          "preview": "/recursos/vistas/isotipo-ti-claro.webp",
+          "width": 823,
+          "height": 792,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "logo-pmo",
+      "name": "SEDIPRO PMO",
+      "category": "areas",
+      "tags": [
+        "logo",
+        "marca",
+        "horizontal",
+        "PMO"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/logo-pmo-color.svg",
+          "pdf": "/recursos/marca/logo-pmo-color.pdf",
+          "preview": "/recursos/vistas/logo-pmo-color.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "claro",
+          "name": "Para fondos oscuros",
+          "src": "/recursos/marca/logo-pmo-claro.svg",
+          "pdf": "/recursos/marca/logo-pmo-claro.pdf",
+          "preview": "/recursos/vistas/logo-pmo-claro.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "blanco",
+          "name": "Blanco",
+          "src": "/recursos/marca/logo-pmo-blanco.svg",
+          "pdf": null,
+          "preview": "/recursos/vistas/logo-pmo-blanco.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "negro",
+          "name": "Negro",
+          "src": "/recursos/marca/logo-pmo-negro.svg",
+          "pdf": null,
+          "preview": "/recursos/vistas/logo-pmo-negro.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "isotipo-pmo",
+      "name": "Isotipo PMO",
+      "category": "isotipos",
+      "tags": [
+        "símbolo",
+        "isotipo",
+        "PMO"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/isotipo-pmo-color.svg",
+          "pdf": "/recursos/marca/isotipo-pmo-color.pdf",
+          "preview": "/recursos/vistas/isotipo-pmo-color.webp",
+          "width": 823,
+          "height": 792,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "claro",
+          "name": "Para fondos oscuros",
+          "src": "/recursos/marca/isotipo-pmo-claro.svg",
+          "pdf": "/recursos/marca/isotipo-pmo-claro.pdf",
+          "preview": "/recursos/vistas/isotipo-pmo-claro.webp",
+          "width": 823,
+          "height": 792,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "logo-gth",
+      "name": "SEDIPRO GTH",
+      "category": "areas",
+      "tags": [
+        "logo",
+        "marca",
+        "horizontal",
+        "GTH"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/logo-gth-color.svg",
+          "pdf": "/recursos/marca/logo-gth-color.pdf",
+          "preview": "/recursos/vistas/logo-gth-color.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "claro",
+          "name": "Para fondos oscuros",
+          "src": "/recursos/marca/logo-gth-claro.svg",
+          "pdf": "/recursos/marca/logo-gth-claro.pdf",
+          "preview": "/recursos/vistas/logo-gth-claro.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "blanco",
+          "name": "Blanco",
+          "src": "/recursos/marca/logo-gth-blanco.svg",
+          "pdf": null,
+          "preview": "/recursos/vistas/logo-gth-blanco.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "negro",
+          "name": "Negro",
+          "src": "/recursos/marca/logo-gth-negro.svg",
+          "pdf": null,
+          "preview": "/recursos/vistas/logo-gth-negro.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "isotipo-gth",
+      "name": "Isotipo GTH",
+      "category": "isotipos",
+      "tags": [
+        "símbolo",
+        "isotipo",
+        "GTH"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/isotipo-gth-color.svg",
+          "pdf": "/recursos/marca/isotipo-gth-color.pdf",
+          "preview": "/recursos/vistas/isotipo-gth-color.webp",
+          "width": 823,
+          "height": 792,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "claro",
+          "name": "Para fondos oscuros",
+          "src": "/recursos/marca/isotipo-gth-claro.svg",
+          "pdf": "/recursos/marca/isotipo-gth-claro.pdf",
+          "preview": "/recursos/vistas/isotipo-gth-claro.webp",
+          "width": 823,
+          "height": 792,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "logo-mkt",
+      "name": "SEDIPRO MKT",
+      "category": "areas",
+      "tags": [
+        "logo",
+        "marca",
+        "horizontal",
+        "MKT"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/logo-mkt-color.svg",
+          "pdf": "/recursos/marca/logo-mkt-color.pdf",
+          "preview": "/recursos/vistas/logo-mkt-color.webp",
+          "width": 1233,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "claro",
+          "name": "Para fondos oscuros",
+          "src": "/recursos/marca/logo-mkt-claro.svg",
+          "pdf": "/recursos/marca/logo-mkt-claro.pdf",
+          "preview": "/recursos/vistas/logo-mkt-claro.webp",
+          "width": 1233,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "blanco",
+          "name": "Blanco",
+          "src": "/recursos/marca/logo-mkt-blanco.svg",
+          "pdf": null,
+          "preview": "/recursos/vistas/logo-mkt-blanco.webp",
+          "width": 1233,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "negro",
+          "name": "Negro",
+          "src": "/recursos/marca/logo-mkt-negro.svg",
+          "pdf": null,
+          "preview": "/recursos/vistas/logo-mkt-negro.webp",
+          "width": 1233,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "isotipo-mkt",
+      "name": "Isotipo MKT",
+      "category": "isotipos",
+      "tags": [
+        "símbolo",
+        "isotipo",
+        "MKT"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/isotipo-mkt-color.svg",
+          "pdf": "/recursos/marca/isotipo-mkt-color.pdf",
+          "preview": "/recursos/vistas/isotipo-mkt-color.webp",
+          "width": 823,
+          "height": 792,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "claro",
+          "name": "Para fondos oscuros",
+          "src": "/recursos/marca/isotipo-mkt-claro.svg",
+          "pdf": "/recursos/marca/isotipo-mkt-claro.pdf",
+          "preview": "/recursos/vistas/isotipo-mkt-claro.webp",
+          "width": 823,
+          "height": 792,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "logo-ltk-fnz",
+      "name": "SEDIPRO LTK y FNZ",
+      "category": "areas",
+      "tags": [
+        "logo",
+        "marca",
+        "horizontal",
+        "LTK y FNZ"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/logo-ltk-fnz-color.svg",
+          "pdf": "/recursos/marca/logo-ltk-fnz-color.pdf",
+          "preview": "/recursos/vistas/logo-ltk-fnz-color.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "claro",
+          "name": "Para fondos oscuros",
+          "src": "/recursos/marca/logo-ltk-fnz-claro.svg",
+          "pdf": "/recursos/marca/logo-ltk-fnz-claro.pdf",
+          "preview": "/recursos/vistas/logo-ltk-fnz-claro.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "blanco",
+          "name": "Blanco",
+          "src": "/recursos/marca/logo-ltk-fnz-blanco.svg",
+          "pdf": null,
+          "preview": "/recursos/vistas/logo-ltk-fnz-blanco.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "negro",
+          "name": "Negro",
+          "src": "/recursos/marca/logo-ltk-fnz-negro.svg",
+          "pdf": null,
+          "preview": "/recursos/vistas/logo-ltk-fnz-negro.webp",
+          "width": 1232,
+          "height": 478,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "isotipo-ltk-fnz",
+      "name": "Isotipo LTK y FNZ",
+      "category": "isotipos",
+      "tags": [
+        "símbolo",
+        "isotipo",
+        "LTK y FNZ"
+      ],
+      "variants": [
+        {
+          "id": "color",
+          "name": "Color institucional",
+          "src": "/recursos/marca/isotipo-ltk-fnz-color.svg",
+          "pdf": "/recursos/marca/isotipo-ltk-fnz-color.pdf",
+          "preview": "/recursos/vistas/isotipo-ltk-fnz-color.webp",
+          "width": 823,
+          "height": 792,
+          "kind": "vector",
+          "transparent": true,
+          "light": false,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        },
+        {
+          "id": "claro",
+          "name": "Para fondos oscuros",
+          "src": "/recursos/marca/isotipo-ltk-fnz-claro.svg",
+          "pdf": "/recursos/marca/isotipo-ltk-fnz-claro.pdf",
+          "preview": "/recursos/vistas/isotipo-ltk-fnz-claro.webp",
+          "width": 823,
+          "height": 792,
+          "kind": "vector",
+          "transparent": true,
+          "light": true,
+          "formats": [
+            "png",
+            "svg",
+            "pdf",
+            "webp",
+            "jpg"
+          ],
+          "quality": "Vectorial"
+        }
+      ]
+    },
+    {
+      "id": "hito-ejecutivo",
+      "name": "Hito · Ejecutivo",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Ejecutivo"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-ejecutivo.png",
+          "preview": "/recursos/vistas/hito-ejecutivo.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        },
+        {
+          "id": "mejorado",
+          "name": "Nitidez mejorada",
+          "src": "/recursos/mejorados/hito-ejecutivo-v1.png",
+          "preview": "/recursos/vistas/hito-ejecutivo-mejorado.webp",
+          "width": 1254,
+          "height": 1254,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Versión mejorada"
+        }
+      ]
+    },
+    {
+      "id": "hito-ejecutivo-2",
+      "name": "Hito · Ejecutivo · Variante",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Ejecutivo · Variante"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-ejecutivo-2.png",
+          "preview": "/recursos/vistas/hito-ejecutivo-2.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-lapiz",
+      "name": "Hito · Con lápiz",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Con lápiz"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-lapiz.png",
+          "preview": "/recursos/vistas/hito-lapiz.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-lateral",
+      "name": "Hito · De perfil",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "De perfil"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-lateral.png",
+          "preview": "/recursos/vistas/hito-lateral.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-mucha-duda",
+      "name": "Hito · Con dudas",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Con dudas"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-mucha-duda.png",
+          "preview": "/recursos/vistas/hito-mucha-duda.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-neutro-1",
+      "name": "Hito · Brazos abiertos",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Brazos abiertos"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-neutro-1.png",
+          "preview": "/recursos/vistas/hito-neutro-1.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-neutro-2",
+      "name": "Hito · Presentando",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Presentando"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-neutro-2.png",
+          "preview": "/recursos/vistas/hito-neutro-2.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-organizacion",
+      "name": "Hito · Organizando",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Organizando"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-organizacion.png",
+          "preview": "/recursos/vistas/hito-organizacion.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-pensando-1",
+      "name": "Hito · Pensando",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Pensando"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-pensando-1.png",
+          "preview": "/recursos/vistas/hito-pensando-1.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-pensando-2",
+      "name": "Hito · Pensando · Variante",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Pensando · Variante"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-pensando-2.png",
+          "preview": "/recursos/vistas/hito-pensando-2.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-pensativo",
+      "name": "Hito · Pensativo",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Pensativo"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-pensativo.png",
+          "preview": "/recursos/vistas/hito-pensativo.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-plantilla",
+      "name": "Hito · Brazos extendidos",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Brazos extendidos"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-plantilla.png",
+          "preview": "/recursos/vistas/hito-plantilla.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-regalo",
+      "name": "Hito · Con regalo",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Con regalo"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-regalo.png",
+          "preview": "/recursos/vistas/hito-regalo.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-saludando-2",
+      "name": "Hito · Saludando · Variante",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Saludando · Variante"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-saludando-2.png",
+          "preview": "/recursos/vistas/hito-saludando-2.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-saludando",
+      "name": "Hito · Saludando",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Saludando"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-saludando.png",
+          "preview": "/recursos/vistas/hito-saludando.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-celebracion",
+      "name": "Hito · Celebrando",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Celebrando"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-celebracion.png",
+          "preview": "/recursos/vistas/hito-celebracion.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-disculpa",
+      "name": "Hito · Pidiendo disculpas",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Pidiendo disculpas"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-disculpa.png",
+          "preview": "/recursos/vistas/hito-disculpa.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-disculpa2",
+      "name": "Hito · Pidiendo disculpas · Variante",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "Pidiendo disculpas · Variante"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-disculpa2.png",
+          "preview": "/recursos/vistas/hito-disculpa2.webp",
+          "width": 1080,
+          "height": 1080,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    },
+    {
+      "id": "hito-corriendo",
+      "name": "Hito · Corriendo",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "correr",
+        "sin fondo"
+      ],
+      "variants": [
+        {
+          "id": "sin-fondo",
+          "name": "Sin fondo",
+          "src": "/recursos/mejorados/hito-corriendo-sin-fondo-v1.png",
+          "preview": "/recursos/vistas/hito-corriendo-sin-fondo-v1.webp",
+          "width": 1402,
+          "height": 1122,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Recorte sin fondo"
+        }
+      ]
+    },
+    {
+      "id": "hito-bienvenida",
+      "name": "Hito · Bienvenida",
+      "category": "hito",
+      "tags": [
+        "mascota",
+        "saludar"
+      ],
+      "variants": [
+        {
+          "id": "original",
+          "name": "Original",
+          "src": "/recursos/originales/hito-bienvenida.webp",
+          "preview": "/recursos/vistas/hito-bienvenida.webp",
+          "width": 2236,
+          "height": 1619,
+          "kind": "raster",
+          "transparent": true,
+          "formats": [
+            "png",
+            "webp",
+            "jpg",
+            "original"
+          ],
+          "quality": "Original"
+        }
+      ]
+    }
+  ],
+  "sourceFile": "/recursos/fuentes/sedipro-identidad.ai"
+}

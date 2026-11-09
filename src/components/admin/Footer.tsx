@@ -27,7 +27,7 @@ const Footer = () => (
         <span className="sr-only md:not-sr-only">Documentación</span>
       </a>
       <a
-        href="https://drive.google.com/file/d/1qZdcgXCaIopkoSZVI2lcJFaIWFhOrapg/view?usp=sharing"
+        href="https://drive.google.com/file/d/14GowHbRK6WjusZVdOrtA7sFKvoN0HtVM/view?usp=sharing"
         target="_blank"
         rel="noopener noreferrer"
         className="hover:text-foreground focus-visible:ring-ring inline-flex size-11 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 md:size-auto"

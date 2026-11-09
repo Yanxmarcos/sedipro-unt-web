@@ -26,6 +26,8 @@ const Header = () => {
       : attendanceName;
   const title = attendanceId
     ? shortAttendanceName
+    : pathname === "/panel/recursos"
+      ? "Recursos institucionales"
     : pathname === "/panel" && permissions.role === "SEDIPRANO"
       ? "Resumen"
       : /^\/panel\/eventos\/[^/]+\/checkin$/.test(pathname)

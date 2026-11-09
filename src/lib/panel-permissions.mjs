@@ -23,6 +23,7 @@ export function panelPermissions(user) {
     canViewEventAudit: isSuperadmin,
     canViewAttendanceAudit: isSuperadmin,
     canViewCertificateAudit: isSuperadmin,
+    canViewResourceAudit: isSuperadmin,
     canManageLinks: Boolean(ROLE_LABELS[role]),
     canViewLinkAudit: isAdmin,
     canPermanentlyDeleteLinks: isSuperadmin,
@@ -46,6 +47,11 @@ export function assignableRoles(user) {
 
 export function canOpenPanelPage(pathname, user, assignments = []) {
   if (
+    pathname === "/panel/recursos/auditoria" ||
+    pathname.startsWith("/panel/recursos/auditoria/")
+  )
+    return panelPermissions(user).canViewResourceAudit;
+  if (
     pathname === "/panel/certificados/auditoria" ||
     pathname.startsWith("/panel/certificados/auditoria/")
   )
@@ -63,6 +69,8 @@ export function canOpenPanelPage(pathname, user, assignments = []) {
   if (pathname === "/panel/enlaces" || pathname.startsWith("/panel/enlaces/"))
     return panelPermissions(user).canManageLinks;
   if (pathname === "/panel") return true;
+  if (pathname === "/panel/recursos")
+    return Boolean(ROLE_LABELS[normalizeRole(user?.rol)]);
   if (pathname === "/panel/versiones")
     return Boolean(ROLE_LABELS[normalizeRole(user?.rol)]);
   if (pathname === "/panel/perfil" || pathname === "/panel/cambiar-contrasena")

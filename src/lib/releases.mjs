@@ -7,6 +7,16 @@ export { CURRENT_VERSION };
 export const RELEASES = [
   {
     version: CURRENT_VERSION,
+    changes: [
+      "Se incorporó Recursos institucionales en Herramientas para que todos los roles encuentren y descarguen la marca de SEDIPRO UNT, sus isotipos, logos de áreas, insignias y poses de Hito.",
+      "Se añadió una galería con buscador y categorías, previsualización en fondos claros y oscuros, selección de variantes y fondo de descarga personalizado.",
+      "Se habilitaron descargas PNG, WebP y JPG, archivos SVG y PDF cuando el recurso es vectorial, kits de variantes y la fuente original de Illustrator.",
+      "Se prepararon insignias de áreas a 4096 píxeles y se corrigió el fondo de Hito corriendo, conservando las fuentes originales y la identidad de la marca.",
+      "Se añadió la opción de copiar imágenes PNG en alta resolución desde la galería y el detalle para pegarlas en Canva, conservando las opciones de descarga.",
+    ],
+  },
+  {
+    version: "2.4.0",
     title: "QR personalizados y novedades del sistema",
     phase: "Herramientas y experiencia de uso",
     changes: [
@@ -29,8 +39,6 @@ export const RELEASES = [
       "Se añadieron gráficos de distribución de sedipranos por carrera y sexo, con selección por área.",
       "Se creó un resumen para el rol Sediprano con saludo personalizado, área, accesos y actividades disponibles.",
       "Se incorporó la actividad reciente de los módulos para seguir el trabajo institucional según los permisos de cada cuenta.",
-      "Se añadieron auditorías para la configuración de asistencias y el uso del generador de certificados, con acceso restringido.",
-      "Se incorporaron opciones para limpiar registros de auditoría y conservar los contadores de uso de certificados.",
       "Se reorganizaron los indicadores del padrón para distinguir integrantes activos, inactivos y total registrado.",
     ],
   },
@@ -44,7 +52,7 @@ export const RELEASES = [
       "Se incorporó una biblioteca compartida con título interno, campaña opcional, notas y búsqueda de enlaces.",
       "Se añadieron estados de activación y pausa, vencimiento opcional, papelera y recuperación de enlaces.",
       "Se habilitó la redirección directa al destino y se reutilizó la página 404 institucional para enlaces no disponibles.",
-      "Se incorporó el contador de clics y un historial de movimientos para la administración del módulo.",
+      "Se incorporó el contador de clics de los enlaces acortados.",
       "Se añadió la eliminación definitiva con permisos restringidos y protección frente a la reutilización de códigos retirados.",
     ],
   },

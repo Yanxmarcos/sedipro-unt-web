@@ -7,7 +7,8 @@
     "/proyectos",
     "/nosotros",
     "/login",
-    "/panel/certificados"
+    "/panel/certificados",
+    "/panel/recursos"
   ],
   "pathBase": "frontend/",
   "statement": "Original raster assets retained; user-supplied local JPG copied unchanged. HOME preserves institutional cover and ScrollStory before the added ProjectJourney photo/video collage. CSS windows, transforms and masks preserve source image pixels.",
@@ -368,6 +369,960 @@
       "height": 1414,
       "currentUsage": "Downloadable design reference in /panel/certificados. The working background must be uploaded explicitly; it is not selected automatically.",
       "originalLicensing": "Not asserted; user-supplied institutional reference."
+    },
+    {
+      "path": "public/recursos/marca/logo-unt-color.svg",
+      "publicUrl": "/recursos/marca/logo-unt-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 1; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-unt-color.pdf",
+      "publicUrl": "/recursos/marca/logo-unt-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 1; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-unt-color.webp",
+      "publicUrl": "/recursos/vistas/logo-unt-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-unt-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-unt-blanco.svg",
+      "publicUrl": "/recursos/marca/logo-unt-blanco.svg",
+      "role": "institutional-resource",
+      "provenance": "SEDIPRO LOGO.ai, original logo-unt-color paths; approved monochrome variant #ffffff; geometry unchanged"
+    },
+    {
+      "path": "public/recursos/vistas/logo-unt-blanco.webp",
+      "publicUrl": "/recursos/vistas/logo-unt-blanco.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-unt-blanco.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-unt-negro.svg",
+      "publicUrl": "/recursos/marca/logo-unt-negro.svg",
+      "role": "institutional-resource",
+      "provenance": "SEDIPRO LOGO.ai, original logo-unt-color paths; approved monochrome variant #111111; geometry unchanged"
+    },
+    {
+      "path": "public/recursos/vistas/logo-unt-negro.webp",
+      "publicUrl": "/recursos/vistas/logo-unt-negro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-unt-negro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-unt-color.svg",
+      "publicUrl": "/recursos/marca/isotipo-unt-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 23; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-unt-color.pdf",
+      "publicUrl": "/recursos/marca/isotipo-unt-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 23; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/isotipo-unt-color.webp",
+      "publicUrl": "/recursos/vistas/isotipo-unt-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/isotipo-unt-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-unt-claro.svg",
+      "publicUrl": "/recursos/marca/isotipo-unt-claro.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 35; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-unt-claro.pdf",
+      "publicUrl": "/recursos/marca/isotipo-unt-claro.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 35; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/isotipo-unt-claro.webp",
+      "publicUrl": "/recursos/vistas/isotipo-unt-claro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/isotipo-unt-claro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-ti-color.svg",
+      "publicUrl": "/recursos/marca/logo-ti-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 6; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-ti-color.pdf",
+      "publicUrl": "/recursos/marca/logo-ti-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 6; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-ti-color.webp",
+      "publicUrl": "/recursos/vistas/logo-ti-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-ti-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-ti-claro.svg",
+      "publicUrl": "/recursos/marca/logo-ti-claro.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 34; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-ti-claro.pdf",
+      "publicUrl": "/recursos/marca/logo-ti-claro.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 34; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-ti-claro.webp",
+      "publicUrl": "/recursos/vistas/logo-ti-claro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-ti-claro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-ti-blanco.svg",
+      "publicUrl": "/recursos/marca/logo-ti-blanco.svg",
+      "role": "institutional-resource",
+      "provenance": "SEDIPRO LOGO.ai, original logo-ti-color paths; approved monochrome variant #ffffff; geometry unchanged"
+    },
+    {
+      "path": "public/recursos/vistas/logo-ti-blanco.webp",
+      "publicUrl": "/recursos/vistas/logo-ti-blanco.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-ti-blanco.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-ti-negro.svg",
+      "publicUrl": "/recursos/marca/logo-ti-negro.svg",
+      "role": "institutional-resource",
+      "provenance": "SEDIPRO LOGO.ai, original logo-ti-color paths; approved monochrome variant #111111; geometry unchanged"
+    },
+    {
+      "path": "public/recursos/vistas/logo-ti-negro.webp",
+      "publicUrl": "/recursos/vistas/logo-ti-negro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-ti-negro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-ti-color.svg",
+      "publicUrl": "/recursos/marca/isotipo-ti-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 28; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-ti-color.pdf",
+      "publicUrl": "/recursos/marca/isotipo-ti-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 28; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/isotipo-ti-color.webp",
+      "publicUrl": "/recursos/vistas/isotipo-ti-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/isotipo-ti-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-ti-claro.svg",
+      "publicUrl": "/recursos/marca/isotipo-ti-claro.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 40; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-ti-claro.pdf",
+      "publicUrl": "/recursos/marca/isotipo-ti-claro.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 40; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/isotipo-ti-claro.webp",
+      "publicUrl": "/recursos/vistas/isotipo-ti-claro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/isotipo-ti-claro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-pmo-color.svg",
+      "publicUrl": "/recursos/marca/logo-pmo-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 5; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-pmo-color.pdf",
+      "publicUrl": "/recursos/marca/logo-pmo-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 5; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-pmo-color.webp",
+      "publicUrl": "/recursos/vistas/logo-pmo-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-pmo-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-pmo-claro.svg",
+      "publicUrl": "/recursos/marca/logo-pmo-claro.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 33; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-pmo-claro.pdf",
+      "publicUrl": "/recursos/marca/logo-pmo-claro.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 33; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-pmo-claro.webp",
+      "publicUrl": "/recursos/vistas/logo-pmo-claro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-pmo-claro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-pmo-blanco.svg",
+      "publicUrl": "/recursos/marca/logo-pmo-blanco.svg",
+      "role": "institutional-resource",
+      "provenance": "SEDIPRO LOGO.ai, original logo-pmo-color paths; approved monochrome variant #ffffff; geometry unchanged"
+    },
+    {
+      "path": "public/recursos/vistas/logo-pmo-blanco.webp",
+      "publicUrl": "/recursos/vistas/logo-pmo-blanco.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-pmo-blanco.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-pmo-negro.svg",
+      "publicUrl": "/recursos/marca/logo-pmo-negro.svg",
+      "role": "institutional-resource",
+      "provenance": "SEDIPRO LOGO.ai, original logo-pmo-color paths; approved monochrome variant #111111; geometry unchanged"
+    },
+    {
+      "path": "public/recursos/vistas/logo-pmo-negro.webp",
+      "publicUrl": "/recursos/vistas/logo-pmo-negro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-pmo-negro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-pmo-color.svg",
+      "publicUrl": "/recursos/marca/isotipo-pmo-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 27; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-pmo-color.pdf",
+      "publicUrl": "/recursos/marca/isotipo-pmo-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 27; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/isotipo-pmo-color.webp",
+      "publicUrl": "/recursos/vistas/isotipo-pmo-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/isotipo-pmo-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-pmo-claro.svg",
+      "publicUrl": "/recursos/marca/isotipo-pmo-claro.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 39; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-pmo-claro.pdf",
+      "publicUrl": "/recursos/marca/isotipo-pmo-claro.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 39; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/isotipo-pmo-claro.webp",
+      "publicUrl": "/recursos/vistas/isotipo-pmo-claro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/isotipo-pmo-claro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-gth-color.svg",
+      "publicUrl": "/recursos/marca/logo-gth-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 4; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-gth-color.pdf",
+      "publicUrl": "/recursos/marca/logo-gth-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 4; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-gth-color.webp",
+      "publicUrl": "/recursos/vistas/logo-gth-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-gth-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-gth-claro.svg",
+      "publicUrl": "/recursos/marca/logo-gth-claro.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 32; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-gth-claro.pdf",
+      "publicUrl": "/recursos/marca/logo-gth-claro.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 32; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-gth-claro.webp",
+      "publicUrl": "/recursos/vistas/logo-gth-claro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-gth-claro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-gth-blanco.svg",
+      "publicUrl": "/recursos/marca/logo-gth-blanco.svg",
+      "role": "institutional-resource",
+      "provenance": "SEDIPRO LOGO.ai, original logo-gth-color paths; approved monochrome variant #ffffff; geometry unchanged"
+    },
+    {
+      "path": "public/recursos/vistas/logo-gth-blanco.webp",
+      "publicUrl": "/recursos/vistas/logo-gth-blanco.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-gth-blanco.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-gth-negro.svg",
+      "publicUrl": "/recursos/marca/logo-gth-negro.svg",
+      "role": "institutional-resource",
+      "provenance": "SEDIPRO LOGO.ai, original logo-gth-color paths; approved monochrome variant #111111; geometry unchanged"
+    },
+    {
+      "path": "public/recursos/vistas/logo-gth-negro.webp",
+      "publicUrl": "/recursos/vistas/logo-gth-negro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-gth-negro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-gth-color.svg",
+      "publicUrl": "/recursos/marca/isotipo-gth-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 26; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-gth-color.pdf",
+      "publicUrl": "/recursos/marca/isotipo-gth-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 26; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/isotipo-gth-color.webp",
+      "publicUrl": "/recursos/vistas/isotipo-gth-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/isotipo-gth-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-gth-claro.svg",
+      "publicUrl": "/recursos/marca/isotipo-gth-claro.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 38; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-gth-claro.pdf",
+      "publicUrl": "/recursos/marca/isotipo-gth-claro.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 38; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/isotipo-gth-claro.webp",
+      "publicUrl": "/recursos/vistas/isotipo-gth-claro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/isotipo-gth-claro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-mkt-color.svg",
+      "publicUrl": "/recursos/marca/logo-mkt-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 2; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-mkt-color.pdf",
+      "publicUrl": "/recursos/marca/logo-mkt-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 2; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-mkt-color.webp",
+      "publicUrl": "/recursos/vistas/logo-mkt-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-mkt-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-mkt-claro.svg",
+      "publicUrl": "/recursos/marca/logo-mkt-claro.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 30; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-mkt-claro.pdf",
+      "publicUrl": "/recursos/marca/logo-mkt-claro.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 30; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-mkt-claro.webp",
+      "publicUrl": "/recursos/vistas/logo-mkt-claro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-mkt-claro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-mkt-blanco.svg",
+      "publicUrl": "/recursos/marca/logo-mkt-blanco.svg",
+      "role": "institutional-resource",
+      "provenance": "SEDIPRO LOGO.ai, original logo-mkt-color paths; approved monochrome variant #ffffff; geometry unchanged"
+    },
+    {
+      "path": "public/recursos/vistas/logo-mkt-blanco.webp",
+      "publicUrl": "/recursos/vistas/logo-mkt-blanco.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-mkt-blanco.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-mkt-negro.svg",
+      "publicUrl": "/recursos/marca/logo-mkt-negro.svg",
+      "role": "institutional-resource",
+      "provenance": "SEDIPRO LOGO.ai, original logo-mkt-color paths; approved monochrome variant #111111; geometry unchanged"
+    },
+    {
+      "path": "public/recursos/vistas/logo-mkt-negro.webp",
+      "publicUrl": "/recursos/vistas/logo-mkt-negro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-mkt-negro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-mkt-color.svg",
+      "publicUrl": "/recursos/marca/isotipo-mkt-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 24; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-mkt-color.pdf",
+      "publicUrl": "/recursos/marca/isotipo-mkt-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 24; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/isotipo-mkt-color.webp",
+      "publicUrl": "/recursos/vistas/isotipo-mkt-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/isotipo-mkt-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-mkt-claro.svg",
+      "publicUrl": "/recursos/marca/isotipo-mkt-claro.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 36; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-mkt-claro.pdf",
+      "publicUrl": "/recursos/marca/isotipo-mkt-claro.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 36; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/isotipo-mkt-claro.webp",
+      "publicUrl": "/recursos/vistas/isotipo-mkt-claro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/isotipo-mkt-claro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-ltk-fnz-color.svg",
+      "publicUrl": "/recursos/marca/logo-ltk-fnz-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 3; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-ltk-fnz-color.pdf",
+      "publicUrl": "/recursos/marca/logo-ltk-fnz-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 3; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-ltk-fnz-color.webp",
+      "publicUrl": "/recursos/vistas/logo-ltk-fnz-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-ltk-fnz-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-ltk-fnz-claro.svg",
+      "publicUrl": "/recursos/marca/logo-ltk-fnz-claro.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 31; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-ltk-fnz-claro.pdf",
+      "publicUrl": "/recursos/marca/logo-ltk-fnz-claro.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 31; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-ltk-fnz-claro.webp",
+      "publicUrl": "/recursos/vistas/logo-ltk-fnz-claro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-ltk-fnz-claro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-ltk-fnz-blanco.svg",
+      "publicUrl": "/recursos/marca/logo-ltk-fnz-blanco.svg",
+      "role": "institutional-resource",
+      "provenance": "SEDIPRO LOGO.ai, original logo-ltk-fnz-color paths; approved monochrome variant #ffffff; geometry unchanged"
+    },
+    {
+      "path": "public/recursos/vistas/logo-ltk-fnz-blanco.webp",
+      "publicUrl": "/recursos/vistas/logo-ltk-fnz-blanco.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-ltk-fnz-blanco.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-ltk-fnz-negro.svg",
+      "publicUrl": "/recursos/marca/logo-ltk-fnz-negro.svg",
+      "role": "institutional-resource",
+      "provenance": "SEDIPRO LOGO.ai, original logo-ltk-fnz-color paths; approved monochrome variant #111111; geometry unchanged"
+    },
+    {
+      "path": "public/recursos/vistas/logo-ltk-fnz-negro.webp",
+      "publicUrl": "/recursos/vistas/logo-ltk-fnz-negro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-ltk-fnz-negro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-ltk-fnz-color.svg",
+      "publicUrl": "/recursos/marca/isotipo-ltk-fnz-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 25; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-ltk-fnz-color.pdf",
+      "publicUrl": "/recursos/marca/isotipo-ltk-fnz-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 25; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/isotipo-ltk-fnz-color.webp",
+      "publicUrl": "/recursos/vistas/isotipo-ltk-fnz-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/isotipo-ltk-fnz-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-ltk-fnz-claro.svg",
+      "publicUrl": "/recursos/marca/isotipo-ltk-fnz-claro.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 37; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/isotipo-ltk-fnz-claro.pdf",
+      "publicUrl": "/recursos/marca/isotipo-ltk-fnz-claro.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 37; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/isotipo-ltk-fnz-claro.webp",
+      "publicUrl": "/recursos/vistas/isotipo-ltk-fnz-claro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/isotipo-ltk-fnz-claro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-unt-vertical-color.svg",
+      "publicUrl": "/recursos/marca/logo-unt-vertical-color.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 19; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-unt-vertical-color.pdf",
+      "publicUrl": "/recursos/marca/logo-unt-vertical-color.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 19; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-unt-vertical-color.webp",
+      "publicUrl": "/recursos/vistas/logo-unt-vertical-color.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-unt-vertical-color.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/marca/logo-unt-vertical-claro.svg",
+      "publicUrl": "/recursos/marca/logo-unt-vertical-claro.svg",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 20; original vector paths and colors extracted"
+    },
+    {
+      "path": "public/recursos/marca/logo-unt-vertical-claro.pdf",
+      "publicUrl": "/recursos/marca/logo-unt-vertical-claro.pdf",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai, artboard 20; original vector PDF page, cropped to artwork"
+    },
+    {
+      "path": "public/recursos/vistas/logo-unt-vertical-claro.webp",
+      "publicUrl": "/recursos/vistas/logo-unt-vertical-claro.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/marca/logo-unt-vertical-claro.svg; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-ejecutivo.png",
+      "publicUrl": "/recursos/originales/hito-ejecutivo.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - Ejecutivo.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-ejecutivo.webp",
+      "publicUrl": "/recursos/vistas/hito-ejecutivo.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-ejecutivo.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-ejecutivo-2.png",
+      "publicUrl": "/recursos/originales/hito-ejecutivo-2.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - Ejecutivo 2.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-ejecutivo-2.webp",
+      "publicUrl": "/recursos/vistas/hito-ejecutivo-2.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-ejecutivo-2.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-lapiz.png",
+      "publicUrl": "/recursos/originales/hito-lapiz.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - lapiz.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-lapiz.webp",
+      "publicUrl": "/recursos/vistas/hito-lapiz.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-lapiz.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-lateral.png",
+      "publicUrl": "/recursos/originales/hito-lateral.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - Lateral.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-lateral.webp",
+      "publicUrl": "/recursos/vistas/hito-lateral.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-lateral.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-mucha-duda.png",
+      "publicUrl": "/recursos/originales/hito-mucha-duda.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - MUCHA DUDA.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-mucha-duda.webp",
+      "publicUrl": "/recursos/vistas/hito-mucha-duda.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-mucha-duda.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-neutro-1.png",
+      "publicUrl": "/recursos/originales/hito-neutro-1.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - NEUTRO_1.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-neutro-1.webp",
+      "publicUrl": "/recursos/vistas/hito-neutro-1.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-neutro-1.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-neutro-2.png",
+      "publicUrl": "/recursos/originales/hito-neutro-2.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - NEUTRO_2.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-neutro-2.webp",
+      "publicUrl": "/recursos/vistas/hito-neutro-2.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-neutro-2.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-organizacion.png",
+      "publicUrl": "/recursos/originales/hito-organizacion.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - Organización.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-organizacion.webp",
+      "publicUrl": "/recursos/vistas/hito-organizacion.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-organizacion.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-pensando-1.png",
+      "publicUrl": "/recursos/originales/hito-pensando-1.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - pensando 1.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-pensando-1.webp",
+      "publicUrl": "/recursos/vistas/hito-pensando-1.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-pensando-1.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-pensando-2.png",
+      "publicUrl": "/recursos/originales/hito-pensando-2.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - pensando 2.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-pensando-2.webp",
+      "publicUrl": "/recursos/vistas/hito-pensando-2.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-pensando-2.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-pensativo.png",
+      "publicUrl": "/recursos/originales/hito-pensativo.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - Pensativo.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-pensativo.webp",
+      "publicUrl": "/recursos/vistas/hito-pensativo.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-pensativo.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-plantilla.png",
+      "publicUrl": "/recursos/originales/hito-plantilla.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - Plantilla.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-plantilla.webp",
+      "publicUrl": "/recursos/vistas/hito-plantilla.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-plantilla.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-regalo.png",
+      "publicUrl": "/recursos/originales/hito-regalo.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - Regalo.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-regalo.webp",
+      "publicUrl": "/recursos/vistas/hito-regalo.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-regalo.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-saludando-2.png",
+      "publicUrl": "/recursos/originales/hito-saludando-2.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - Saludando 2.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-saludando-2.webp",
+      "publicUrl": "/recursos/vistas/hito-saludando-2.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-saludando-2.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-saludando.png",
+      "publicUrl": "/recursos/originales/hito-saludando.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - Saludando.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-saludando.webp",
+      "publicUrl": "/recursos/vistas/hito-saludando.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-saludando.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-celebracion.png",
+      "publicUrl": "/recursos/originales/hito-celebracion.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - celebracion.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-celebracion.webp",
+      "publicUrl": "/recursos/vistas/hito-celebracion.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-celebracion.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-disculpa.png",
+      "publicUrl": "/recursos/originales/hito-disculpa.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - Disculpa.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-disculpa.webp",
+      "publicUrl": "/recursos/vistas/hito-disculpa.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-disculpa.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-disculpa2.png",
+      "publicUrl": "/recursos/originales/hito-disculpa2.png",
+      "role": "institutional-resource",
+      "provenance": "HITO EL BUHO/HITO - Disculpa2.png; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-disculpa2.webp",
+      "publicUrl": "/recursos/vistas/hito-disculpa2.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-disculpa2.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-corriendo.png",
+      "publicUrl": "/recursos/originales/hito-corriendo.png",
+      "role": "institutional-resource",
+      "provenance": "User-supplied Hito-corriendo.png; Opaque original preserved unchanged as source archive; not displayed in catalogue"
+    },
+    {
+      "path": "public/recursos/mejorados/hito-corriendo-sin-fondo-v1.png",
+      "publicUrl": "/recursos/mejorados/hito-corriendo-sin-fondo-v1.png",
+      "role": "institutional-resource",
+      "provenance": "User-supplied Hito-corriendo.png; built-in image edit; Black background removed with real alpha; identity/pose/color constraints and exact prompt in scripts/resources/hito-corriendo-recorte.json"
+    },
+    {
+      "path": "public/recursos/vistas/hito-corriendo-sin-fondo-v1.webp",
+      "publicUrl": "/recursos/vistas/hito-corriendo-sin-fondo-v1.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/mejorados/hito-corriendo-sin-fondo-v1.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/hito-bienvenida.webp",
+      "publicUrl": "/recursos/originales/hito-bienvenida.webp",
+      "role": "institutional-resource",
+      "provenance": "sitio-web-oficial/frontend/public/img/buho.webp; original file copied without modification"
+    },
+    {
+      "path": "public/recursos/vistas/hito-bienvenida.webp",
+      "publicUrl": "/recursos/vistas/hito-bienvenida.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/hito-bienvenida.webp; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/insignia-gth.webp",
+      "publicUrl": "/recursos/originales/insignia-gth.webp",
+      "role": "institutional-resource",
+      "provenance": "codex-clipboard-aa36ec09-0f73-42a1-aaad-05fa4769fde7.png; restoration prompts in scripts/resources/insignias/procedencia.json; official logo-unt-blanco.svg; Restored raster 1254x1254, transparent plate; prepared at4096x4096 with official white SEDIPRO UNT vector footer, unchanged vector geometry. Not native4K photography."
+    },
+    {
+      "path": "public/recursos/vistas/insignia-gth-detalle.webp",
+      "publicUrl": "/recursos/vistas/insignia-gth-detalle.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/insignia-gth.webp; 1024px detail preview encoding; full4K source used for downloads"
+    },
+    {
+      "path": "public/recursos/vistas/insignia-gth.webp",
+      "publicUrl": "/recursos/vistas/insignia-gth.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/insignia-gth.webp; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/insignia-pmo.webp",
+      "publicUrl": "/recursos/originales/insignia-pmo.webp",
+      "role": "institutional-resource",
+      "provenance": "codex-clipboard-627a4b77-cb9d-4f74-a1db-8134f816a57d.png; restoration prompts in scripts/resources/insignias/procedencia.json; official logo-unt-blanco.svg; Restored raster 1254x1254, transparent plate; prepared at4096x4096 with official white SEDIPRO UNT vector footer, unchanged vector geometry. Not native4K photography."
+    },
+    {
+      "path": "public/recursos/vistas/insignia-pmo-detalle.webp",
+      "publicUrl": "/recursos/vistas/insignia-pmo-detalle.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/insignia-pmo.webp; 1024px detail preview encoding; full4K source used for downloads"
+    },
+    {
+      "path": "public/recursos/vistas/insignia-pmo.webp",
+      "publicUrl": "/recursos/vistas/insignia-pmo.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/insignia-pmo.webp; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/insignia-ti.webp",
+      "publicUrl": "/recursos/originales/insignia-ti.webp",
+      "role": "institutional-resource",
+      "provenance": "codex-clipboard-c2d3a17b-8e39-4dff-a2d5-5bc6c7e68ffc.png; restoration prompts in scripts/resources/insignias/procedencia.json; official logo-unt-blanco.svg; Restored raster 1254x1254, transparent plate; prepared at4096x4096 with official white SEDIPRO UNT vector footer, unchanged vector geometry. Not native4K photography."
+    },
+    {
+      "path": "public/recursos/vistas/insignia-ti-detalle.webp",
+      "publicUrl": "/recursos/vistas/insignia-ti-detalle.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/insignia-ti.webp; 1024px detail preview encoding; full4K source used for downloads"
+    },
+    {
+      "path": "public/recursos/vistas/insignia-ti.webp",
+      "publicUrl": "/recursos/vistas/insignia-ti.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/insignia-ti.webp; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/insignia-mkt.webp",
+      "publicUrl": "/recursos/originales/insignia-mkt.webp",
+      "role": "institutional-resource",
+      "provenance": "codex-clipboard-b71126a3-4f97-4e47-b956-4c3c39ac200a.png; restoration prompts in scripts/resources/insignias/procedencia.json; official logo-unt-blanco.svg; Restored raster 1254x1254, transparent plate; prepared at4096x4096 with official white SEDIPRO UNT vector footer, unchanged vector geometry. Not native4K photography."
+    },
+    {
+      "path": "public/recursos/vistas/insignia-mkt-detalle.webp",
+      "publicUrl": "/recursos/vistas/insignia-mkt-detalle.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/insignia-mkt.webp; 1024px detail preview encoding; full4K source used for downloads"
+    },
+    {
+      "path": "public/recursos/vistas/insignia-mkt.webp",
+      "publicUrl": "/recursos/vistas/insignia-mkt.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/insignia-mkt.webp; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/originales/insignia-ltk-fnz.webp",
+      "publicUrl": "/recursos/originales/insignia-ltk-fnz.webp",
+      "role": "institutional-resource",
+      "provenance": "codex-clipboard-7f265083-8e99-4633-b346-8dda56f30e57.png; restoration prompts in scripts/resources/insignias/procedencia.json; official logo-unt-blanco.svg; Restored raster 1254x1254, transparent plate; prepared at4096x4096 with official white SEDIPRO UNT vector footer, unchanged vector geometry. Not native4K photography."
+    },
+    {
+      "path": "public/recursos/vistas/insignia-ltk-fnz-detalle.webp",
+      "publicUrl": "/recursos/vistas/insignia-ltk-fnz-detalle.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/insignia-ltk-fnz.webp; 1024px detail preview encoding; full4K source used for downloads"
+    },
+    {
+      "path": "public/recursos/vistas/insignia-ltk-fnz.webp",
+      "publicUrl": "/recursos/vistas/insignia-ltk-fnz.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/originales/insignia-ltk-fnz.webp; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/vistas/hito-ejecutivo-mejorado.webp",
+      "publicUrl": "/recursos/vistas/hito-ejecutivo-mejorado.webp",
+      "role": "institutional-resource",
+      "provenance": "public/recursos/mejorados/hito-ejecutivo-v1.png; gallery preview encoding; no retouching"
+    },
+    {
+      "path": "public/recursos/mejorados/hito-ejecutivo-v1.png",
+      "publicUrl": "/recursos/mejorados/hito-ejecutivo-v1.png",
+      "role": "institutional-resource",
+      "provenance": "User-supplied HITO - Ejecutivo.png; built-in image editing; accepted sample 2026-11-08; Faithful restoration derivative; original retained. Prompt and identity rules: scripts/resources/HITO-CURACION.md"
+    },
+    {
+      "path": "public/recursos/fuentes/sedipro-identidad.ai",
+      "publicUrl": "/recursos/fuentes/sedipro-identidad.ai",
+      "role": "institutional-resource",
+      "provenance": "User-supplied SEDIPRO LOGO.ai; original Illustrator source copied unchanged"
+    },
+    {
+      "path": "public/logos/canva.svg",
+      "publicUrl": "/logos/canva.svg",
+      "role": "clipboard-action-brand-icon",
+      "provenance": "User-supplied canva.svg; copied unchanged for Canva clipboard action; no script or external content"
     }
   ],
   "instagramRecognitions": [
@@ -428,7 +1383,8 @@
   "preservedNonRaster": [
     "public/favicon.svg",
     "public/img/hito-pet/hito.json",
-    "src/assets/svg/logo.tsx"
+    "src/assets/svg/logo.tsx",
+    "public/logos/canva.svg"
   ],
   "nonRasterNote": "Listed separately for context; raster provenance status does not assert their original creation or licensing.",
   "collageNonRaster": {

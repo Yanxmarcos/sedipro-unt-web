@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { mkdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { CURRENT_VERSION } from "../../src/lib/app-version.mjs";
 const id = "1234567890abcdef12345678";
 const summary = {
   perfil: { nombres: "ANA MARÍA", area: "PMO" },
@@ -2939,12 +2940,12 @@ test("panel release history is accessible to every role through the version foot
     });
     await expect(manual).toHaveAttribute(
       "href",
-      "https://drive.google.com/file/d/1qZdcgXCaIopkoSZVI2lcJFaIWFhOrapg/view?usp=sharing",
+      "https://drive.google.com/file/d/14GowHbRK6WjusZVdOrtA7sFKvoN0HtVM/view?usp=sharing",
     );
     await expect(manual).toHaveAttribute("target", "_blank");
     await expect(manual).toHaveAttribute("rel", "noopener noreferrer");
     const version = footer.getByRole("link", {
-      name: "Versión 2.4.0",
+      name: `Versión ${CURRENT_VERSION}`,
       exact: true,
     });
     await version.scrollIntoViewIfNeeded();
@@ -2959,7 +2960,7 @@ test("panel release history is accessible to every role through the version foot
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: "Versión 2.4.0 · Sistema web de SEDIPRO UNT",
+        name: `Versión ${CURRENT_VERSION} · Sistema web de SEDIPRO UNT`,
         exact: true,
       }),
     ).toBeVisible();
@@ -2982,7 +2983,7 @@ test("panel release history is accessible to every role through the version foot
     await expect(
       page
         .locator("footer")
-        .getByRole("link", { name: "Versión 2.4.0", exact: true }),
+        .getByRole("link", { name: `Versión ${CURRENT_VERSION}`, exact: true }),
     ).toHaveAttribute("href", "/panel/versiones");
   }
 });
@@ -3005,7 +3006,7 @@ test("panel release footer keeps four mobile icons and a responsive readable his
       await expect(
         page.getByRole("heading", {
           level: 1,
-          name: "Versión 2.4.0 · Sistema web de SEDIPRO UNT",
+          name: `Versión ${CURRENT_VERSION} · Sistema web de SEDIPRO UNT`,
           exact: true,
         }),
       ).toBeVisible();
@@ -3036,7 +3037,7 @@ test("panel release footer keeps four mobile icons and a responsive readable his
         "Documentación",
         "Manual de Usuario",
         "Reportar",
-        "Versión 2.4.0",
+        `Versión ${CURRENT_VERSION}`,
       ]) {
         const link = footer.getByRole("link", { name, exact: true });
         await expect(link).toBeVisible();

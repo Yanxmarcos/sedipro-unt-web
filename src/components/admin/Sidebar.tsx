@@ -691,7 +691,7 @@ const SidebarLayout = () => {
             },
             {
               groupLabel: "HERRAMIENTAS",
-              items: navItems.flatMap((group) => group.items).filter((item) => item.href === "/panel/certificados" || item.href === "/panel/enlaces"),
+              items: navItems.flatMap((group) => group.items).filter((item) => item.href === "/panel/certificados" || item.href === "/panel/enlaces" || item.href === "/panel/recursos"),
             },
           ]
         : [];
