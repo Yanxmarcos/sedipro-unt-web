@@ -1,0 +1,13 @@
+.preview {
+  isolation: isolate;
+}
+.checker {
+  background-color: #f4f4f5;
+  background-image: conic-gradient(
+    #e4e4e7 25%,
+    transparent 0 50%,
+    #e4e4e7 0 75%,
+    transparent 0
+  );
+  background-size: 20px 20px;
+}

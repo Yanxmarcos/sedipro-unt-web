@@ -17,6 +17,7 @@
 !/tests/enlaces/
 !/tests/public-scroll/
 !/tests/member-summary/
+!/tests/recursos/
 /playwright.config.mjs
 /test-results/
 /playwright-report/
@@ -58,3 +59,4 @@ next-env.d.ts
 !/scripts/audit-seo.mjs
 !/scripts/generate-hito.mjs
 !/scripts/hito-source/
+!/scripts/resources/

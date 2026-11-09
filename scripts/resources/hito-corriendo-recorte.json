@@ -1,0 +1,8 @@
+{
+  "date": "2026-11-08",
+  "source": "User-supplied Hito-corriendo.png",
+  "output": "public/recursos/mejorados/hito-corriendo-sin-fondo-v1.png",
+  "tool": "built-in image editing",
+  "operation": "Remove black background only; preserve official mascot identity, pose and colors; original archived unchanged",
+  "prompt": "EDIT ONLY THE BACKGROUND of the supplied official SEDIPRO UNT Hito running image. Remove the black rectangular background and replace it with genuine alpha transparency, including empty gaps between the legs, tail, wings and body. The owl mascot itself is the protected original artwork: preserve its exact running pose, silhouette, facial features, head angle, large purple irises and black pupils/highlights, white eye patches, yellow beak and open mouth, purple feathers and tail, blue polo and its small existing white SEDIPRO chest mark, yellow feet and black claws. Preserve the exact original colors, proportions, expression, orientation and original visual style. DO NOT redraw, restyle, improve, recolor or regenerate the character; do not add fingers, accessories, floor, glow, shadows or new lettering. Black pupils, black claws and dark character shading must remain opaque: do not remove those internal dark areas. This is a precise background-removal cutout of the SAME owl, not a new mascot illustration. Preserve the entire owl uncropped with clear margin; preserve the original 1402x1122 framing/aspect ratio as closely as possible. Transparent output, no white or replacement backdrop."
+}
