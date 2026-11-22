@@ -5,6 +5,14 @@ const protectedPrefixes = ["/panel", "/registro"];
 
 export default async function proxy(request) {
   const { pathname } = request.nextUrl;
+  if (process.env.SEDINVITA_ENABLED !== 'true' && (
+    /^\/sedinvita\/.+/i.test(pathname) ||
+    /^\/panel\/sedinvita(?:\/|$)/i.test(pathname)
+  )) {
+    return NextResponse.redirect(new URL('/sedinvita', request.url), {
+      headers: { 'Cache-Control': 'no-store' },
+    });
+  }
   const shortPath = /^\/(fb|ig|lk|tk|wa|fm|yt|gd|go)(?:\/([^/]+))?\/?$/.exec(
     pathname,
   );
@@ -57,6 +65,7 @@ export const config = {
   matcher: [
     "/panel/:path*",
     "/registro/:path*",
+    "/sedinvita/:path*",
     "/fb/:path*",
     "/ig/:path*",
     "/lk/:path*",

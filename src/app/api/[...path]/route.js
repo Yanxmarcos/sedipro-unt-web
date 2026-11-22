@@ -15,6 +15,12 @@ async function forward(request, { params }) {
     }
 
     const { path } = await params;
+    if (process.env.SEDINVITA_ENABLED !== 'true' && path[0]?.toLowerCase() === 'sedinvita') {
+        return NextResponse.json(
+            { message: 'SEDINVITA no está disponible en esta edición' },
+            { status: 404, headers: { 'Cache-Control': 'no-store' } },
+        );
+    }
     const target = new URL(`/api/${path.map(encodeURIComponent).join('/')}`, API_ORIGIN);
     target.search = request.nextUrl.search;
 
@@ -45,13 +51,38 @@ async function forward(request, { params }) {
         headers.set('authorization', `Bearer ${token}`);
     }
 
+    const maxBody = request.method !== 'POST' ? 0
+        : /^\/auth\/(login|change-password)$/.test(endpoint) ? 4096
+        : /^\/eventos\/public\/[^/]+\/(inscripciones|recuperar(?:\/verificar)?)$/.test(endpoint) ? 131072
+        : 0;
+
     try {
+        let body;
+        if (maxBody) {
+            const reader = request.body?.getReader();
+            const chunks = [];
+            let length = 0;
+            while (reader) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                length += value.byteLength;
+                if (length > maxBody) {
+                    void reader.cancel().catch(() => {});
+                    return NextResponse.json(
+                        { message: 'La solicitud supera el tamaño permitido' },
+                        { status: 413, headers: { 'Cache-Control': 'no-store' } },
+                    );
+                }
+                chunks.push(value);
+            }
+            body = Buffer.concat(chunks);
+        } else if (!['GET', 'HEAD'].includes(request.method)) {
+            body = await request.arrayBuffer();
+        }
         const upstream = await fetch(target, {
             method: request.method,
             headers,
-            body: ['GET', 'HEAD'].includes(request.method)
-                ? undefined
-                : await request.arrayBuffer(),
+            body,
             cache: 'no-store',
             redirect: 'manual',
         });

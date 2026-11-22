@@ -8,6 +8,14 @@ export const RELEASES = [
   {
     version: CURRENT_VERSION,
     changes: [
+      "Se reforzó la protección del inicio de sesión, el cierre de sesión y el acceso a la información del panel.",
+      "Se actualizaron los componentes del sitio para mantener el sistema al día y preparar las próximas convocatorias.",
+      "Se cerró la edición de SEDINVITA. Su página informativa sigue disponible.",
+    ],
+  },
+  {
+    version: "2.5.0",
+    changes: [
       "Se incorporó Recursos institucionales en Herramientas para que todos los roles encuentren y descarguen la marca de SEDIPRO UNT, sus isotipos, logos de áreas, insignias y poses de Hito.",
       "Se añadió una galería con buscador y categorías, previsualización en fondos claros y oscuros, selección de variantes y fondo de descarga personalizado.",
       "Se habilitaron descargas PNG, WebP y JPG, archivos SVG y PDF cuando el recurso es vectorial, kits de variantes y la fuente original de Illustrator.",
