@@ -137,6 +137,7 @@ export default function PerfilPage() {
             <div className="space-y-6 lg:col-span-2">
               {profile.linked !== false && (
                 <ProfilePhoto
+                  preview
                   name={name}
                   url={profile.fotoPerfil?.url}
                   onUploaded={(photo) =>
