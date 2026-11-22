@@ -17,6 +17,7 @@ import {
 } from './sections'
 import { Navbar, Footer, BackToTop } from './components'
 import PixelSnow from './components/PixelSnow'
+import Ganadores from './sections/Ganadores'
 import { useIsDesktop } from './hooks/useIsDesktop'
 
 export default function CrownNightPage() {
@@ -24,7 +25,7 @@ export default function CrownNightPage() {
     const isDesktop = useIsDesktop(1024)
 
     return (
-        <div className="relative min-h-screen w-full overflow-hidden">
+        <div className="relative min-h-screen w-full overflow-x-clip">
             {/* Fondo PixelSnow - SOLO EN DESKTOP */}
             {isDesktop && (
                 <div className="fixed inset-0 w-full h-full -z-10">
@@ -52,10 +53,11 @@ export default function CrownNightPage() {
 
             <div className="fixed inset-0 bg-background/5 pointer-events-none -z-5" />
 
-            <div className="relative z-10">
+            <div className="relative z-10 [&_section[id]]:scroll-mt-24">
                 <Navbar />
                 <Hero />
                 <About />
+                <Ganadores />
                 <Publicaciones />
                 <Miss />         
                 <Mister />     

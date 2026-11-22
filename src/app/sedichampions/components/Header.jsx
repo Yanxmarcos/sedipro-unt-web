@@ -131,26 +131,47 @@ export default function Header({ onOpenArticle, timeout, isArticleVisible }) {
 					))}
 				</ul>
 			</nav>
+			<div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-white">
+				<a href="#ganadores" className="underline underline-offset-4">Ganadores y resultados</a>
+				<a href="#galeria" className="underline underline-offset-4">Galería</a>
+			</div>
 
-			{/* VIDEO PROMOCIONAL - Formato celular */}
-			<div
+			<section
+				aria-labelledby="sedichampions-reels"
 				className={`
-          w-full max-w-[280px] mx-auto my-14
+          w-full max-w-[584px] mx-auto my-14
           transition-all duration-[0.325s] ease-in-out
           ${timeout ? 'opacity-0' : 'opacity-100'}
         `}
 			>
-				<div className="relative w-full" style={{ paddingBottom: '178%' }}>
-					<iframe
-						src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1047014287716451%2F&show_text=false&width=267&t=0"
-						className="absolute inset-0 w-full h-full rounded-lg border-0"
-						scrolling="no"
-						allowFullScreen
-						allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-						loading="lazy"
-					/>
+				<h2 id="sedichampions-reels" className="mb-5 text-center text-sm font-semibold uppercase tracking-widest text-white">
+					Videos de SEDICHAMPIONS
+				</h2>
+				<div className="grid gap-6 sm:grid-cols-2">
+					{[
+						{ id: '1047014287716451', title: 'Video promocional' },
+						{ id: '1373321634765231', title: 'Reel de SEDICHAMPIONS' },
+					].map(({ id, title }) => {
+						const href = `https://www.facebook.com/reel/${id}/`
+						return (
+							<div key={id} className="mx-auto w-full max-w-[280px] text-center">
+								<iframe
+									title={title}
+									src={`https://www.facebook.com/plugins/video.php?height=476&href=${encodeURIComponent(href)}&show_text=false&width=267&t=0`}
+									className="aspect-[267/476] w-full rounded-lg border border-white/20"
+									scrolling="no"
+									allowFullScreen
+									allow="autoplay; encrypted-media; picture-in-picture"
+									loading="lazy"
+								/>
+								<a href={href} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-11 items-center text-sm text-white underline underline-offset-4" aria-label={`Ver ${title} en Facebook (abre en otra pestaña)`}>
+									Ver en Facebook
+								</a>
+							</div>
+						)
+					})}
 				</div>
-			</div>
+			</section>
 		</header>
 	)
 }

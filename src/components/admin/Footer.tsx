@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BookOpen, BookUser, Bug, Tag } from "lucide-react";
 import { CURRENT_VERSION } from "@/lib/app-version.mjs";
+import { USER_MANUAL_URL } from "@/configs/panel-links";
 import {
   Tooltip,
   TooltipContent,
@@ -27,7 +28,7 @@ const Footer = () => (
         <span className="sr-only md:not-sr-only">Documentación</span>
       </a>
       <a
-        href="https://drive.google.com/file/d/14GowHbRK6WjusZVdOrtA7sFKvoN0HtVM/view?usp=sharing"
+        href={USER_MANUAL_URL}
         target="_blank"
         rel="noopener noreferrer"
         className="hover:text-foreground focus-visible:ring-ring inline-flex size-11 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 md:size-auto"

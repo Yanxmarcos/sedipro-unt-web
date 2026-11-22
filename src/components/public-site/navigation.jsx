@@ -17,7 +17,7 @@ const links = [
   { label: "Inicio", href: "/" },
   { label: "Proyectos", href: "/proyectos" },
   { label: "Nosotros", href: "/nosotros" },
-  { label: "Acceso sediprano", href: "/login" },
+  { label: "Iniciar sesión", href: "/login" },
 ];
 
 const socialIcons = {
@@ -101,6 +101,10 @@ export function PublicNavigation() {
     let frame = 0;
     const update = () => {
       frame = 0;
+      const brand = bar?.querySelector("img");
+      const brandControl = brand?.closest("a");
+      const menuControl = trigger.current;
+      if (!bar?.isConnected || !brandControl || !menuControl) return;
       const cover = document.getElementById("cover-heading")?.closest("section");
       const image = cover?.querySelector("[data-cover-artwork]")?.getBoundingClientRect();
       const sampleY = bar.getBoundingClientRect().height / 2;
@@ -115,13 +119,11 @@ export function PublicNavigation() {
         const bounds = section.getBoundingClientRect();
         return bounds.top <= sampleY && bounds.bottom > sampleY;
       });
-      const brand = bar.querySelector("img");
-      const brandControl = brand.closest("a");
       let brandOnLight = bar.dataset.onPaper === "true";
       let menuOnLight = brandOnLight;
       if (mixed) {
         brandOnLight = !isOverRibbon(mixed, brand, sampleY);
-        menuOnLight = !isOverRibbon(mixed, trigger.current, sampleY);
+        menuOnLight = !isOverRibbon(mixed, menuControl, sampleY);
       } else if ([...document.querySelectorAll('[data-nav-surface="ink"]')].some(section => {
         const bounds = section.getBoundingClientRect();
         return bounds.top <= sampleY && bounds.bottom > sampleY;
@@ -137,11 +139,11 @@ export function PublicNavigation() {
         return mediaBounds.some(media => media.left < rect.right && media.right > rect.left && media.top < rect.bottom && media.bottom > rect.top);
       };
       const brandOnMedia = touchesMedia(brandControl);
-      const menuOnMedia = touchesMedia(trigger.current);
+      const menuOnMedia = touchesMedia(menuControl);
       brandControl.dataset.overMedia = String(brandOnMedia);
-      trigger.current.dataset.overMedia = String(menuOnMedia);
+      menuControl.dataset.overMedia = String(menuOnMedia);
       brandControl.dataset.tone = brandOnLight || brandOnMedia ? "light" : "dark";
-      trigger.current.dataset.tone = menuOnLight || menuOnMedia ? "light" : "dark";
+      menuControl.dataset.tone = menuOnLight || menuOnMedia ? "light" : "dark";
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
     update();

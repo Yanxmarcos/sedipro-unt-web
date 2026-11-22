@@ -2,7 +2,7 @@ export const LOADING_ROUTES = {
   "/": "Inicio",
   "/proyectos": "Proyectos",
   "/nosotros": "Nosotros",
-  "/login": "Acceso sediprano",
+  "/login": "Iniciar sesión",
 };
 
 export function loadingPath(pathname) {
