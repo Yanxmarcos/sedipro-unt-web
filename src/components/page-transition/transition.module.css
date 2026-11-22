@@ -1,21 +1,43 @@
 .content { display: contents; }
 .screen { --loader-blue: #304d90; --loader-paper: #f6f1fa; position: fixed; inset: 0; width: 100%; z-index: 10000; overflow: hidden; isolation: isolate; touch-action: none; color: var(--loader-paper); font-family: var(--font-geist-sans), Arial, sans-serif; }
-.sheet { position: absolute; inset: 0; background: var(--loader-blue); will-change: transform; }
+.sheet { position: absolute; inset: 0; background: var(--loader-blue); }
+.traceLayer { position: absolute; inset: 0; background: var(--loader-blue); }
+.screen[data-draw-logo][data-phase="loading"] .sheet { visibility: hidden; }
 .upper { z-index: 2; }
 .lower { z-index: 1; }
 .logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: clamp(245px,34vw,490px); }
 .logo svg { display: block; width: 100%; height: auto; }
 .logo svg path { fill: var(--loader-paper); }
+@media (prefers-reduced-motion: no-preference) {
+  .traceLayer .logo svg path {
+    stroke: var(--loader-paper);
+    stroke-width: 1.65px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1;
+    animation:
+      logo-trace 840ms cubic-bezier(.45,0,.55,1) var(--trace-delay, 0ms) both,
+      logo-fill 180ms ease-in-out 1110ms both;
+  }
+}
+@keyframes logo-trace {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes logo-fill {
+  from { stroke-opacity: 1; fill-opacity: 0; }
+  to { stroke-opacity: 0; fill-opacity: 1; }
+}
 .edge { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; opacity: 0; pointer-events: none; }
 .edge path { stroke: var(--loader-paper); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
 .message { position: absolute; left: 50%; bottom: 4.5vh; width: min(520px,calc(100vw - 48px)); margin: 0; transform: translateX(-50%); font-size: 14px; font-weight: 400; line-height: 1.55; text-align: center; text-wrap: balance; }
-.screen[data-phase="closing"] .sheet { transform: translateY(0); transition: transform 340ms cubic-bezier(.65,0,.35,1); }
-.screen[data-phase="opening"] .sheet { transition: transform 850ms cubic-bezier(.76,0,.24,1); }
+.screen[data-phase="closing"] .sheet { will-change: transform; transform: translateY(0); transition: transform 340ms cubic-bezier(.65,0,.35,1); }
+.screen[data-phase="opening"] .sheet { will-change: transform; transition: transform 850ms cubic-bezier(.76,0,.24,1); }
 .screen[data-phase="opening"] .upper, .screen[data-phase="idle"] .upper { transform: translateY(-55%); }
 .screen[data-phase="opening"] .lower, .screen[data-phase="idle"] .lower { transform: translateY(55%); }
 .screen[data-phase="closing"] .edge, .screen[data-phase="opening"] .edge { opacity: 1; }
 .screen[data-phase="idle"] { visibility: hidden; pointer-events: none; }
-.screen[data-phase="idle"] .sheet { will-change: auto; }
 /* If hydration never starts, release the SSR curtain instead of trapping the page. */
 .screen:not([data-controlled]) { animation: release 0s 12s forwards; }
 @keyframes release { to { visibility: hidden; pointer-events: none; } }
