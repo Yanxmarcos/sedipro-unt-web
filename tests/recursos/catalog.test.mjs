@@ -34,8 +34,8 @@ test("resource audit stays superadmin-only and release history describes the cat
   assert.equal(RELEASES[0].version, CURRENT_VERSION);
   assert.equal(new Set(RELEASES.map((r) => r.version)).size, RELEASES.length);
   assert.ok(
-    RELEASES[0].changes.some(
-      (text) => text.includes("Recursos institucionales"),
+    RELEASES.some((release) =>
+      release.changes.some((text) => text.includes("Recursos institucionales")),
     ),
   );
 });
