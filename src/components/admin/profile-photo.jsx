@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useUploadThing } from "@/lib/uploadthing";
+import { PhotoPreview } from "@/components/admin/member-photo";
 
 export function ProfilePhoto({
   url,
@@ -14,6 +15,7 @@ export function ProfilePhoto({
   sedipranoId,
   onUploaded,
   disabled = false,
+  preview = false,
 }) {
   const inputRef = useRef(null);
   const [progress, setProgress] = useState(0);
@@ -51,9 +53,7 @@ export function ProfilePhoto({
     }
   }
 
-  return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-4">
+  const avatar = (
         <Avatar className="size-20 border border-dashed">
           <AvatarImage src={url || undefined} alt={name || "Foto de perfil"} />
           <AvatarFallback className="text-xl">
@@ -64,6 +64,16 @@ export function ProfilePhoto({
               .join("")}
           </AvatarFallback>
         </Avatar>
+  );
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-4">
+        {preview ? (
+          <PhotoPreview url={url} name={name || "perfil"} tooltip="Ver mi foto">
+            {avatar}
+          </PhotoPreview>
+        ) : avatar}
         <div className="space-y-2">
           <input
             ref={inputRef}

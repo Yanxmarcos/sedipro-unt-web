@@ -51,6 +51,7 @@ import {
   PageLoading,
   EmptyState,
 } from "@/components/admin/page-state";
+import { MemberPhoto } from "@/components/admin/member-photo";
 import { ProfilePhoto } from "@/components/admin/profile-photo";
 import { usePanelSession } from "@/components/admin/panel-session";
 import { panelApi } from "@/lib/panel-api";
@@ -934,13 +935,7 @@ export default function MemberDirectory({ mode = "members" }) {
                   <TableRow key={row.memberId || row.userId}>
                     <TableCell className="pl-4">
                       <div className="flex items-center gap-3">
-                        <Avatar className="size-9 shrink-0">
-                          <AvatarImage
-                            src={row.fotoPerfil?.url}
-                            alt={fullName(row)}
-                          />
-                          <AvatarFallback>{initials(row)}</AvatarFallback>
-                        </Avatar>
+                        <MemberPhoto row={row} preview={mode === "members"} />
                         <div className="min-w-0">
                           <p className="break-words font-medium">
                             {fullName(row)}

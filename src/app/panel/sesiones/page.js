@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { MemberPhoto } from "@/components/admin/member-photo";
 import {
   Table,
   TableBody,
@@ -162,11 +163,17 @@ export default function SessionsPage() {
                 {filteredSessions.map((session) => (
                   <TableRow key={session.id}>
                     <TableCell className="pl-5">
-                      <div className="font-medium">
-                        {formatPersonName(session.nombres, session.apellidos)}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {session.user} · DNI {session.dni}
+                      <div className="flex items-center gap-3">
+                        <MemberPhoto row={session} />
+                        <div className="min-w-0">
+                          <div className="font-medium">
+                            {formatPersonName(session.nombres, session.apellidos)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {session.user !== session.dni && `${session.user} · `}
+                            DNI {session.dni} · {session.area || "Sin área"}
+                          </div>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
