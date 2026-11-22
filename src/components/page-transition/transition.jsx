@@ -8,12 +8,16 @@ import styles from "./transition.module.css";
 
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const LOADING_MESSAGE = "Espera un momento, estamos preparando todo para ti.";
-const LOGO_REVEAL_MS = 1380;
+const LOGO_REVEAL_MS = 1580;
 
 export function PageTransition({ children, logo }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [phase, setPhase] = useState(() => loadingPath(pathname) ? "loading" : "idle");
+  const [phase, setPhase] = useState(() => {
+    const destination = loadingPath(pathname);
+    if (!destination) return "idle";
+    return destination.startsWith("/eventos/") ? "loading" : "boot";
+  });
   const [controlled, setControlled] = useState(false);
   const screen = useRef(null);
   const content = useRef(null), phaseRef = useRef(phase), active = useRef(null), pending = useRef(null);
@@ -53,8 +57,20 @@ export function PageTransition({ children, logo }) {
     // Let the prepared view paint before the paper parts.
     await nextPaint(controller.signal);
     await nextPaint(controller.signal);
+    if (controller.signal.aborted) return;
+    if (phaseRef.current === "boot") {
+      if (reducedMotion()) {
+        open();
+        return;
+      }
+      changePhase("loading");
+      // Let the tracing layer commit and paint before measuring its clock.
+      await nextPaint(controller.signal);
+      await nextPaint(controller.signal);
+      if (controller.signal.aborted) return;
+    }
     if (animateLogo && !reducedMotion() && loadingStarted.current !== null) {
-      // On a cold load the CSS can already be tracing while JS hydrates.
+      // Navigation may have started the animation before the new route arrived.
       const trace = screen.current?.querySelector(`.${styles.traceLayer} path[pathLength]`)?.getAnimations?.()[0];
       const timelineTime = trace?.timeline?.currentTime;
       const elapsed = typeof timelineTime === "number" && typeof trace.startTime === "number"
@@ -64,7 +80,7 @@ export function PageTransition({ children, logo }) {
       if (remaining > 0 && !await pause(remaining, controller.signal)) return;
     }
     if (!controller.signal.aborted) open();
-  }, [open]);
+  }, [changePhase, open]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -81,7 +97,11 @@ export function PageTransition({ children, logo }) {
       const controller = arriving?.controller ?? new AbortController();
       active.current = controller; pending.current = null;
       clearTimeout(navigationTimer.current); clearTimeout(openTimer.current);
-      changePhase("loading");
+      if (destination === "/" && phaseRef.current !== "boot") {
+        changePhase("boot");
+      } else if (phaseRef.current !== "boot") {
+        changePhase("loading");
+      }
       const eventPage = destination.startsWith("/eventos/");
       void prepare(controller, eventPage ? 20000 : 10000, !eventPage);
     });
@@ -118,7 +138,7 @@ export function PageTransition({ children, logo }) {
       changePhase("closing");
       try { router.prefetch(destination.pathname + destination.search); } catch { /* Navigation can proceed without prefetch. */ }
       if (!await pause(reducedMotion() ? 0 : 340, controller.signal)) return;
-      changePhase("loading");
+      changePhase(navigation.path === "/" ? "boot" : "loading");
       // A route/server failure must never leave an opaque, unusable screen.
       navigationTimer.current = setTimeout(() => {
         if (pending.current !== navigation) return;
@@ -143,7 +163,7 @@ export function PageTransition({ children, logo }) {
         pending.current = null; controller.abort(); open();
       }, 15000);
       moveFocus.current = true;
-      changePhase("loading");
+      changePhase(destination === "/" ? "boot" : "loading");
     };
     document.addEventListener("click", click, true);
     window.addEventListener("popstate", pop);
@@ -166,7 +186,7 @@ export function PageTransition({ children, logo }) {
   }, [busy]);
   return <>
     <div ref={screen} className={styles.screen} data-public-loader data-phase={phase} data-controlled={controlled || undefined} data-draw-logo={drawLogo || undefined} aria-hidden={!busy}>
-      {drawLogo && phase === "loading" && (
+      {(phase === "boot" || (drawLogo && phase === "loading")) && (
         <div className={styles.traceLayer} aria-hidden="true">
           <div className={styles.logo}>{logo}</div>
           <p className={styles.message}>{LOADING_MESSAGE}</p>
