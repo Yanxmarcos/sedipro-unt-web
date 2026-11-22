@@ -8,15 +8,24 @@ import styles from "./transition.module.css";
 
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const LOADING_MESSAGE = "Espera un momento, estamos preparando todo para ti.";
+const LOGO_REVEAL_MS = 1380;
 
 export function PageTransition({ children, logo }) {
   const pathname = usePathname();
   const router = useRouter();
   const [phase, setPhase] = useState(() => loadingPath(pathname) ? "loading" : "idle");
   const [controlled, setControlled] = useState(false);
+  const screen = useRef(null);
   const content = useRef(null), phaseRef = useRef(phase), active = useRef(null), pending = useRef(null);
   const openTimer = useRef(null), navigationTimer = useRef(null), moveFocus = useRef(false);
-  const changePhase = useCallback(next => { phaseRef.current = next; setPhase(next); }, []);
+  const loadingStarted = useRef(null);
+  const changePhase = useCallback(next => {
+    if (next === "loading" && (phaseRef.current !== next || loadingStarted.current === null)) {
+      loadingStarted.current = performance.now();
+    }
+    phaseRef.current = next;
+    setPhase(next);
+  }, []);
   const finish = useCallback(() => {
     if (phaseRef.current !== "opening") return;
     clearTimeout(openTimer.current);
@@ -34,7 +43,7 @@ export function PageTransition({ children, logo }) {
     clearTimeout(openTimer.current);
     openTimer.current = setTimeout(finish, reducedMotion() ? 180 : 950);
   }, [changePhase, finish]);
-  const prepare = useCallback(async (controller, maximumWait = 10000) => {
+  const prepare = useCallback(async (controller, maximumWait = 10000, animateLogo = false) => {
     try {
       await waitForView(content.current, () => {}, controller.signal, maximumWait);
     } catch {
@@ -44,6 +53,16 @@ export function PageTransition({ children, logo }) {
     // Let the prepared view paint before the paper parts.
     await nextPaint(controller.signal);
     await nextPaint(controller.signal);
+    if (animateLogo && !reducedMotion() && loadingStarted.current !== null) {
+      // On a cold load the CSS can already be tracing while JS hydrates.
+      const trace = screen.current?.querySelector(`.${styles.traceLayer} path[pathLength]`)?.getAnimations?.()[0];
+      const timelineTime = trace?.timeline?.currentTime;
+      const elapsed = typeof timelineTime === "number" && typeof trace.startTime === "number"
+        ? timelineTime - trace.startTime
+        : performance.now() - loadingStarted.current;
+      const remaining = LOGO_REVEAL_MS - elapsed;
+      if (remaining > 0 && !await pause(remaining, controller.signal)) return;
+    }
     if (!controller.signal.aborted) open();
   }, [open]);
 
@@ -63,7 +82,8 @@ export function PageTransition({ children, logo }) {
       active.current = controller; pending.current = null;
       clearTimeout(navigationTimer.current); clearTimeout(openTimer.current);
       changePhase("loading");
-      void prepare(controller, destination.startsWith("/eventos/") ? 20000 : 10000);
+      const eventPage = destination.startsWith("/eventos/");
+      void prepare(controller, eventPage ? 20000 : 10000, !eventPage);
     });
     return () => cancelAnimationFrame(frame);
   }, [pathname, prepare, changePhase]);
@@ -135,6 +155,8 @@ export function PageTransition({ children, logo }) {
   }, []);
 
   const busy = phase !== "idle";
+  const destination = loadingPath(pathname);
+  const drawLogo = Boolean(destination && !destination.startsWith("/eventos/"));
   useEffect(() => {
     if (!busy) return;
     const html = document.documentElement;
@@ -143,8 +165,13 @@ export function PageTransition({ children, logo }) {
     return () => { html.style.overflow = previousOverflow; };
   }, [busy]);
   return <>
-    <div ref={content} className={styles.content} data-route-content inert={controlled && busy ? true : undefined} aria-busy={controlled && busy || undefined}>{children}</div>
-    <div className={styles.screen} data-public-loader data-phase={phase} data-controlled={controlled || undefined} aria-hidden={!busy}>
+    <div ref={screen} className={styles.screen} data-public-loader data-phase={phase} data-controlled={controlled || undefined} data-draw-logo={drawLogo || undefined} aria-hidden={!busy}>
+      {drawLogo && phase === "loading" && (
+        <div className={styles.traceLayer} aria-hidden="true">
+          <div className={styles.logo}>{logo}</div>
+          <p className={styles.message}>{LOADING_MESSAGE}</p>
+        </div>
+      )}
       <div className={`${styles.sheet} ${styles.upper}`} style={{ clipPath: TOP_TEAR }} onTransitionEnd={event => { if (event.target === event.currentTarget && event.propertyName === "transform") finish(); }} aria-hidden="true">
         <div className={styles.logo}>{logo}</div><svg className={styles.edge} viewBox="0 0 100 100" preserveAspectRatio="none"><path d={TEAR_EDGE} /></svg>
       </div>
@@ -155,5 +182,6 @@ export function PageTransition({ children, logo }) {
     </div>
     <span className={styles.srOnly} role="status" aria-live="polite">{busy ? LOADING_MESSAGE : ""}</span>
     <noscript><style>{"[data-public-loader]{display:none!important}"}</style></noscript>
+    <div ref={content} className={styles.content} data-route-content inert={controlled && busy ? true : undefined} aria-busy={controlled && busy || undefined}>{children}</div>
   </>;
 }
