@@ -1,15 +1,17 @@
 .content { display: contents; }
 .screen { --loader-blue: #304d90; --loader-paper: #f6f1fa; position: fixed; inset: 0; width: 100%; z-index: 10000; overflow: hidden; isolation: isolate; touch-action: none; color: var(--loader-paper); font-family: var(--font-geist-sans), Arial, sans-serif; }
-.sheet { position: absolute; inset: 0; background: var(--loader-blue); }
-.traceLayer { position: absolute; inset: 0; background: var(--loader-blue); }
-.screen[data-draw-logo][data-phase="loading"] .sheet { visibility: hidden; }
+.screen[data-draw-logo], .screen[data-phase="boot"] { --curtain-background: #141020; }
+.sheet { position: absolute; inset: 0; background: var(--curtain-background, var(--loader-blue)); }
+.traceLayer { position: absolute; inset: 0; background: var(--curtain-background, var(--loader-blue)); }
+.screen[data-phase="boot"] .sheet, .screen[data-draw-logo][data-phase="loading"] .sheet { visibility: hidden; }
 .upper { z-index: 2; }
 .lower { z-index: 1; }
 .logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: clamp(245px,34vw,490px); }
 .logo svg { display: block; width: 100%; height: auto; }
 .logo svg path { fill: var(--loader-paper); }
 @media (prefers-reduced-motion: no-preference) {
-  .traceLayer .logo svg path {
+  .screen[data-phase="boot"] .traceLayer .logo { visibility: hidden; }
+  .screen[data-phase="loading"] .traceLayer .logo svg path {
     stroke: var(--loader-paper);
     stroke-width: 1.65px;
     stroke-linecap: round;

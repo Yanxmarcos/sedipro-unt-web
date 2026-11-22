@@ -252,7 +252,7 @@ export function ProjectJourney() {
           <JourneyFigure variant="laptop" className={styles.laptopFigure} />
         </div>
         <div className={styles.lower} id="perfil-director">
-          <Polaroid photo={photos.ipmc} className={styles.lowerPhoto} />
+          <Polaroid photo={photos.fourthMeeting} className={styles.lowerPhoto} />
           <article ref={profile} className={styles.panel} data-nav-surface="paper">
             <h3 className={styles.profileHeading}>¿Por qué es importante el perfil de director de proyectos?</h3>
             <p>Los directores de proyectos son personas organizadas y orientadas a las metas. Entienden el papel estratégico de los proyectos para que una organización aprenda, cambie y tenga éxito.</p><p>Desarrollar sus competencias permite gestionar proyectos y formar equipos humanos en el entorno empresarial.</p>
