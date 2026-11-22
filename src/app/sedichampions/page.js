@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Header from './components/Header'
 import Article from './components/Article'
 import Footer from './components/Footer'
+import EventRecap from './components/EventRecap'
 
 export default function SedichampionsPage() {
   const [article, setArticle] = useState('')
@@ -112,6 +113,7 @@ export default function SedichampionsPage() {
           isOpen={isModalOpen}
         />
 
+        {!isArticleVisible && <EventRecap />}
         <Footer timeout={timeout} isArticleVisible={isArticleVisible} />
       </div>
     </div>

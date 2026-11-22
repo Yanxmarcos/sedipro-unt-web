@@ -38,7 +38,7 @@ export function LoginAccess({ username, setUsername, password, setPassword, show
     <div ref={group} className={styles.group}>
       <LoginHito covered={coverEyes} />
       <section className={styles.card} aria-labelledby="login-title">
-        <h1 id="login-title" className="sr-only">Acceso sediprano</h1>
+        <h1 id="login-title" className="sr-only">Iniciar sesión</h1>
         {[styles.handLeft, styles.handRight].map((className, index) => <svg key={className} className={className} viewBox="720 450 250 240" aria-hidden="true" focusable="false">
           <defs><clipPath id={`${gripId}-${index}`}><path d="M755 690C755 625 770 570 794 536C804 523 816 516 830 516C890 516 944 546 970 580L970 690Z" /></clipPath></defs>
           <image href="/img/institutional/login/hito-rig.png" width="2172" height="724" clipPath={`url(#${gripId}-${index})`} />

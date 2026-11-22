@@ -2,46 +2,53 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { navVariants } from '../utils/motion'
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false)
     const menuRef = useRef(null)
+    const triggerRef = useRef(null)
+    const reducedMotion = useReducedMotion()
 
-    // Cerrar menú al hacer click fuera
+    // Detectar el clic exterior antes de que React sustituya el icono.
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (menuRef.current && !menuRef.current.contains(e.target)) {
                 setIsOpen(false)
             }
         }
-        document.addEventListener('click', handleClickOutside)
-        return () => document.removeEventListener('click', handleClickOutside)
+        document.addEventListener('pointerdown', handleClickOutside)
+        return () => document.removeEventListener('pointerdown', handleClickOutside)
     }, [])
 
     // Cerrar menú al presionar Escape
     useEffect(() => {
         const handleEsc = (e) => {
-            if (e.key === 'Escape') setIsOpen(false)
+            if (e.key === 'Escape' && isOpen) {
+                setIsOpen(false)
+                triggerRef.current?.focus()
+            }
         }
         document.addEventListener('keydown', handleEsc)
         return () => document.removeEventListener('keydown', handleEsc)
-    }, [])
+    }, [isOpen])
 
     const scrollToSection = (sectionId) => {
         setIsOpen(false)
         const section = document.getElementById(sectionId)
         if (section) {
-            section.scrollIntoView({ behavior: 'smooth' })
+            section.scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth' })
         }
     }
 
     const menuItems = [
         // { id: 'inicio', label: 'Inicio' },
         { id: 'about', label: 'Sobre Crown Night' },
+        { id: 'ganadores', label: 'Ganadores' },
+        { id: 'publicaciones', label: 'Publicaciones' },
         { id: 'miss', label: 'Miss' },
         { id: 'mister', label: 'Mister' },
         { id: 'todos', label: 'Apoya tu candidat@' },
@@ -53,15 +60,13 @@ const Navbar = () => {
     ]
 
     return (
-        <motion.nav
-            variants={navVariants}
-            initial="hidden"
-            whileInView="show"
-            className="px-4 sm:px-6 md:px-8 py-4 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/10"
+        <nav
+            aria-label="Navegación de Crown Night"
+            className="px-4 sm:px-6 md:px-8 py-4 sticky top-0 z-60 bg-background/95 backdrop-blur-xl border-b border-border/10"
             ref={menuRef}
         >
             {/* Gradiente de fondo */}
-            <div className="absolute w-[50%] inset-0 bg-gradient-to-r from-primary/20 to-transparent blur-3xl" />
+            <div className="pointer-events-none absolute w-[50%] inset-0 bg-gradient-to-r from-primary/20 to-transparent blur-3xl" />
 
             <div className="max-w-7xl mx-auto flex justify-between items-center gap-8 relative">
                 {/* Logo SEDIPRO UNT */}
@@ -87,34 +92,34 @@ const Navbar = () => {
 
                 {/* Título Crown Night - centrado */}
                 <Link href="/crown-night" className="absolute left-1/2 -translate-x-1/2">
-                    <h2 className="font-extrabold text-lg sm:text-xl md:text-2xl text-foreground tracking-wider whitespace-nowrap">
+                    <h2 className="font-extrabold text-base sm:text-xl md:text-2xl text-foreground tracking-wider whitespace-nowrap">
                         <span className="text-primary">CROWN</span> NIGHT
                     </h2>
                 </Link>
 
                 {/* Botón Menú Hamburguesa */}
-                <div className="relative">
+                <div className="relative z-10 ml-auto shrink-0">
                     <button
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            setIsOpen(!isOpen)
-                        }}
-                        className="flex flex-col gap-1.5 p-2 hover:bg-primary/10 rounded-lg transition-all duration-300 group"
-                        aria-label="Menú"
+                        ref={triggerRef}
+                        type="button"
+                        onClick={() => setIsOpen((open) => !open)}
+                        className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-2 text-sm font-semibold text-foreground hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-offset-2"
+                        aria-expanded={isOpen}
+                        aria-controls={isOpen ? 'crown-night-menu' : undefined}
                     >
-                        <span className={`block w-6 h-0.5 bg-foreground transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-2' : ''}`} />
-                        <span className={`block w-6 h-0.5 bg-foreground transition-all duration-300 ${isOpen ? 'opacity-0' : ''}`} />
-                        <span className={`block w-6 h-0.5 bg-foreground transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+                        <span className="pointer-events-none sr-only sm:not-sr-only">{isOpen ? 'Cerrar' : 'Menú'}</span>
+                        {isOpen ? <X size={22} className="pointer-events-none" aria-hidden="true" /> : <Menu size={22} className="pointer-events-none" aria-hidden="true" />}
                     </button>
 
                     {/* Menú desplegable hacia abajo */}
                     <AnimatePresence>
                         {isOpen && (
                             <motion.div
+                                id="crown-night-menu"
                                 initial={{ opacity: 0, y: -10, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                                transition={{ duration: 0.2 }}
+                                transition={{ duration: reducedMotion ? 0 : 0.2 }}
                                 className="absolute right-0 mt-3 w-56 sm:w-64 bg-background/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-border/10 overflow-hidden z-50"
                             >
                                 <div className="py-2 max-h-[80vh] overflow-y-auto">
@@ -160,7 +165,7 @@ const Navbar = () => {
                     </AnimatePresence>
                 </div>
             </div>
-        </motion.nav>
+        </nav>
     )
 }
 

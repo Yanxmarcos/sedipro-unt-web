@@ -1,6 +1,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { BookUser, Tag } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+import { USER_MANUAL_URL } from "@/configs/panel-links";
+import { CURRENT_VERSION } from "@/lib/app-version.mjs";
 import ModeToggle from "@/components/admin/ModeToggle";
 import ProfileDropdown from "@/components/admin-shared/ProfileDropdown";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -58,6 +63,26 @@ const Header = () => {
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <SessionCountdown />
+          <nav aria-label="Ayuda y versión" className="hidden lg:flex items-center">
+            <a
+              href={USER_MANUAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({ variant: "ghost", size: "icon" })}
+              title="Manual de usuario"
+              aria-label="Manual de usuario (abre en otra pestaña)"
+            >
+              <BookUser aria-hidden="true" />
+            </a>
+            <Link
+              href="/panel/versiones"
+              className={buttonVariants({ variant: "ghost", size: "icon" })}
+              title={`Ver novedades de la versión ${CURRENT_VERSION}`}
+              aria-label={`Ver novedades de la versión ${CURRENT_VERSION}`}
+            >
+              <Tag aria-hidden="true" />
+            </Link>
+          </nav>
           <ModeToggle />
           <ProfileDropdown />
         </div>

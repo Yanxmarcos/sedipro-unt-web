@@ -19,7 +19,7 @@ export function PublicFooter({ socialShowcase = false }) {
           <div className={styles.middle}>
             <nav aria-label="Páginas públicas" className={styles.navigation}>
               <div><Link href="/">Inicio</Link><Link href="/proyectos">Proyectos</Link></div>
-              <div><Link href="/nosotros">Nosotros</Link><Link href="/login">Acceso Sediprano</Link></div>
+              <div><Link href="/nosotros">Nosotros</Link><Link href="/login">Iniciar sesión</Link></div>
             </nav>
             <Image className={styles.logo} src="/logos/sedi-logo.svg" alt="SEDIPRO UNT" width={1563} height={555} />
           </div>

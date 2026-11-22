@@ -42,8 +42,11 @@ const Hero = () => {
                     variants={textVariant(1.4)}
                     className="flex flex-col items-center gap-2 mt-12"
                 >
+                    <a href="#about" className="flex min-h-11 flex-col items-center justify-center gap-2 rounded-md px-3 text-xs font-semibold uppercase tracking-widest text-foreground focus-visible:outline-2 focus-visible:outline-offset-4">
+                    Desliza para explorar
                     <svg
-                        className="w-5 h-5 text-foreground font-bold animate-bounce"
+                        aria-hidden="true"
+                        className="w-5 h-5 motion-safe:animate-bounce"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -55,6 +58,7 @@ const Hero = () => {
                             d="M19 14l-7 7m0 0l-7-7m7 7V3"
                         />
                     </svg>
+                    </a>
                 </motion.div>
             </motion.div>
         </section>
