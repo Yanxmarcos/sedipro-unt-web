@@ -114,6 +114,14 @@ export const navItems: NavItem[] = [
     groupLabel: "Proyectos",
     items: [
       {
+        icon: "UsersRound",
+        label: "NAVISEDIPRO",
+        childItems: [
+          { label: "Donadores", href: "/panel/navisedipro/participantes" },
+          { label: "Personas con acceso", href: "/panel/navisedipro/accesos" },
+        ],
+      },
+      {
         icon: "Sparkles",
         label: "SEDInvita",
         childItems: [

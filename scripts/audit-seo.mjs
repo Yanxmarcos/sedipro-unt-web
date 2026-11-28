@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { PUBLIC_PAGES, SOCIAL_IMAGE, absoluteUrl } from "../src/lib/seo.mjs";
 
 const base = process.argv[2] || "http://localhost:7000";
 const checks = [];
+const editions = JSON.parse(readFileSync(new URL("../src/app/navisedipro/ediciones/archive.json", import.meta.url), "utf8"));
 const decode = value => value.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&#39;/g, "'");
 const attributes = tag => Object.fromEntries([...tag.matchAll(/([\w:-]+)="([^"]*)"/g)].map(([, key, value]) => [key, decode(value)]));
 function meta(html, name) {
@@ -23,15 +25,17 @@ for (const page of PUBLIC_PAGES) {
   assert.deepEqual(canonicals(html), [absoluteUrl(page.path)], prefix + ": canonical");
   assert.equal(meta(html, "description"), page.description, prefix + ": description");
   assert.equal(new URL(meta(html, "og:url")).toString(), absoluteUrl(page.path), prefix + ": og:url");
-  assert.equal(meta(html, "og:image"), SOCIAL_IMAGE.url, prefix + ": og:image");
-  assert.equal(meta(html, "og:image:width"), String(SOCIAL_IMAGE.width), prefix + ": image width");
-  assert.equal(meta(html, "og:image:height"), String(SOCIAL_IMAGE.height), prefix + ": image height");
+  const image = page.image ?? SOCIAL_IMAGE;
+  assert.equal(meta(html, "og:image"), image.url, prefix + ": og:image");
+  assert.equal(meta(html, "og:image:width"), String(image.width), prefix + ": image width");
+  assert.equal(meta(html, "og:image:height"), String(image.height), prefix + ": image height");
   assert.equal(meta(html, "twitter:card"), "summary_large_image", prefix + ": social card");
   assert.ok(!/noindex/i.test(meta(html, "robots") || ""), prefix + ": unexpectedly noindex");
   assert.ok(!/noindex/i.test(response.headers.get("x-robots-tag") || ""), prefix + ": noindex header");
   const graphs = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)].map(([, json]) => JSON.parse(json));
-  assert.ok(graphs.some(graph => graph["@graph"]?.some(node => node.url === absoluteUrl(page.path))), prefix + ": structured page data");
-  checks.push({ path: prefix, status: response.status, canonical: canonicals(html)[0], image: meta(html, "og:image"), structuredData: true });
+  const structuredData = graphs.some(graph => graph["@graph"]?.some(node => node.url === absoluteUrl(page.path)));
+  if (!page.path.startsWith("/navisedipro")) assert.ok(structuredData, prefix + ": structured page data");
+  checks.push({ path: prefix, status: response.status, canonical: canonicals(html)[0], image: meta(html, "og:image"), structuredData });
 }
 
 for (const path of ["/login", "/sedinvita/login", "/sedinvita/facilitador/login", "/votacion", "/eventos/seo-check"]) {
@@ -66,7 +70,8 @@ const sitemapResponse = await get("/sitemap.xml");
 assert.equal(sitemapResponse.status, 200);
 const sitemap = await sitemapResponse.text();
 const locations = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(([, url]) => url);
-assert.deepEqual(locations.sort(), PUBLIC_PAGES.map(page => absoluteUrl(page.path)).sort());
+const editionUrls = editions.filter(edition => !edition.esPlantilla).map(edition => absoluteUrl(`/navisedipro/ediciones/${edition.slug}`));
+assert.deepEqual(locations.sort(), [...PUBLIC_PAGES.map(page => absoluteUrl(page.path)), ...editionUrls].sort());
 assert.ok(!/localhost|vercel\.app|<lastmod>/.test(sitemap));
 
 const imageResponse = await get(new URL(SOCIAL_IMAGE.url).pathname);

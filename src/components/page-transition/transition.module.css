@@ -3,14 +3,14 @@
 .screen[data-draw-logo], .screen[data-phase="boot"] { --curtain-background: #141020; }
 .sheet { position: absolute; inset: 0; background: var(--curtain-background, var(--loader-blue)); }
 .traceLayer { position: absolute; inset: 0; background: var(--curtain-background, var(--loader-blue)); }
-.screen[data-phase="boot"] .sheet, .screen[data-draw-logo][data-phase="loading"] .sheet { visibility: hidden; }
+.screen[data-phase="boot"] .sheet, .screen[data-phase="boot-fade"] .sheet, .screen[data-draw-logo][data-phase="loading"] .sheet { visibility: hidden; }
 .upper { z-index: 2; }
 .lower { z-index: 1; }
 .logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: clamp(245px,34vw,490px); }
 .logo svg { display: block; width: 100%; height: auto; }
 .logo svg path { fill: var(--loader-paper); }
 @media (prefers-reduced-motion: no-preference) {
-  .screen[data-phase="boot"] .traceLayer .logo { visibility: hidden; }
+  .screen[data-phase="boot-fade"] .traceLayer .logo { opacity: 0; transition: opacity 180ms ease-out; }
   .screen[data-phase="loading"] .traceLayer .logo svg path {
     stroke: var(--loader-paper);
     stroke-width: 1.65px;

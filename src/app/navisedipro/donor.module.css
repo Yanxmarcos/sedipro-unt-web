@@ -1,0 +1,91 @@
+.dialog {
+  inset: 0;
+  margin: auto;
+  width: min(28rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  background: var(--paper);
+  color: var(--pine);
+  border: 1px solid var(--sand);
+  border-radius: 1rem;
+  padding: 2rem 1.25rem 1.25rem;
+  box-shadow: 0 1rem 4rem #0005;
+}
+.dialog::backdrop { background: #172018b8; }
+.dialog h2 { font: 750 clamp(1.35rem, 4vw, 1.85rem)/1.25 var(--font-montserrat), sans-serif; text-align: center; }
+.mascot { display: block; width: clamp(5rem, 19vh, 8rem); height: auto; margin: 0 auto .75rem; }
+.close {
+  position: absolute;
+  right: .5rem;
+  top: .35rem;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.5rem;
+}
+.actions, .donorForm { display: grid; gap: .8rem; }
+.actions { margin-top: 1rem; }
+.actions a, .primary {
+  display: inline-flex;
+  justify-content: center;
+  padding: .75rem 1rem;
+  background: var(--pine);
+  color: var(--paper);
+  border: 1px solid var(--pine);
+  border-radius: .5rem;
+  font-weight: 700;
+}
+.actions a + a { background: var(--paper); color: var(--pine); }
+.galleryPage {
+  min-height: 60svh;
+  padding: clamp(2rem, 6vw, 5rem) max(1rem, 6vw);
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 1rem;
+  background: var(--paper);
+  color: var(--pine);
+}
+.galleryPage h1 { font-size: clamp(2rem, 5vw, 4rem); font-weight: 750; text-align: center; }
+.donorForm { width: min(100%, 28rem); }
+.donorForm label { display: grid; gap: .25rem; }
+.donorForm input { border: 1px solid currentColor; border-radius: .5rem; padding: .65rem .85rem; }
+.photos { width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1rem; }
+.photos figure { position: relative; min-height: 15rem; background: var(--sand); border-radius: .75rem; overflow: hidden; }
+.photos img { object-fit: contain; }
+
+.accessPanel, .accessAlert { width: min(100%, 28rem); }
+.accessAlert {
+  display: flex;
+  align-items: flex-start;
+  gap: .65rem;
+  padding: .85rem 1rem;
+  color: var(--red);
+  background: color-mix(in srgb, var(--red) 6%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--red) 35%, var(--paper));
+  border-inline-start: .25rem solid var(--red);
+  border-radius: .55rem;
+}
+.accessAlert svg { flex: none; margin-top: .12rem; }
+.accessAlert p { margin-top: .2rem; }
+.donationPrompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem 1rem;
+  border-top: 1px solid var(--sand);
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+}
+.donationPrompt a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  padding: .7rem 1rem;
+  background: var(--red);
+  color: var(--paper);
+  border-radius: .55rem;
+  font-weight: 700;
+  text-align: center;
+}
+.donationPrompt a:hover { background: var(--brown); }

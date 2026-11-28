@@ -1,0 +1,140 @@
+.footerDivider {
+  position: relative;
+  height: 140px;
+  background: var(--paper);
+  color: var(--pine);
+}
+
+.footerDivider > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: calc(100% + 1px);
+  fill: var(--red);
+}
+
+.footerDivider a {
+  position: absolute;
+  top: 0;
+  left: 81.94%;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 39px;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.footerDivider a svg { color: var(--paper); }
+
+@media (max-width: 767px) {
+  .footerDivider { height: clamp(76px, 16.2vw, 124px); margin-top: -1px; }
+  .footerDivider > svg { left: -25%; width: 125%; }
+  .footerDivider a { left: 77.43%; gap: 17px; font-size: 11px; }
+  .footerDivider a svg { width: 28px; height: 28px; }
+}
+
+.footer {
+  --navi-logo-width: min(26%, 25rem);
+  position: relative;
+  isolation: isolate;
+  min-height: clamp(34rem, 56.25vw, 64rem);
+  overflow: hidden;
+  color: var(--paper);
+  background: var(--red);
+}
+
+.logo {
+  position: absolute;
+  top: 5%;
+  left: var(--page-gutter);
+  z-index: 1;
+  width: var(--navi-logo-width);
+}
+
+.logo img { display: block; width: 100%; height: auto; transform: translateX(-13.6%); }
+
+.house {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: min(43%, 51rem);
+  height: auto;
+  pointer-events: none;
+}
+
+.ribbon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  font-family: var(--navi-serif), sans-serif;
+  font-size: 86px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.footerBrand {
+  position: absolute;
+  left: var(--page-gutter);
+  bottom: clamp(1rem, 3vw, 3rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  gap: 1rem;
+  /* The artwork occupies 1402 of the PNG's 1920 horizontal pixels. */
+  width: calc(var(--navi-logo-width) * 1402 / 1920);
+}
+
+.footerBrand > a, .footerBrand > a img { display: block; width: 100%; }
+
+.socials {
+  display: flex;
+  width: 94%;
+  justify-self: center;
+  justify-content: space-between;
+  gap: .2rem;
+}
+
+.socials a {
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  min-width: 0;
+  aspect-ratio: 1;
+  border: 1px solid var(--sand);
+  border-radius: 50%;
+  color: var(--red);
+  background: var(--paper);
+  font-size: .8rem;
+  cursor: pointer;
+}
+
+.socials a:hover { background: var(--sand); }
+.footer a:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .footer {
+    --navi-logo-width: min(48%, 17rem);
+    --footer-content-bottom: .75rem;
+    min-height: calc(clamp(30.5rem, calc(75vw - 2.5rem), 39.5rem) - clamp(3rem, 16vw, 4rem) + var(--footer-content-bottom));
+  }
+  .house {
+    right: var(--page-gutter);
+    width: calc(min(52%, calc(100% - var(--page-gutter) * 2 - var(--navi-logo-width) * 1402 / 1920 - .75rem)) * .9);
+  }
+  .house, .footerBrand { bottom: var(--footer-content-bottom); }
+}

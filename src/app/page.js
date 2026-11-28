@@ -8,6 +8,7 @@ import { PublicFooter } from "@/components/public-site/footer";
 import { ElasticSection } from "@/components/public-site/elastic-section";
 import { pageMetadata } from "@/lib/seo.mjs";
 import { StructuredData } from "@/components/seo/structured-data";
+import { NavisediproAnnouncement } from "@/components/public-site/navisedipro-announcement";
 
 export const metadata = pageMetadata("/");
 
@@ -16,6 +17,7 @@ export default function HomePage() {
     <main id="main-content">
       <StructuredData path="/" />
       <PublicHero />
+      <NavisediproAnnouncement />
       <div id="historia"><ElasticSection surface="#29295d" previous="#fbfaf7" revealBackground pronounced><ScrollStory /></ElasticSection></div>
       <ElasticSection surface="#304d90" previous="#29295d" revealBackground pronounced clearPrevious><ProjectJourney /></ElasticSection>
       <ElasticSection surface="#304d90" previous="#f6f1fa" joined revealBackground><HomeApproach /></ElasticSection>

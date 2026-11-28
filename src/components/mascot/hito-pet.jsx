@@ -13,6 +13,7 @@ const PREFERENCE_KEY = "sedipro:hito";
 const PREFERENCE_EVENT = "sedipro:hito-preference";
 const BUBBLE_WIDTH = 264;
 const AUTOMATIC_STATES = ["walk", "idle", "walk", "think", "walk", "flutter", "walk", "sleep", "run", "hop", "walk", "work", "celebrate", "love"];
+const FESTIVE_AUTOMATIC_STATES = AUTOMATIC_STATES.filter((state) => state !== "hop" && state !== "celebrate");
 
 function getPreferences() {
   try { return sessionStorage.getItem(PREFERENCE_KEY) || "active"; }
@@ -44,6 +45,7 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
   const [message, setMessage] = useState("");
   const [assetFailed, setAssetFailed] = useState(false);
   const messages = HITO_MESSAGES[pathname] || HITO_MESSAGES["/"];
+  const festive = pathname === "/navisedipro";
 
   useEffect(() => {
     interactionRef.current.open = open;
@@ -71,6 +73,7 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
     let lastDraw = 0;
     const image = new window.Image();
     const rigImage = new window.Image();
+    const hatImage = festive ? new window.Image() : null;
     const engine = engineRef.current || {
       x: Math.max(EDGE, Math.min(window.innerWidth - PET_WIDTH - EDGE, window.innerWidth * 0.72)),
       y: 0, walkDistance: 0, dragging: false,
@@ -119,7 +122,7 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
       drawHito(paintContext, image, manifest, state, frame, engine.direction,
         reducedMotion || paused ? { x: 0, y: 0 } : engine.look,
         !paused && !reducedMotion && engine.clock < engine.blinkUntil,
-        { image: rigImage, distance: reducedMotion ? 0 : engine.walkDistance });
+        { image: rigImage, distance: reducedMotion ? 0 : engine.walkDistance, hat: hatImage });
       context.clearRect(0, 0, canvas.width, canvas.height);
       const progress = turnStarted === null ? 1 : clamp((engine.clock - turnStarted) / 120, 0, 1);
       if (progress < 1) {
@@ -146,7 +149,8 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
           engine.requested = null;
           engine.age = 0;
         } else if (engine.age >= manifest.animations[engine.state].duration) {
-          engine.state = held ? "idle" : AUTOMATIC_STATES[engine.sequence++ % AUTOMATIC_STATES.length];
+          const states = festive ? FESTIVE_AUTOMATIC_STATES : AUTOMATIC_STATES;
+          engine.state = held ? "idle" : states[engine.sequence++ % states.length];
           engine.age = 0;
         }
         if (held && manifest.animations[engine.state].speed) {
@@ -168,7 +172,7 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
           engine.blinkUntil = engine.clock + 160;
           engine.nextBlink = engine.clock + 2600 + Math.random() * 2800;
         }
-        if (!held && engine.clock >= engine.nextComment) {
+        if (!festive && !held && engine.clock >= engine.nextComment) {
           setMessage(messages.comments[engine.commentIndex++ % messages.comments.length]);
           engine.commentUntil = engine.clock + 6000;
           engine.nextComment = engine.clock + 32000 + Math.random() * 10000;
@@ -218,7 +222,7 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
     image.onload = () => {
       if (disposed) return;
       position(); draw();
-      if (greetOnMount && !engine.greeted && !paused && !reducedMotion) {
+      if (!festive && greetOnMount && !engine.greeted && !paused && !reducedMotion) {
         setMessage(messages.greeting);
         engine.greeted = true;
       }
@@ -226,6 +230,10 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
     };
     image.onerror = () => { if (!disposed) setAssetFailed(true); };
     rigImage.onload = () => { if (!disposed) draw(); };
+    if (hatImage) {
+      hatImage.onload = () => { if (!disposed) draw(); };
+      hatImage.src = "/navisedipro/hito-gorro-rojo.webp";
+    }
     if (manifest.gait?.image) rigImage.src = manifest.gait.image;
     image.src = manifest.image;
     window.addEventListener("resize", resize);
@@ -238,6 +246,7 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
       image.onload = null;
       image.onerror = null;
       rigImage.onload = null;
+      if (hatImage) hatImage.onload = null;
       renderRef.current = null;
       engine.dragging = false;
       gestureRef.current = null;
@@ -248,7 +257,7 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
       document.removeEventListener("pointerleave", resetLook);
       document.removeEventListener("visibilitychange", visibility);
     };
-  }, [hidden, paused, reducedMotion, messages, greetOnMount]);
+  }, [hidden, paused, reducedMotion, messages, greetOnMount, festive]);
 
   useEffect(() => {
     if (!open) return;
@@ -270,6 +279,13 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
   }, [open]);
 
   function toggleControls() {
+    if (festive) {
+      const engine = engineRef.current;
+      if (!engine) return;
+      setMessage(messages.comments[engine.commentIndex++ % messages.comments.length]);
+      engine.commentUntil = engine.clock + 6000;
+      return;
+    }
     setOpen((value) => !value);
     setMessage(messages.greeting);
     if (engineRef.current) {
@@ -386,7 +402,7 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
   );
 
   return (
-    <div className={styles.root} data-testid="hito-pet" data-paused={paused || reducedMotion}>
+    <div className={styles.root} data-testid="hito-pet" data-paused={paused || reducedMotion} data-festive={festive || undefined}>
       <span id="hito-drag-help" className={styles.visuallyHidden}>Arrastra para mover a Hito. Con el teclado, usa las flechas para moverlo y la tecla Inicio para volver a la base.</span>
       <div ref={actorRef} className={styles.actor} data-state="idle"
         onPointerEnter={() => { interactionRef.current.hovered = true; }}
@@ -396,11 +412,11 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
         {(message || open) && (
           <div ref={bubbleRef} className={styles.bubble} id="hito-controls" data-open={open}>
             <div className={styles.bubbleHeader}>
-              <span className={styles.name}>HITO <span> / SEDIPRO UNT</span></span>
+              <span className={styles.name}>HITO <span> / {festive ? "NAVISEDIPRO" : "SEDIPRO UNT"}</span></span>
               {open && <button onClick={() => setOpen(false)} aria-label="Cerrar controles de Hito"><ChevronDown size={16} aria-hidden="true" /></button>}
             </div>
             {/* Announce user-requested replies only, never interrupt reading with ambient chatter. */}
-            <p role={open ? "status" : undefined}>{message || messages.greeting}</p>
+            <p role={open || festive ? "status" : undefined}>{message || messages.greeting}</p>
             {open && (
               <div className={styles.controls}>
                 <div className={styles.actions}>
@@ -423,10 +439,10 @@ export function HitoPet({ pathname = "/", greetOnMount = true }) {
         <button ref={controlsRef} className={styles.pet} onClick={interact}
           onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={endDrag}
           onPointerCancel={endDrag} onLostPointerCapture={endDrag} onKeyDown={moveWithKeyboard}
-          aria-label="Hito, mascota de SEDIPRO. Abrir controles"
+          aria-label={festive ? "Hito, mostrar otra frase de NAVISEDIPRO" : "Hito, mascota de SEDIPRO. Abrir controles"}
           aria-describedby="hito-drag-help"
-          aria-expanded={open} aria-controls={open ? "hito-controls" : undefined}
-          title="Soy Hito. ¡Tócame o arrástrame!">
+          aria-expanded={festive ? undefined : open} aria-controls={open ? "hito-controls" : undefined}
+          title={festive ? undefined : "Soy Hito. ¡Tócame o arrástrame!"}>
           <canvas ref={canvasRef} width={manifest.frame.width} height={manifest.frame.height} aria-hidden="true" />
         </button>
       </div>

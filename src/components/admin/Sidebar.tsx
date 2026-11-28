@@ -696,14 +696,25 @@ const SidebarLayout = () => {
           ]
         : [];
 
-    return externalApps.length > 0
-      ? visibleItems.map((item) =>
-          item.groupLabel === "Apps"
-            ? { ...item, items: item.items.concat(externalApps) }
-            : item,
-        )
-      : visibleItems;
-  }, [externalApps, role, user?.mustChangePassword]);
+    if (isMember && user?.navisedipro2026Access) {
+      visibleItems.push({
+        groupLabel: "Proyectos",
+        items: [{
+          icon: "UsersRound",
+          label: "NAVISEDIPRO",
+          childItems: [{ label: "Donadores", href: "/panel/navisedipro/participantes" }],
+        }],
+      });
+    }
+
+    return visibleItems.map((group) => ({
+      ...group,
+      items: (group.groupLabel === "Apps" ? group.items.concat(externalApps) : group.items)
+        .map((item) => item.label === "NAVISEDIPRO" && !isAdmin
+          ? { ...item, childItems: item.childItems?.filter((child) => child.href !== "/panel/navisedipro/accesos") }
+          : item),
+    }));
+  }, [externalApps, role, user?.mustChangePassword, user?.navisedipro2026Access]);
 
   const activeBranchKeys = useMemo(
     () => getActiveBranchKeys(navGroups, pathname, searchParams),

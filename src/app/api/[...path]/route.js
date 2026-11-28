@@ -51,9 +51,11 @@ async function forward(request, { params }) {
         headers.set('authorization', `Bearer ${token}`);
     }
 
-    const maxBody = request.method !== 'POST' ? 0
+    const maxBody = request.method === 'PATCH' && endpoint === '/navisedipro/access' ? 4096
+        : request.method !== 'POST' ? 0
         : /^\/auth\/(login|change-password)$/.test(endpoint) ? 4096
         : /^\/eventos\/public\/[^/]+\/(inscripciones|recuperar(?:\/verificar)?)$/.test(endpoint) ? 131072
+        : endpoint.startsWith('/navisedipro/') ? 4096
         : 0;
 
     try {

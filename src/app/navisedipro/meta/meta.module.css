@@ -1,0 +1,128 @@
+.scene {
+  --road-bottom: max(3%, env(safe-area-inset-bottom));
+  --caravan-width: clamp(5rem, 12vw, 12rem);
+  isolation: isolate;
+  position: relative;
+  min-height: 42rem;
+  min-height: max(42rem, 100svh);
+  overflow: hidden;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  background: #141a2d;
+  color: var(--paper);
+}
+.background { z-index: -2; object-fit: cover; object-position: center bottom; }
+.stars { position: absolute; inset: 0; pointer-events: none; }
+.stars span {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  opacity: .2;
+  background: #fff8e0;
+  box-shadow: 0 0 8px 2px #fff0becc;
+  animation: sparkle 3.6s ease-in-out infinite;
+}
+@keyframes sparkle { 50% { opacity: 1; transform: scale(1.35); } }
+.title, .intro {
+  z-index: 1;
+  text-align: center;
+  text-shadow: 0 2px 20px #101626;
+}
+.title {
+  margin: calc(var(--navi-header-height, 76px) + clamp(1rem, 3svh, 2rem)) 0 0;
+  font: 600 clamp(2.4rem, 5vw, 4rem)/1.15 "Segoe Script", "Apple Chancery", "Brush Script MT", cursive;
+}
+.intro {
+  width: min(90%, 38ch);
+  margin: .4rem 0 0;
+  font: 600 clamp(1.45rem, 2.8vw, 3rem)/1.2 var(--font-montserrat), system-ui, sans-serif;
+  text-wrap: balance;
+}
+.donate { z-index: 1; margin-top: 1rem; }
+.deadline, .deadlineCountdown { position: relative; z-index: 1; }
+.deadline { width: min(90%, 42rem); margin: .75rem 0 0; text-align: center; text-wrap: balance; }
+.scene .deadlineCountdown { width: min(90%, 25rem); justify-content: center; margin: .75rem 0 0; }
+.scene .deadlineCountdown dd { font-size: clamp(1.65rem, 3vw, 2.5rem); }
+.shepherd, .stable {
+  position: absolute;
+  bottom: calc(var(--road-bottom) + 2.5rem + var(--caravan-width) * .38);
+  height: auto;
+  pointer-events: none;
+}
+.shepherd {
+  left: 2%;
+  bottom: calc(var(--road-bottom) + 1.4rem + var(--caravan-width) * .38);
+  width: min(26%, 30rem);
+}
+.shepherd::before, .stable::before {
+  content: "";
+  position: absolute;
+  inset: auto 7% -2% 7%;
+  height: 10%;
+  background: radial-gradient(ellipse, #291709c9, transparent 70%);
+}
+.shepherd::before { inset-inline: 15% 16%; }
+.stable {
+  right: 0;
+  width: min(39%, 50rem);
+}
+.shepherd img, .stable img { position: relative; display: block; width: 100%; height: auto; }
+.stable img {
+  filter: brightness(calc(.28 + var(--progress) * .72)) saturate(calc(.65 + var(--progress) * .35));
+  transition: filter .7s ease;
+}
+.road {
+  position: absolute;
+  bottom: var(--road-bottom);
+  width: min(88%, 82rem);
+  padding: .75rem;
+  border-radius: 3rem;
+  border: 1px solid #ffecc577;
+  background: #392517e8;
+}
+.goalStatus {
+  position: absolute;
+  z-index: 1;
+  bottom: calc(var(--road-bottom) + 3.4rem);
+  max-width: 42%;
+  padding: .35rem .75rem;
+  border-radius: 1rem;
+  background: #392517ee;
+  color: #fffbe9;
+  font-size: clamp(.7rem, 1.5vw, .95rem);
+  font-weight: 700;
+  text-align: center;
+}
+.track { position: relative; height: .85rem; border-radius: inherit; background: #ffecc545; }
+.fill { width: calc(var(--progress) * 100%); height: 100%; border-radius: inherit; background: #f5c660; transition: width .7s ease; }
+.caravan {
+  position: absolute;
+  left: calc((100% - var(--caravan-width)) * var(--progress));
+  bottom: 75%;
+  width: var(--caravan-width);
+  display: flex;
+  transition: left .7s ease;
+}
+.king {
+  width: calc(100% / 3);
+  background: var(--sprite) left center / 800% 100% no-repeat;
+}
+.scene[data-advanced] .king { animation: walk 1.2s steps(7) infinite; }
+@keyframes walk { to { background-position: right center; } }
+@media (max-width: 700px) {
+  .scene {
+    --road-bottom: calc(max(3%, env(safe-area-inset-bottom)) + clamp(3rem, 12svh, 7rem));
+    --caravan-width: 6.25rem;
+    min-height: max(45rem, 100svh);
+  }
+  .title { margin-top: calc(var(--navi-header-height, 76px) + clamp(2.4rem, 11svh, 7rem)); }
+  .shepherd { width: 36%; }
+  .stable { width: 49%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene .king { animation: none; }
+  .stable img, .fill, .caravan { transition: none; }
+  .stars span { animation: none; opacity: .7; }
+}

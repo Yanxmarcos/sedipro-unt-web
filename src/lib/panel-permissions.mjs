@@ -46,6 +46,12 @@ export function assignableRoles(user) {
 }
 
 export function canOpenPanelPage(pathname, user, assignments = []) {
+  if (pathname === "/panel/navisedipro/accesos" || pathname.startsWith("/panel/navisedipro/accesos/"))
+    return panelPermissions(user).isAdmin;
+  if (pathname === "/panel/navisedipro" || pathname.startsWith("/panel/navisedipro/"))
+    return panelPermissions(user).canManage || (
+      normalizeRole(user?.rol) === "SEDIPRANO" && user?.navisedipro2026Access === true
+    );
   if (
     pathname === "/panel/recursos/auditoria" ||
     pathname.startsWith("/panel/recursos/auditoria/")
