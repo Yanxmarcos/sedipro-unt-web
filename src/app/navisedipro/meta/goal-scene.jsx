@@ -9,6 +9,7 @@ import campaignStyles from "../campaign.module.css";
 import styles from "./meta.module.css";
 
 const goal = 150;
+const initialFraction = .19;
 const caravan = [["rojo", 285], ["verde", 290], ["morado", 268]];
 const stars = [
   [6, 9, 0], [13, 24, 1.4], [19, 6, 2.1], [27, 17, .7],
@@ -50,9 +51,9 @@ export default function GoalScene() {
       document.removeEventListener("visibilitychange", refresh);
     };
   }, []);
-  const preview = process.env.NODE_ENV === "development" && !validatedDonations;
   const progress = Math.min(goal, validatedDonations ?? 0);
-  const fraction = preview ? .19 : progress / goal;
+  const fraction = initialFraction + (1 - initialFraction) * (progress / goal);
+  const percentage = Math.round(fraction * 100);
 
   return (
     <main id="main-content" className={styles.scene} data-goal-scene data-advanced={(fraction > 0 && fraction < 1) || undefined} style={{ "--progress": fraction }}>
@@ -74,9 +75,10 @@ export default function GoalScene() {
         <Image src="/navisedipro/establo-nacimiento.webp" alt="" width={1616} height={1090} sizes="(max-width: 700px) 49vw, 39vw" />
       </div>
       {progress === goal && <p className={styles.goalStatus} role="status">Meta completada</p>}
-      <div className={styles.road} role="progressbar" aria-label={preview ? "Vista previa del avance de NAVISEDIPRO" : "Avance de NAVISEDIPRO"}
+      <div className={styles.road} role="progressbar" aria-label="Avance de la campaña NAVISEDIPRO"
         aria-valuemin={0} aria-valuemax={100}
-        aria-valuenow={validatedDonations === null && !preview ? undefined : Math.round(fraction * 100)}>
+        aria-valuenow={percentage}
+        aria-valuetext={`${percentage}% en la barra de campaña, con un punto de partida del 19%`}>
         <div className={styles.track}>
           <div className={styles.fill} />
           <div className={styles.caravan} aria-hidden="true">
@@ -89,7 +91,7 @@ export default function GoalScene() {
             ))}
           </div>
         </div>
-        <span className={styles.roadValue} aria-hidden="true">{validatedDonations === null && !preview ? "—" : `${Math.round(fraction * 100)}%`}</span>
+        <span className={styles.roadValue} aria-hidden="true">{percentage}%</span>
       </div>
     </main>
   );
