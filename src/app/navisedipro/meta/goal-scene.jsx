@@ -51,11 +51,11 @@ export default function GoalScene() {
     };
   }, []);
   const preview = process.env.NODE_ENV === "development" && !validatedDonations;
-  const progress = Math.min(goal, preview ? 20 : (validatedDonations ?? 0));
-  const fraction = progress / goal;
+  const progress = Math.min(goal, validatedDonations ?? 0);
+  const fraction = preview ? .19 : progress / goal;
 
   return (
-    <main id="main-content" className={styles.scene} data-goal-scene data-advanced={(progress > 0 && progress < goal) || undefined} style={{ "--progress": fraction }}>
+    <main id="main-content" className={styles.scene} data-goal-scene data-advanced={(fraction > 0 && fraction < 1) || undefined} style={{ "--progress": fraction }}>
       <Image className={styles.background} src="/navisedipro/fondo-belen.webp" alt="" fill sizes="100vw" preload />
       <div className={styles.stars} aria-hidden="true">
         {stars.map(([x, y, delay]) => (
@@ -89,6 +89,7 @@ export default function GoalScene() {
             ))}
           </div>
         </div>
+        <span className={styles.roadValue} aria-hidden="true">{validatedDonations === null && !preview ? "—" : `${Math.round(fraction * 100)}%`}</span>
       </div>
     </main>
   );
