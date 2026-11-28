@@ -1,0 +1,97 @@
+.dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  background: transparent;
+  color: #fffbe9;
+}
+.dialog::backdrop { background: #151020a8; }
+:global(html):has(.dialog[open]) { overflow: hidden; }
+.notice {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: .4rem;
+  width: min(98vw, 47rem, calc(100svh - 6rem));
+  animation: land .68s cubic-bezier(.22,.78,.25,1) both;
+}
+@keyframes land {
+  0% { transform: translateY(-105vh) rotate(-13deg) scale(.85); }
+  66% { transform: translateY(10px) rotate(2deg) scale(1.025); }
+  84% { transform: translateY(-5px) rotate(-1deg); }
+  100% { transform: none; }
+}
+.stage { position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: 1; }
+.stage img {
+  position: absolute;
+  width: auto;
+  height: 69%;
+  object-fit: contain;
+  box-shadow: 0 15px 36px #1000006b;
+}
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; visibility: hidden; }
+.stage[data-rendered] canvas { visibility: visible; }
+.stage[data-rendered] img { opacity: 0; }
+.printButton {
+  position: absolute;
+  top: 17%;
+  width: 56%;
+  height: 69%;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.close {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid #ffecc577;
+  border-radius: 50%;
+  color: #fffbe9;
+  background: #141020;
+  cursor: pointer;
+}
+.close { position: absolute; top: 16%; right: 23%; z-index: 1; }
+.caption {
+  display: grid;
+  justify-items: center;
+  gap: .65rem;
+  width: min(100%, 27rem);
+  padding: .85rem 1rem;
+  border-radius: .5rem;
+  background: #fffbe9;
+  color: #8f0500;
+  text-align: center;
+}
+.caption p { margin: 0; font: italic 600 clamp(1rem, 3.4vw, 1.25rem)/1.25 Georgia, serif; }
+.notice:has(.stage[data-rendered]) .caption p {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  margin-top: .35rem;
+  padding: .65rem 1rem;
+  border-radius: .4rem;
+  background: #8f0500;
+  color: #fffbe9;
+  font-weight: 700;
+  text-align: center;
+}
+.cta:hover { background: #680500; }
+.caption .cta:focus-visible { outline-color: #8f0500; }
+.notice :is(button, a):focus-visible { outline: 2px solid #ffecc5; outline-offset: 4px; }
+@media (max-height: 560px) { .notice { width: min(92vw, max(13rem, calc(100svh - 12rem))); } }
+@media (prefers-reduced-motion: reduce) { .notice { animation: none; } }

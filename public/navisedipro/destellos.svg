@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="390" viewBox="0 0 560 390">
+  <style>
+    .twinkle { opacity: var(--rest, .48); animation: glow var(--cycle, 9s) ease-in-out var(--delay, 0s) infinite; }
+    @keyframes glow {
+      0%, 28%, 56%, 100% { opacity: var(--rest, .48); filter: brightness(1) drop-shadow(0 0 0 transparent) drop-shadow(0 0 0 transparent); }
+      38%, 44% { opacity: 1; filter: brightness(1.17) drop-shadow(0 0 3px #ffc65a) drop-shadow(0 0 10px #ffc65ab8); }
+    }
+    @media (prefers-reduced-motion: reduce) { .twinkle { animation: none; } }
+  </style>
+  <defs>
+    <g id="flake" fill="none" stroke="currentColor" stroke-linecap="round">
+      <path id="branch" d="M0 0V-20m-5 4 5 5 5-5m-4-4 4 4 4-4" />
+      <use href="#branch" transform="rotate(60)" />
+      <use href="#branch" transform="rotate(120)" />
+      <use href="#branch" transform="rotate(180)" />
+      <use href="#branch" transform="rotate(240)" />
+      <use href="#branch" transform="rotate(300)" />
+    </g>
+    <path id="star" d="M0-7Q1-1 7 0Q1 1 0 7Q-1 1-7 0Q-1-1 0-7Z"/>
+  </defs>
+  <g color="#fffbe9" fill="currentColor">
+    <use class="twinkle" style="--cycle:8s;--delay:-1s" href="#flake" transform="translate(76 93) rotate(17) scale(.9)" opacity=".32"/>
+    <use class="twinkle" style="--cycle:13s;--delay:-8s" href="#flake" transform="translate(289 226) rotate(30) scale(1.45)" opacity=".23"/>
+    <use class="twinkle" style="--cycle:11s;--delay:-4s" href="#flake" transform="translate(498 53) scale(.7)" opacity=".36"/>
+    <use class="twinkle" style="--cycle:15s;--delay:-7s" href="#flake" transform="translate(457 335) rotate(15)" opacity=".29"/>
+    <use class="twinkle" style="--cycle:7s;--delay:-5s" href="#star" transform="translate(172 52)" opacity=".48"/>
+    <use class="twinkle" style="--cycle:10s;--delay:-2s" href="#star" transform="translate(377 132) scale(.72)" opacity=".42"/>
+    <use class="twinkle" style="--cycle:12s;--delay:-3s" href="#star" transform="translate(119 285) scale(1.2)" opacity=".37"/>
+    <use class="twinkle" style="--cycle:9s;--delay:-6s" href="#star" transform="translate(535 224) scale(.55)" opacity=".54"/>
+    <g opacity=".25">
+      <circle cx="24" cy="44" r="2"/><circle cx="118" cy="156" r="3"/>
+      <circle cx="229" cy="110" r="2.5"/><circle cx="311" cy="67" r="1.6"/>
+      <circle cx="426" cy="14" r="2.4"/><circle cx="461" cy="172" r="2"/>
+      <circle cx="554" cy="120" r="3"/><circle cx="205" cy="254" r="2"/>
+      <circle cx="351" cy="318" r="2.5"/><circle cx="537" cy="366" r="2"/>
+      <circle cx="44" cy="339" r="3.5"/><circle cx="194" cy="375" r="1.7"/>
+    </g>
+    <g opacity=".08"><circle cx="143" cy="199" r="9"/><circle cx="404" cy="240" r="12"/><circle cx="262" cy="34" r="6"/></g>
+  </g>
+</svg>

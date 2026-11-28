@@ -112,6 +112,27 @@
 .name span { color: #c8b7e0; font-size: 9px; font-weight: 400; }
 .bubble p { margin: 0; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
 
+.root[data-festive] .bubble {
+  clip-path: none;
+  border: 0;
+  padding: 22px 26px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 264 116' preserveAspectRatio='none'%3E%3Cpath d='M26 24C30 8 54 3 72 14C90 -2 115 1 132 11C152 0 177 3 190 16C211 7 233 14 238 29C268 34 268 71 246 82C243 99 220 107 201 101C186 116 157 116 140 105C122 116 95 116 78 105C54 115 30 106 25 94C-3 88 -8 52 14 42C14 34 18 27 26 24Z' fill='%23fffbe9' stroke='%23d6a348' stroke-width='1.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  color: #044529;
+  box-shadow: none;
+  filter: drop-shadow(0 4px 5px #56240030);
+  font-family: var(--font-montserrat), system-ui, sans-serif;
+  pointer-events: none;
+}
+.root[data-festive] .name { color: #8f0500; }
+.root[data-festive] .name span { color: #044529; font-weight: 650; }
+.root[data-festive] .actor::after {
+  background:
+    radial-gradient(circle at 5px 4px, #fffbe9 3px, #d6a348 3.5px 4px, transparent 4.5px),
+    radial-gradient(circle at 9px 11px, #fffbe9 1.5px, #d6a348 2px 2.5px, transparent 3px);
+  clip-path: none;
+  pointer-events: none;
+}
+
 .bubble button {
   display: inline-flex;
   align-items: center;

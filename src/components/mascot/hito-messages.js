@@ -1,5 +1,14 @@
 // Add a route here and to LANDING_PATHS to reuse Hito on another public page.
 export const HITO_MESSAGES = {
+  "/navisedipro": {
+    greeting: "¡Hola! Soy Hito. ¿Me ayudas a regalar sonrisas esta Navidad?",
+    comments: [
+      "Puedes donar un juguete o insumos para la chocolatada. ¡Cada aporte cuenta!",
+      "En «Cómo ayudar» encontrarás el formulario para registrar tu donación.",
+      "¿Quieres coordinar una entrega o un auspicio? Escríbele a Angela desde Contacto.",
+      "Compartir NAVISEDIPRO también ayuda a que más personas se sumen.",
+    ],
+  },
   "/": {
     greeting: "¡Hola! Soy Hito. ¿Creamos el próximo gran proyecto?",
     comments: ["Toda gran idea empieza con un pequeño paso.", "¡Un equipo, muchas ideas! Eso es SEDIPRO UNT.", "Yo pongo las alas. Tú pones las ideas."],

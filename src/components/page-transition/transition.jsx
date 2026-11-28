@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { loadingPath, navigationDestination, nextPaint, pause, waitForView } from "./readiness.mjs";
+import { isInternalCampaignNavigation, loadingPath, navigationDestination, nextPaint, pause, waitForView } from "./readiness.mjs";
 import { TOP_TEAR, BOTTOM_TEAR, TEAR_EDGE } from "./tear-geometry.mjs";
 import styles from "./transition.module.css";
 
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const LOADING_MESSAGE = "Espera un momento, estamos preparando todo para ti.";
 const LOGO_REVEAL_MS = 1580;
+const BOOT_LOGO_FADE_MS = 180;
+const usesBootLogo = path => path === "/" || path === "/navisedipro";
 
 export function PageTransition({ children, logo }) {
   const pathname = usePathname();
@@ -23,6 +25,7 @@ export function PageTransition({ children, logo }) {
   const content = useRef(null), phaseRef = useRef(phase), active = useRef(null), pending = useRef(null);
   const openTimer = useRef(null), navigationTimer = useRef(null), moveFocus = useRef(false);
   const loadingStarted = useRef(null);
+  const previousPath = useRef(null);
   const changePhase = useCallback(next => {
     if (next === "loading" && (phaseRef.current !== next || loadingStarted.current === null)) {
       loadingStarted.current = performance.now();
@@ -63,6 +66,9 @@ export function PageTransition({ children, logo }) {
         open();
         return;
       }
+      changePhase("boot-fade");
+      await nextPaint(controller.signal);
+      if (!await pause(BOOT_LOGO_FADE_MS, controller.signal)) return;
       changePhase("loading");
       // Let the tracing layer commit and paint before measuring its clock.
       await nextPaint(controller.signal);
@@ -86,7 +92,9 @@ export function PageTransition({ children, logo }) {
     const frame = requestAnimationFrame(() => {
       setControlled(true);
       const destination = loadingPath(pathname);
-      if (!destination) {
+      const internalCampaign = isInternalCampaignNavigation(previousPath.current, pathname);
+      previousPath.current = pathname;
+      if (!destination || internalCampaign) {
         active.current?.abort(); pending.current = null;
         clearTimeout(navigationTimer.current); clearTimeout(openTimer.current);
         changePhase("idle");
@@ -97,7 +105,7 @@ export function PageTransition({ children, logo }) {
       const controller = arriving?.controller ?? new AbortController();
       active.current = controller; pending.current = null;
       clearTimeout(navigationTimer.current); clearTimeout(openTimer.current);
-      if (destination === "/" && phaseRef.current !== "boot") {
+      if (usesBootLogo(destination) && phaseRef.current !== "boot") {
         changePhase("boot");
       } else if (phaseRef.current !== "boot") {
         changePhase("loading");
@@ -138,7 +146,7 @@ export function PageTransition({ children, logo }) {
       changePhase("closing");
       try { router.prefetch(destination.pathname + destination.search); } catch { /* Navigation can proceed without prefetch. */ }
       if (!await pause(reducedMotion() ? 0 : 340, controller.signal)) return;
-      changePhase(navigation.path === "/" ? "boot" : "loading");
+      changePhase(usesBootLogo(navigation.path) ? "boot" : "loading");
       // A route/server failure must never leave an opaque, unusable screen.
       navigationTimer.current = setTimeout(() => {
         if (pending.current !== navigation) return;
@@ -153,6 +161,7 @@ export function PageTransition({ children, logo }) {
     const pop = () => {
       const destination = loadingPath(window.location.pathname);
       if (!destination || destination === loadingPath(pathname)) return;
+      if (isInternalCampaignNavigation(pathname, window.location.pathname)) return;
       active.current?.abort(); clearTimeout(openTimer.current);
       const controller = new AbortController(); active.current = controller;
       const navigation = { path: destination, controller, kind: "pop" };
@@ -163,7 +172,7 @@ export function PageTransition({ children, logo }) {
         pending.current = null; controller.abort(); open();
       }, 15000);
       moveFocus.current = true;
-      changePhase(destination === "/" ? "boot" : "loading");
+      changePhase(usesBootLogo(destination) ? "boot" : "loading");
     };
     document.addEventListener("click", click, true);
     window.addEventListener("popstate", pop);
@@ -186,7 +195,7 @@ export function PageTransition({ children, logo }) {
   }, [busy]);
   return <>
     <div ref={screen} className={styles.screen} data-public-loader data-phase={phase} data-controlled={controlled || undefined} data-draw-logo={drawLogo || undefined} aria-hidden={!busy}>
-      {(phase === "boot" || (drawLogo && phase === "loading")) && (
+      {(phase === "boot" || phase === "boot-fade" || (drawLogo && phase === "loading")) && (
         <div className={styles.traceLayer} aria-hidden="true">
           <div className={styles.logo}>{logo}</div>
           <p className={styles.message}>{LOADING_MESSAGE}</p>

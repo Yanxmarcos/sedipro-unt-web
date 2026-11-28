@@ -1,5 +1,13 @@
 import { getHitoStep, getHitoArmSwing, solveHitoLeg, getHitoBodyPose, getHitoFootPose } from "./hito-motion.js";
 
+const FESTIVE_HAT_POSES = {
+  wave: { drop: 4 },
+  think: { drop: 6, shiftX: 7, flip: true, angle: .32 },
+  sleep: { drop: 4, angle: .31, width: 83 },
+  flutter: { drop: 3, shiftX: 3, angle: .29, width: 92 },
+  love: { drop: 6, shiftX: 7, flip: true, angle: .32 },
+};
+
 // Gesture/fallback sprites support unequal frame durations.
 export function getHitoFrame(animation, age) {
   if (!animation.frameDurations) return Math.floor(age * animation.fps / 1000) % animation.frames;
@@ -28,15 +36,33 @@ export function drawHito(context, image, manifest, state, frame, direction, look
   }
   const gait = manifest.gait;
   if (sideways && gait && motion?.image?.complete && motion.image.naturalWidth) {
-    drawWalk(context, motion.image, gait, manifest, state, direction, look, blink, motion.distance);
+    drawWalk(context, motion.image, gait, manifest, state, direction, look, blink, motion.distance, motion.hat);
   } else {
     context.drawImage(image, index * width, animation.row * height, width, height, 0, 0, width, height);
     drawEyes(context, image, animation.eyes[index], index * width, animation.row * height, manifest.palette, look, blink, sideways ? direction : 1);
+    const eyes = sideways ? null : animation.eyes[index];
+    drawFestiveHat(context, motion?.hat, sideways ? 96 : 80, sideways ? 49 : 51, eyes, FESTIVE_HAT_POSES[state]);
   }
   context.restore();
 }
 
-function drawWalk(context, image, gait, manifest, state, direction, look, blink, distance) {
+function drawFestiveHat(context, hat, center, brim, eyes, { drop = 0, shiftX = 0, flip = false, angle = .21, width = 88 } = {}) {
+  if (!hat?.complete || !hat.naturalWidth) return;
+  if (eyes?.length === 2) {
+    center = (eyes[0].x + eyes[1].x) / 2;
+    brim = Math.max(47, (eyes[0].y + eyes[1].y) / 2 - 21);
+  }
+  const height = width * hat.naturalHeight / hat.naturalWidth;
+  context.save();
+  // Seat the fur band over the crown rather than above its silhouette.
+  context.translate(center - 1 + shiftX, brim + 5 + drop);
+  if (flip) context.scale(-1, 1);
+  context.rotate(angle);
+  context.drawImage(hat, -width * .61, -height * .64, width, height);
+  context.restore();
+}
+
+function drawWalk(context, image, gait, manifest, state, direction, look, blink, distance, hat) {
   // CSS pixels -> texture pixels. Synchronizing phase to distance prevents
   // skating, and also stops the feet as soon as a dragged Hito stops moving.
   const phase = distance / (gait.stride / 2 / gait.support);
@@ -51,7 +77,10 @@ function drawWalk(context, image, gait, manifest, state, direction, look, blink,
     applyPose(pose);
     const [x, y, w, h] = gait.body.regions[region];
     context.drawImage(image, x, y, w, h, x, y, w, h);
-    if (region === "head") drawEyes(context, image, gait.body.eyes, 0, 0, manifest.palette, look, blink, direction);
+    if (region === "head") {
+      drawEyes(context, image, gait.body.eyes, 0, 0, manifest.palette, look, blink, direction);
+      drawFestiveHat(context, hat, 80, 51);
+    }
     context.restore();
   }
   function drawArm(index) {

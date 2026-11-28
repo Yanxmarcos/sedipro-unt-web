@@ -3,11 +3,18 @@ export const LOADING_ROUTES = {
   "/proyectos": "Proyectos",
   "/nosotros": "Nosotros",
   "/login": "Iniciar sesión",
+  "/navisedipro": "NAVISEDIPRO",
 };
 
 export function loadingPath(pathname) {
   const path = pathname.replace(/\/$/, "") || "/";
+  if (path === "/navi") return "/navisedipro";
   return Object.hasOwn(LOADING_ROUTES, path) || /^\/eventos\/[^/]+$/.test(path) ? path : null;
+}
+
+export function isInternalCampaignNavigation(from, to) {
+  return loadingPath(to) === "/navisedipro" &&
+    (from === "/navisedipro" || from?.startsWith("/navisedipro/"));
 }
 
 export function navigationDestination(anchor, event, location) {
@@ -15,6 +22,7 @@ export function navigationDestination(anchor, event, location) {
   if (anchor.hasAttribute("download") || (anchor.target && anchor.target !== "_self")) return null;
   const url = new URL(anchor.href, location.href);
   if (url.origin !== location.origin || !loadingPath(url.pathname) || url.pathname === location.pathname) return null;
+  if (isInternalCampaignNavigation(location.pathname, url.pathname)) return null;
   return url;
 }
 

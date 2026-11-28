@@ -19,7 +19,18 @@ export const INDEXABLE_ROBOTS = {
 };
 export const NOINDEX_ROBOTS = { index: false, follow: false };
 
+export const NAVISEDIPRO_IMAGE = {
+  url: `${SITE_URL}/navisedipro/vista-previa.jpg`,
+  width: 1200,
+  height: 630,
+  type: "image/jpeg",
+  alt: "Logos de SEDIPRO UNT y NAVISEDIPRO sobre fondo rojo",
+};
+
 export const PUBLIC_PAGES = [
+  { path: "/navisedipro", name: "NAVISEDIPRO", title: "NAVISEDIPRO 2026: campaña navideña en Trujillo | SEDIPRO UNT", description: "Dona juguetes, insumos para la chocolatada o un aporte económico para los niños del Comedor Popular Amigos de Jesús en La Esperanza, Trujillo.", image: NAVISEDIPRO_IMAGE },
+  { path: "/navisedipro/meta", name: "Meta de NAVISEDIPRO", title: "Meta de NAVISEDIPRO 2026 | SEDIPRO UNT", description: "Sigue el avance de la campaña navideña para más de 150 niños en La Esperanza y conoce cuánto tiempo queda para donar.", image: NAVISEDIPRO_IMAGE },
+  { path: "/navisedipro/ediciones", name: "Ediciones de NAVISEDIPRO", title: "Ediciones de NAVISEDIPRO | SEDIPRO UNT", description: "Explora la historia de la campaña navideña de SEDIPRO UNT con fotos y actividades de sus ediciones en Trujillo.", image: NAVISEDIPRO_IMAGE },
   { path: "/", name: "Inicio", title: "SEDIPRO UNT | Sección Estudiantil de Dirección de Proyectos de la UNT", description: SITE_DESCRIPTION },
   { path: "/nosotros", name: "Nosotros", title: "Nosotros: equipo y áreas | SEDIPRO UNT", description: "Conoce SEDIPRO UNT, nuestra directiva, las áreas GTH, PMO, Marketing, Logística y Finanzas y TI, y nuestros reconocimientos en dirección de proyectos." },
   { path: "/proyectos", name: "Proyectos", title: "Proyectos e iniciativas estudiantiles | SEDIPRO UNT", description: "Explora los proyectos de SEDIPRO UNT: Proyectando Vocaciones, SEDINVITA, Crown Night y Sedichampions. Liderazgo y trabajo en equipo desde la UNT." },
@@ -37,7 +48,7 @@ export function absoluteUrl(path) {
 export function pageMetadata(path, overrides = {}) {
   const page = PUBLIC_PAGES.find(item => item.path === path);
   if (!page) throw new Error(`SEO page is not configured: ${path}`);
-  const { title = page.title, description = page.description, image = SOCIAL_IMAGE } = overrides;
+  const { title = page.title, description = page.description, image = page.image ?? SOCIAL_IMAGE } = overrides;
   return {
     title,
     description,

@@ -4,6 +4,9 @@ const nextConfig = {
   distDir: process.env.ENLACES_QA_DIST_DIR || '.next',
   allowedDevOrigins: ['localhost', '127.0.0.1', '192.168.1.*'],
   productionBrowserSourceMaps: false,
+  async redirects() {
+    return [{ source: "/navi", destination: "/navisedipro", permanent: true }];
+  },
   async headers() {
     const noindex = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
     if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {

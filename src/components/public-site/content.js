@@ -35,6 +35,18 @@ export const IMAGERY = {
 
 export const PROJECTS = [
     {
+        id: "navisedipro",
+        date: "2026-12-19",
+        iconLabel: "NAVISEDIPRO",
+        title: "NAVISEDIPRO 2026",
+        description: "Campaña solidaria que reúne regalos, víveres y aportes para compartir una jornada navideña con los niños del Comedor Popular Amigos de Jesús, en La Esperanza.",
+        meta: "Sábado 19 de diciembre, 2026.",
+        href: "/navisedipro",
+        imageRatio: 1080 / 1350,
+        image: "/proyectos/navisedipro.webp",
+        imageAlt: "Logos de SEDIPRO UNT y NAVISEDIPRO sobre fondo rojo",
+    },
+    {
         id: "sedichampions",
         date: "2026-08-08",
         iconLabel: "SEDICHAMPIONS LEAGUE",

@@ -1,0 +1,97 @@
+.archive h1, .archive h2, .detail h1, .detail h2 {
+  margin: 0;
+  font-family: var(--navi-serif), Impact, sans-serif;
+  font-weight: 800;
+  line-height: .92;
+  letter-spacing: -.022em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.intro {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-content: center;
+  min-height: clamp(26rem, 68svh, 46rem);
+  overflow: hidden;
+  padding: 7rem var(--page-gutter);
+  text-align: center;
+}
+.intro h1 { font-size: clamp(3.4rem, 9vw, 10rem); }
+.intro h1 span { display: block; color: var(--red); }
+.intro p { max-width: 34rem; margin: 1.2rem auto 0; }
+.decorations { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.decorations img { position: absolute; width: clamp(4rem, 15vw, 15rem); height: auto; }
+.decorations img:nth-child(1) { top: 8%; left: 3%; rotate: -17deg; }
+.decorations img:nth-child(2) { top: 7%; right: 6%; rotate: 14deg; }
+.decorations img:nth-child(3) { bottom: 4%; left: 14%; rotate: -10deg; }
+.decorations img:nth-child(4) { bottom: 7%; right: 12%; rotate: 17deg; }
+
+.editions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.editions > li {
+  padding: clamp(2rem, 4vw, 4rem) var(--page-gutter);
+  background: var(--pine);
+  color: var(--paper);
+  --edition-accent: var(--sand);
+}
+.editions > li:nth-child(3n) {
+  background: var(--red);
+}
+.editions > li:is(:nth-child(3n + 2), :last-child) {
+  background: var(--paper);
+  color: var(--pine);
+  --edition-accent: var(--red);
+}
+.card {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.5rem, 2.5vw, 3rem);
+}
+.cardPhoto, .detailCover { position: relative; overflow: hidden; aspect-ratio: 16 / 9; border-radius: .55rem; }
+.cardPhoto img, .detailCover img { object-fit: cover; }
+.cardPhoto img { transition: transform .45s ease; }
+.cardPhoto { align-self: start; aspect-ratio: 17 / 10; }
+.card:is(:hover, :focus-visible) .cardPhoto img { transform: scale(1.08); }
+.cardCopy { display: flex; flex-direction: column; align-items: start; padding: clamp(.5rem, 2vw, 2rem) 1.5rem 0 0; }
+.cardCopy h2 { font-size: clamp(2rem, 4.5vw, 5rem); }
+.cardCopy p { margin: .9rem 0 1.5rem; line-height: 1.6; }
+.cardDate { margin-top: auto; color: var(--edition-accent); font-size: .88rem; font-weight: 700; }
+.arrow { position: absolute; bottom: 0; right: 0; color: var(--edition-accent); }
+
+.detailHero { padding: clamp(2rem, 6vw, 5rem) var(--page-gutter); text-align: center; background: var(--pine); color: var(--paper); }
+.back { display: inline-block; margin-bottom: 1.2rem; text-decoration: underline; text-underline-offset: .2em; }
+.detailHero time { display: block; color: var(--sand); font-weight: 700; }
+.detailHero h1 { margin: .3em auto; font-size: clamp(3rem, 7vw, 7rem); }
+.detailHero p { max-width: 48rem; margin: 0 auto 2rem; }
+.detailCover { width: min(100%, 65rem); margin-inline: auto; }
+.detailBody { width: min(100%, 76rem); padding: 2rem var(--page-gutter) 4rem; margin: auto; }
+.detailSection { padding: 1.8rem 0; border-bottom: 1px solid #04452955; }
+.detailSection h2 { margin-bottom: .65em; font-size: clamp(2rem, 4vw, 3.8rem); }
+.detailSection p { margin: .75rem 0; line-height: 1.65; }
+.detailSection ul { list-style: disc; padding-inline-start: 1.3rem; }
+.detailSection li { margin-top: .5rem; }
+.facts { display: flex; flex-wrap: wrap; gap: 1rem 2rem; margin-top: 1.2rem; }
+.facts dt { font-weight: 750; }
+.gallery, .videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1rem; }
+.gallery figure, .videos figure { min-width: 0; margin: 0; }
+.gallery img { display: block; width: 100%; height: auto; border-radius: .4rem; }
+.videos video { width: 100%; aspect-ratio: 16 / 9; background: var(--pine); }
+.neighbors { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; margin-top: 2rem; font-weight: 750; }
+.neighbors a { text-decoration: underline; text-underline-offset: .2em; }
+
+@media (max-width: 760px) {
+  .intro { min-height: 0; padding-block: clamp(5.5rem, 20vw, 7rem); }
+  .card { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  .cardCopy { padding-top: 0; }
+  .decorations img:nth-child(3) { left: 5%; }
+  .decorations img:nth-child(4) { right: 5%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cardPhoto img { transition: none; }
+  .card:is(:hover, :focus-visible) .cardPhoto img { transform: none; }
+}
