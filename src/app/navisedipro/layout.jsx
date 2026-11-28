@@ -22,10 +22,10 @@ export default function NavisediproLayout({ children }) {
       >
         <nav aria-label="NAVISEDIPRO">
           <Link href="/navisedipro">Inicio</Link>
+          <Link href="/navisedipro/meta">Meta</Link>
           <Link href="/navisedipro#donar">Cómo ayudar</Link>
           <Link href="/navisedipro#fecha-y-lugar">Fecha y lugar</Link>
           <Link href="/navisedipro/ediciones">Ediciones</Link>
-          <Link href="/navisedipro/meta">Meta</Link>
         </nav>
         <div className={styles.headerActions}>
           <Link className={styles.contactButton} href="/navisedipro#contacto">Contáctanos</Link>

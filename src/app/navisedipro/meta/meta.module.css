@@ -77,11 +77,16 @@
   position: absolute;
   bottom: var(--road-bottom);
   width: min(88%, 82rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .6rem;
   padding: .75rem;
   border-radius: 3rem;
   border: 1px solid #ffecc577;
   background: #392517e8;
 }
+.roadValue { min-width: 4ch; font-size: .85rem; font-weight: 750; font-variant-numeric: tabular-nums; text-align: right; }
 .goalStatus {
   position: absolute;
   z-index: 1;
